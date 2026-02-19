@@ -1,0 +1,33 @@
+# Urjiberi School ERP — .gitignore
+
+# Runtime storage
+storage/uploads/*
+storage/backups/*
+!storage/uploads/.gitkeep
+!storage/backups/.gitkeep
+
+# Environment / config overrides
+config/database.local.php
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Composer (if ever added)
+vendor/
+composer.lock
+
+# Node (if ever added)
+node_modules/
+package-lock.json
