@@ -9,11 +9,12 @@ if (!defined('APP_ROOT')) {
 }
 
 // ── MySQL Connection ─────────────────────────────────────────
-define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
+// On cPanel: DB_HOST is usually 'localhost', DB_NAME = cpaneluser_dbname
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_PORT', getenv('DB_PORT') ?: '3306');
 define('DB_NAME', getenv('DB_NAME') ?: 'urjiberi_school');
 define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') ?: '0000');
+define('DB_PASS', getenv('DB_PASS') ?: '');
 define('DB_CHARSET', 'utf8mb4');
 define('DB_COLLATION', 'utf8mb4_unicode_ci');
 

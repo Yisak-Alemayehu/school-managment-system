@@ -32,7 +32,7 @@ function get_all_flash(): array {
 
 // ── Old Input (form repopulation) ────────────────────────────
 
-function set_old_input(array $data = null): void {
+function set_old_input(?array $data = null): void {
     $_SESSION['_old_input'] = $data ?? $_POST;
 }
 

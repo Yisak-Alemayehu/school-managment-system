@@ -1,8 +1,10 @@
 # Urjiberi School ERP — Root .htaccess
 # Redirect all traffic to public/ directory
 # and block access to sensitive directories
+#
+# cPanel: Upload entire project to public_html/ (or a subdirectory).
+# This file redirects requests into the public/ folder automatically.
 
-# Deny access to everything at root level
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
@@ -14,9 +16,13 @@
     RewriteRule ^sql/ - [F,L]
     RewriteRule ^docs/ - [F,L]
     RewriteRule ^storage/ - [F,L]
+    RewriteRule ^logs/ - [F,L]
     
-    # Block dotfiles
-    RewriteRule (^\.|/\.) - [F,L]
+    # Block dotfiles (except .htaccess itself)
+    RewriteRule (^\.|/\.)(?!htaccess) - [F,L]
+    
+    # Block .env file from web access
+    RewriteRule ^\.env - [F,L]
     
     # Redirect everything else to public/
     RewriteCond %{REQUEST_URI} !^/public/
@@ -26,9 +32,13 @@
 # Disable directory listing
 Options -Indexes
 
-# Block access to PHP files in root
-<FilesMatch "\.php$">
+# Block access to sensitive files at root (but allow rewrite to public/)
+<FilesMatch "\.(sql|md|log|bak|ini|env|yml|yaml|xml|lock)$">
     <IfModule mod_authz_core.c>
         Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
     </IfModule>
 </FilesMatch>

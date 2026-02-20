@@ -1,17 +1,25 @@
 RewriteEngine On
-RewriteBase /
 
-# Force HTTPS in production
+# Auto-detect RewriteBase from the request
+# Works whether app is in root or subdirectory
+RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$
+RewriteRule ^(.*) - [E=BASE:%1]
+
+# Force HTTPS in production (uncomment when SSL is ready)
 # RewriteCond %{HTTPS} !=on
 # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Block access to dotfiles
-RewriteRule (^\.|/\.) - [F,L]
+RewriteRule (^\.|/\.)(?!htaccess) - [F,L]
 
 # Block access to sensitive file types
-<FilesMatch "\.(sql|md|log|bak|ini|env|yml|yaml|xml|lock|json)$">
+<FilesMatch "\.(sql|md|log|bak|ini|env|yml|yaml|xml|lock)$">
     <IfModule mod_authz_core.c>
         Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
     </IfModule>
 </FilesMatch>
 

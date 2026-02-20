@@ -562,7 +562,11 @@ BEGIN
                         (`name`, `class_id`, `subject_id`, `session_id`, `term_id`, `total_marks`, `created_by`)
                     VALUES (
                         ELT(v_anum, 'Test 1', 'Test 2', 'Assignment', 'Mid-Term Exam', 'Final Exam'),
-                        v_class, v_subj, 1, v_term, 100.00, 1
+                        v_class, v_subj, 1, v_term,
+                        -- Weights sum to 100 per subject per term:
+                        --   Test 1=10, Test 2=10, Assignment=10, Mid-Term=30, Final=40
+                        CASE v_anum WHEN 1 THEN 10 WHEN 2 THEN 10 WHEN 3 THEN 10 WHEN 4 THEN 30 ELSE 40 END,
+                        1
                     );
                     SET v_anum = v_anum + 1;
                 END WHILE; -- assessments
@@ -658,14 +662,15 @@ SELECT
     e.student_id,
     e.class_id,
     e.section_id,
+    -- Marks scaled to each assessment's weight so per-subject total <= 100
     ROUND(CASE
         WHEN MOD(e.student_id * 3 + a.id, 10) = 0
-            THEN 32 + MOD(e.student_id * 17 + a.id * 13,              22)
+            THEN (32 + MOD(e.student_id * 17 + a.id * 13,              22)) * a.total_marks / 100
         WHEN MOD(e.student_id * 3 + a.id, 10) IN (1, 2)
-            THEN 80 + MOD(e.student_id *  7 + a.id *  3,              17)
+            THEN (80 + MOD(e.student_id *  7 + a.id *  3,              17)) * a.total_marks / 100
         ELSE
-            55 + MOD(e.student_id * 11 + a.id *  7 + a.subject_id * 5, 28)
-    END) AS marks_obtained,
+            (55 + MOD(e.student_id * 11 + a.id *  7 + a.subject_id * 5, 28)) * a.total_marks / 100
+    END, 1) AS marks_obtained,
     0,
     1
 FROM `assessments` a

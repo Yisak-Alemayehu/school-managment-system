@@ -27,11 +27,12 @@ function pwa_meta_tags(): string {
  * Get service worker registration script
  */
 function pwa_register_script(): string {
+    $swUrl = url('/service-worker.js');
     return <<<JS
 <script>
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/service-worker.js')
+        navigator.serviceWorker.register('{$swUrl}')
             .then(function(reg) {
                 console.log('SW registered:', reg.scope);
             })

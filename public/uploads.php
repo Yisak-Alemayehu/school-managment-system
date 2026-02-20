@@ -6,7 +6,10 @@
  */
 
 // Bootstrap just the config for UPLOAD_PATH
-require __DIR__ . '/../config/app.php';
+define('APP_ROOT', dirname(__DIR__));
+require APP_ROOT . '/core/env.php';
+env_load(APP_ROOT . '/.env');
+require APP_ROOT . '/config/app.php';
 
 $requestedFile = $_GET['file'] ?? '';
 

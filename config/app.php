@@ -42,7 +42,8 @@ define('SQL_PATH', APP_ROOT . '/sql');
 // ── Session ──────────────────────────────────────────────────
 define('SESSION_NAME', 'urjiberi_session');
 define('SESSION_LIFETIME', 7200);       // 2 hours
-define('SESSION_SECURE', APP_ENV === 'production');
+// Only require secure cookies if actually on HTTPS (auto-detect)
+define('SESSION_SECURE', !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
 define('SESSION_HTTPONLY', true);
 define('SESSION_SAMESITE', 'Lax');
 
