@@ -24,6 +24,12 @@ switch ($action) {
         require __DIR__ . '/views/report.php';
         break;
 
+    case 'view':
+        auth_require_permission('attendance.view');
+        $pageTitle = 'View Attendance';
+        require __DIR__ . '/views/view.php';
+        break;
+
     case 'student':
         auth_require_permission('attendance.view');
         $pageTitle = 'Student Attendance';

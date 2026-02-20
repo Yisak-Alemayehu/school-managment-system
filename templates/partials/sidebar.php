@@ -10,8 +10,9 @@ $isAccountant = auth_has_role('accountant');
 $isStudent = auth_has_role('student');
 $isParent = auth_has_role('parent');
 
-// Whether we are currently inside the academics module (for auto-expand)
+// Auto-expand flags
 $inAcademics = route_is('academics');
+$inStudents  = route_is('students');
 
 $navItems = [];
 
@@ -54,14 +55,46 @@ if ($isAdmin || $isTeacher) {
     ];
 }
 
-// Students — admin/teacher/parent
+// Students — admin/teacher/parent (tree)
 if ($isAdmin || $isTeacher || $isParent) {
-    $navItems[] = ['icon' => 'users', 'label' => 'Students', 'url' => '/students', 'module' => 'students'];
+    $navItems[] = [
+        'icon'   => 'users',
+        'label'  => 'Students',
+        'module' => 'students',
+        'tree'   => true,
+        'groups' => [
+            'Admission' => [
+                ['action' => 'admission',      'label' => 'Student Admission'],
+                ['action' => 'roll-numbers',   'label' => 'Assign Roll Number'],
+                ['action' => 'bulk-import',    'label' => 'Add Bulk Data'],
+            ],
+            'Records' => [
+                ['action' => 'details',        'label' => 'Student Details'],
+                ['action' => 'id-cards',       'label' => 'Generate ID Card'],
+            ],
+            'Credentials' => [
+                ['action' => 'credentials',    'label' => 'Generate Username & Password'],
+                ['action' => 'reset-password', 'label' => 'Reset Password'],
+            ],
+        ],
+    ];
 }
 
-// Attendance — admin/teacher/student/parent
+// Attendance — admin/teacher/student/parent (tree)
 if ($isAdmin || $isTeacher || $isStudent || $isParent) {
-    $navItems[] = ['icon' => 'clipboard-check', 'label' => 'Attendance', 'url' => '/attendance', 'module' => 'attendance'];
+    $navItems[] = [
+        'icon'   => 'clipboard-check',
+        'label'  => 'Attendance',
+        'module' => 'attendance',
+        'tree'   => true,
+        'groups' => [
+            'Manage' => [
+                ['action' => 'index',  'label' => 'Add Attendance'],
+                ['action' => 'view',   'label' => 'View Attendance'],
+                ['action' => 'report', 'label' => 'Attendance Report'],
+            ],
+        ],
+    ];
 }
 
 // Exams & Marks — admin/teacher/student/parent
@@ -111,21 +144,24 @@ if ($isAdmin) {
     <!-- Navigation -->
     <nav class="mt-2 px-3 pb-4 space-y-1">
         <?php foreach ($navItems as $item):
-            // ── Tree item (Academics) ───────────────────────────────────────
+            // ── Tree item ──────────────────────────────────────────────────
             if (!empty($item['tree'])):
-                $parentActive = $inAcademics;
+                $mod = $item['module'];
+                $parentActive = route_is($mod);
                 $parentCls = $parentActive
                     ? 'bg-sidebar-active text-white'
                     : 'text-sidebar-text hover:bg-sidebar-hover hover:text-white';
                 $curAction = current_action();
+                $submenuId = $mod . '-submenu';
+                $arrowId   = $mod . '-arrow';
         ?>
         <div>
             <button type="button"
-                    onclick="sidebarTreeToggle('academics-submenu','academics-arrow')"
+                    onclick="sidebarTreeToggle('<?= $submenuId ?>','<?= $arrowId ?>')"
                     class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors <?= $parentCls ?>">
                 <?= sidebar_icon($item['icon']) ?>
                 <span><?= e($item['label']) ?></span>
-                <svg id="academics-arrow"
+                <svg id="<?= $arrowId ?>"
                      class="ml-auto w-4 h-4 flex-shrink-0 transition-transform duration-200 <?= $parentActive ? 'rotate-180' : '' ?>"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -133,19 +169,19 @@ if ($isAdmin) {
             </button>
 
             <!-- Sub-menu -->
-            <div id="academics-submenu"
+            <div id="<?= $submenuId ?>"
                  class="overflow-hidden transition-all duration-200 <?= $parentActive ? '' : 'hidden' ?>">
                 <div class="mt-1 ml-3 pl-3 border-l border-white/10 space-y-0.5 pb-1">
                     <?php foreach ($item['groups'] as $groupLabel => $children): ?>
                     <p class="px-2 pt-2 pb-0.5 text-xs font-semibold uppercase tracking-wider"
                        style="color:rgba(255,255,255,0.35)"><?= e($groupLabel) ?></p>
                     <?php foreach ($children as $child):
-                        $childActive = ($curAction === $child['action']);
+                        $childActive = ($inAcademics || $parentActive) && ($curAction === $child['action']);
                         $childCls = $childActive
                             ? 'bg-sidebar-active/80 text-white font-semibold'
                             : 'text-sidebar-text hover:bg-sidebar-hover hover:text-white';
                     ?>
-                    <a href="<?= url('academics', $child['action']) ?>"
+                    <a href="<?= url($mod, $child['action']) ?>"
                        class="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition-colors <?= $childCls ?>">
                         <span class="w-1 h-1 rounded-full bg-current flex-shrink-0 opacity-60"></span>
                         <?= e($child['label']) ?>
