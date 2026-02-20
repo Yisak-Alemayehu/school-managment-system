@@ -18,16 +18,14 @@ $selClass   = input_int('class_id');
 $selSection = input_int('section_id'); // 0 = all sections
 $generate   = ($selTerm && $selClass && isset($_GET['generate']));
 
-// Helper: conduct grade from average
-function conductGrade(float $avg): string {
-    return match(true) {
-        $avg >= 90 => 'A',
-        $avg >= 80 => 'B',
-        $avg >= 70 => 'C',
-        $avg >= 60 => 'D',
-        default    => 'F',
-    };
-}
+// Conduct grade labels (behavioral — stored in student_conduct table)
+const CONDUCT_LABELS = [
+    'A' => 'Excellent',
+    'B' => 'Very Good',
+    'C' => 'Good',
+    'D' => 'Satisfactory',
+    'F' => 'Needs Improvement',
+];
 
 $subjects    = [];
 $rosterRows  = [];
@@ -46,25 +44,6 @@ if ($generate && $sessionId) {
         ORDER BY s.name
     ", [$selClass, $sessionId]);
 
-    // For each subject, find the assessment for this class/subject/term
-    $assessmentMap = []; // subject_id => assessment_id
-    if ($subjects) {
-        $subIds = array_column($subjects, 'id');
-        $ph = implode(',', array_fill(0, count($subIds), '?'));
-        $rows = db_fetch_all(
-            "SELECT id, subject_id FROM assessments
-             WHERE class_id=? AND term_id=? AND session_id=? AND subject_id IN ({$ph})
-             ORDER BY id DESC",
-            array_merge([$selClass, $selTerm, $sessionId], $subIds)
-        );
-        // Take first assessment per subject
-        foreach ($rows as $r) {
-            if (!isset($assessmentMap[$r['subject_id']])) {
-                $assessmentMap[$r['subject_id']] = $r['id'];
-            }
-        }
-    }
-
     // Students
     $where  = "WHERE e.class_id = ? AND e.session_id = ? AND e.status = 'active'";
     $params = [$selClass, $sessionId];
@@ -82,22 +61,43 @@ if ($generate && $sessionId) {
         $studentIds = array_column($students, 'id');
         $idPh = implode(',', array_fill(0, count($studentIds), '?'));
 
-        // Get results for all assessments in this term/class
-        $assessmentIds = array_values($assessmentMap);
-        $marksGrid = []; // [student_id][subject_id] => marks_obtained
-        if ($assessmentIds) {
-            $aPh = implode(',', array_fill(0, count($assessmentIds), '?'));
+        // Sum ALL assessment marks per student per subject for this class/term
+        // marksGrid[student_id][subject_id] = summed marks (null if all absent)
+        $marksGrid = [];
+        if ($subjects) {
+            $subIds = array_column($subjects, 'id');
+            $subPh  = implode(',', array_fill(0, count($subIds), '?'));
+
+            // One query: join assessments → student_results, group by student+subject, sum marks
             $resultRows = db_fetch_all(
-                "SELECT sr.student_id, a.subject_id, sr.marks_obtained, sr.is_absent
+                "SELECT sr.student_id, a.subject_id,
+                        SUM(CASE WHEN sr.is_absent = 0 THEN sr.marks_obtained ELSE 0 END) AS total_marks,
+                        MAX(CASE WHEN sr.is_absent = 0 THEN 1 ELSE 0 END) AS has_marks,
+                        MIN(sr.is_absent) AS any_present
                  FROM student_results sr
                  JOIN assessments a ON a.id = sr.assessment_id
-                 WHERE sr.assessment_id IN ({$aPh}) AND sr.student_id IN ({$idPh})",
-                array_merge($assessmentIds, $studentIds)
+                 WHERE a.class_id = ? AND a.term_id = ? AND a.session_id = ?
+                   AND a.subject_id IN ({$subPh})
+                   AND sr.student_id IN ({$idPh})
+                 GROUP BY sr.student_id, a.subject_id",
+                array_merge([$selClass, $selTerm, $sessionId], $subIds, $studentIds)
             );
             foreach ($resultRows as $rr) {
+                // null = all attempts were absent, otherwise sum
                 $marksGrid[$rr['student_id']][$rr['subject_id']] =
-                    $rr['is_absent'] ? null : $rr['marks_obtained'];
+                    $rr['has_marks'] ? (float)$rr['total_marks'] : null;
             }
+        }
+
+        // Conduct grades (behavioral) from student_conduct table
+        $conductMap = [];
+        {
+            $cmRows = db_fetch_all(
+                "SELECT student_id, conduct FROM student_conduct
+                 WHERE class_id=? AND session_id=? AND term_id=? AND student_id IN ({$idPh})",
+                array_merge([$selClass, $sessionId, $selTerm], $studentIds)
+            );
+            foreach ($cmRows as $cm) $conductMap[$cm['student_id']] = $cm['conduct'];
         }
 
         // Absent days from attendance table during the term
@@ -127,13 +127,15 @@ if ($generate && $sessionId) {
             $age      = $st['date_of_birth']
                 ? (int)date_diff(new DateTime($st['date_of_birth']), new DateTime())->y
                 : null;
+            // Conduct: behavioral grade from DB (not derived from marks)
+            $conduct  = $conductMap[$st['id']] ?? null;
             $rawRows[] = [
                 'student'  => $st,
                 'marks'    => $subjectMarks,
                 'total'    => $total,
                 'avg'      => $avg,
                 'ab_days'  => $abDays,
-                'conduct'  => $avg !== null ? conductGrade($avg) : '—',
+                'conduct'  => $conduct,   // null = not yet entered
                 'age'      => $age,
             ];
         }
@@ -314,14 +316,12 @@ ob_start();
                 <?php
                     $st  = $row['student'];
                     $avg = $row['avg'];
-                    $conduct = $row['conduct'];
-                    $remark = match($conduct) {
-                        'A' => 'Excellent',
-                        'B' => 'Very Good',
-                        'C' => 'Good',
-                        'D' => 'Pass',
-                        default => 'Fail',
-                    };
+                    // Conduct: behavioral grade (null = not yet entered by teacher)
+                    $conduct = $row['conduct'];  // 'A','B','C','D','F' or null
+                    $conductLabel = $conduct ? (CONDUCT_LABELS[$conduct] ?? $conduct) : '—';
+                    // Remark: academic outcome (independent of conduct)
+                    $avg = $row['avg'];
+                    $remark = $avg !== null ? ($avg >= 50 ? 'Passed' : 'Failed') : '—';
                     $avgClass = $avg !== null
                         ? ($avg >= 50 ? 'text-green-700' : 'text-red-700')
                         : 'text-gray-400';
@@ -353,9 +353,21 @@ ob_start();
                         <?= $avg !== null ? number_format($avg, 1) : '—' ?>
                     </td>
                     <td class="px-2 py-1.5 text-center text-gray-600 border-r border-gray-100"><?= $row['ab_days'] ?></td>
-                    <td class="px-2 py-1.5 text-center font-bold border-r border-gray-100
-                               <?= match($conduct) { 'A','B'=>'text-green-700', 'C'=>'text-blue-700', 'D'=>'text-yellow-700', default=>'text-red-700' } ?>">
-                        <?= $conduct ?>
+                    <td class="px-2 py-1.5 text-center border-r border-gray-100">
+                        <?php if ($conduct): ?>
+                        <span class="inline-block px-1.5 py-0.5 rounded text-xs font-bold
+                            <?= match($conduct) {
+                                'A' => 'bg-green-100 text-green-800',
+                                'B' => 'bg-blue-100 text-blue-800',
+                                'C' => 'bg-indigo-100 text-indigo-800',
+                                'D' => 'bg-yellow-100 text-yellow-800',
+                                default => 'bg-red-100 text-red-800'
+                            } ?>" title="<?= $conductLabel ?>">
+                            <?= $conduct ?>
+                        </span>
+                        <?php else: ?>
+                        <span class="text-gray-300 text-xs">N/E</span>
+                        <?php endif; ?>
                     </td>
                     <td class="px-2 py-1.5 text-center font-semibold text-gray-700 border-r border-gray-100"><?= $row['rank'] ?></td>
                     <td class="px-2 py-1.5 text-center text-xs text-gray-600"><?= $remark ?></td>

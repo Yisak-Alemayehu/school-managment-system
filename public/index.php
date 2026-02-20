@@ -9,6 +9,10 @@
 // Define root path
 define('APP_ROOT', dirname(__DIR__));
 
+// Load .env first (must be before config files that use getenv)
+require APP_ROOT . '/core/env.php';
+env_load(APP_ROOT . '/.env');
+
 // Load configuration
 require APP_ROOT . '/config/app.php';
 require APP_ROOT . '/config/database.php';

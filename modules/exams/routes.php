@@ -74,6 +74,17 @@ switch ($action) {
         require __DIR__ . '/actions/assessment_delete.php';
         break;
 
+    // ===== Enter Conduct (behavioral grades) =====
+    case 'enter-conduct':
+        auth_require_permission('marks.view');
+        $pageTitle = 'Enter Student Conduct';
+        require __DIR__ . '/views/enter_conduct.php';
+        break;
+    case 'conduct-save':
+        auth_require_permission('marks.manage');
+        require __DIR__ . '/actions/conduct_save.php';
+        break;
+
     // ===== Enter Results =====
     case 'enter-results':
         auth_require_permission('marks.view');

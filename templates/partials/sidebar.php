@@ -110,6 +110,7 @@ if ($isAdmin || $isTeacher || $isStudent || $isParent) {
             ],
             'Results' => [
                 ['action' => 'enter-results',  'label' => 'Enter Students\' Results'],
+                ['action' => 'enter-conduct',  'label' => 'Enter Conduct Grades'],
             ],
             'Reports' => [
                 ['action' => 'roster',          'label' => 'Generate Roster'],

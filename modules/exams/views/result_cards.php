@@ -18,20 +18,24 @@ $selClass   = input_int('class_id');
 $selSection = input_int('section_id');
 $generate   = ($selTerm && $selClass && isset($_GET['generate']));
 
-function conductGradeRc(float $avg): string {
+// Academic letter grade from a numeric mark (0–100)
+function academicGrade(float $mark): string {
     return match(true) {
-        $avg >= 90 => 'A',
-        $avg >= 80 => 'B',
-        $avg >= 70 => 'C',
-        $avg >= 60 => 'D',
+        $mark >= 90 => 'A',
+        $mark >= 80 => 'B',
+        $mark >= 70 => 'C',
+        $mark >= 60 => 'D',
         default    => 'F',
     };
 }
-function remarkRc(string $grade): string {
-    return match($grade) {
-        'A' => 'Excellent', 'B' => 'Very Good', 'C' => 'Good', 'D' => 'Pass', default => 'Needs Improvement',
-    };
-}
+// Conduct (behavioral) grade labels — independent of marks
+$conductLabelsRc = [
+    'A' => 'Excellent',
+    'B' => 'Very Good',
+    'C' => 'Good',
+    'D' => 'Satisfactory',
+    'F' => 'Needs Improvement',
+];
 
 $cards       = [];
 $subjects    = [];
@@ -46,6 +50,16 @@ if ($generate && $sessionId) {
     $term     = db_fetch_one("SELECT name FROM terms WHERE id=?", [$selTerm]);
     $termName = $term['name'] ?? '';
 
+    // Determine previous terms (all terms that come before selTerm in sort order)
+    // $allTerms is already ordered by sort_order from the top of this file
+    $prevTerms = [];
+    foreach ($allTerms as $_t) {
+        if ($_t['id'] == $selTerm) break;
+        $prevTerms[] = $_t;  // collects T1, T2 … before selected term
+    }
+    // All terms shown on card = prev + current
+    $allCardTerms = array_merge($prevTerms, [['id' => $selTerm, 'name' => $termName]]);
+
     // Subjects for the class
     $subjects = db_fetch_all("
         SELECT s.id, s.name FROM subjects s
@@ -53,18 +67,9 @@ if ($generate && $sessionId) {
         WHERE cs.class_id = ? AND cs.session_id = ? ORDER BY s.name
     ", [$selClass, $sessionId]);
 
-    // Assessment map: subject_id => assessment_id
-    $assessmentMap = [];
-    if ($subjects) {
-        $subIds = array_column($subjects, 'id');
-        $ph = implode(',', array_fill(0, count($subIds), '?'));
-        $rows = db_fetch_all(
-            "SELECT id, subject_id FROM assessments
-             WHERE class_id=? AND term_id=? AND session_id=? AND subject_id IN ({$ph}) ORDER BY id DESC",
-            array_merge([$selClass, $selTerm, $sessionId], $subIds)
-        );
-        foreach ($rows as $r) if (!isset($assessmentMap[$r['subject_id']])) $assessmentMap[$r['subject_id']] = $r['id'];
-    }
+    // Pre-compute subject IDs/placeholders (reused across multiple queries)
+    $subIds = $subjects ? array_column($subjects, 'id') : [];
+    $subPh  = $subIds   ? implode(',', array_fill(0, count($subIds), '?')) : '';
 
     // Students
     $where  = "WHERE e.class_id = ? AND e.session_id = ? AND e.status = 'active'";
@@ -85,21 +90,24 @@ if ($generate && $sessionId) {
         $studentIds = array_column($students, 'id');
         $idPh = implode(',', array_fill(0, count($studentIds), '?'));
 
-        // All results for this term/class
-        $assessmentIds = array_values($assessmentMap);
-        $marksGrid = [];
-        if ($assessmentIds) {
-            $aPh = implode(',', array_fill(0, count($assessmentIds), '?'));
-            $resultRows = db_fetch_all(
-                "SELECT sr.student_id, a.subject_id, sr.marks_obtained, sr.is_absent
+        // ── Current-term marks: SUM all assessments per student/subject ──────
+        $marksGrid = []; // [student_id][subject_id] => float|null
+        if ($subIds) {
+            $mkRows = db_fetch_all(
+                "SELECT sr.student_id, a.subject_id,
+                        SUM(CASE WHEN sr.is_absent = 0 THEN sr.marks_obtained ELSE 0 END) AS total_marks,
+                        MAX(CASE WHEN sr.is_absent = 0 THEN 1 ELSE 0 END) AS has_marks
                  FROM student_results sr
                  JOIN assessments a ON a.id = sr.assessment_id
-                 WHERE sr.assessment_id IN ({$aPh}) AND sr.student_id IN ({$idPh})",
-                array_merge($assessmentIds, $studentIds)
+                 WHERE a.class_id = ? AND a.term_id = ? AND a.session_id = ?
+                   AND a.subject_id IN ({$subPh})
+                   AND sr.student_id IN ({$idPh})
+                 GROUP BY sr.student_id, a.subject_id",
+                array_merge([$selClass, $selTerm, $sessionId], $subIds, $studentIds)
             );
-            foreach ($resultRows as $rr) {
+            foreach ($mkRows as $rr) {
                 $marksGrid[$rr['student_id']][$rr['subject_id']] =
-                    $rr['is_absent'] ? null : $rr['marks_obtained'];
+                    $rr['has_marks'] ? (float)$rr['total_marks'] : null;
             }
         }
 
@@ -113,46 +121,126 @@ if ($generate && $sessionId) {
         );
         foreach ($abRows as $r) $abMap[$r['student_id']] = $r['cnt'];
 
-        // Compute totals for ranking
+        // Behavioral conduct grades from student_conduct table
+        $conductMap = [];
+        $condRows = db_fetch_all(
+            "SELECT student_id, conduct FROM student_conduct
+             WHERE class_id=? AND session_id=? AND term_id=? AND student_id IN ({$idPh})",
+            array_merge([$selClass, $sessionId, $selTerm], $studentIds)
+        );
+        foreach ($condRows as $cr) $conductMap[$cr['student_id']] = $cr['conduct'];
+
+        // ── Previous-term marks: SUM all assessments per term/student/subject ─
+        $prevMarksGrid = []; // [term_id][student_id][subject_id] => float|null
+        if ($prevTerms && $subIds) {
+            $prevTermIds = array_column($prevTerms, 'id');
+            $prevTPh     = implode(',', array_fill(0, count($prevTermIds), '?'));
+            $prevRows    = db_fetch_all(
+                "SELECT a.term_id, sr.student_id, a.subject_id,
+                        SUM(CASE WHEN sr.is_absent=0 THEN sr.marks_obtained ELSE 0 END) AS total_marks,
+                        MAX(CASE WHEN sr.is_absent=0 THEN 1 ELSE 0 END) AS has_marks
+                 FROM student_results sr
+                 JOIN assessments a ON a.id=sr.assessment_id
+                 WHERE a.class_id=? AND a.session_id=?
+                   AND a.term_id IN ({$prevTPh})
+                   AND a.subject_id IN ({$subPh})
+                   AND sr.student_id IN ({$idPh})
+                 GROUP BY a.term_id, sr.student_id, a.subject_id",
+                array_merge([$selClass, $sessionId], $prevTermIds, $subIds, $studentIds)
+            );
+            foreach ($prevRows as $r) {
+                $prevMarksGrid[$r['term_id']][$r['student_id']][$r['subject_id']] =
+                    $r['has_marks'] ? (float)$r['total_marks'] : null;
+            }
+        }
+
+        // Rank by current-term total
         $totals = [];
         foreach ($students as $st) {
-            $total = 0;
+            $tot = 0;
             foreach ($subjects as $subj) {
-                $mark = $marksGrid[$st['id']][$subj['id']] ?? null;
-                if ($mark !== null) $total += (float)$mark;
+                $m = $marksGrid[$st['id']][$subj['id']] ?? null;
+                if ($m !== null) $tot += $m;
             }
-            $totals[$st['id']] = $total;
+            $totals[$st['id']] = $tot;
         }
-        // Rank
         arsort($totals);
         $rankMap = []; $rank = 1;
         foreach ($totals as $sid => $tot) { $rankMap[$sid] = $rank++; }
 
         // Build cards
         foreach ($students as $st) {
-            $subjectMarks = [];
-            $total = 0; $subjCount = count($subjects);
-            foreach ($subjects as $subj) {
-                $mark = $marksGrid[$st['id']][$subj['id']] ?? null;
-                $subjectMarks[$subj['id']] = $mark;
-                if ($mark !== null) $total += (float)$mark;
+            $sid     = $st['id'];
+            $numSubj = count($subjects);
+
+            // Per-term marks for this student: [term_id => [subj_id => mark|null]]
+            $studentTermMarks = [];
+            foreach ($allCardTerms as $ct) {
+                $tid = $ct['id'];
+                $row = [];
+                foreach ($subjects as $subj) {
+                    $row[$subj['id']] = ($tid == $selTerm)
+                        ? ($marksGrid[$sid][$subj['id']] ?? null)
+                        : ($prevMarksGrid[$tid][$sid][$subj['id']] ?? null);
+                }
+                $studentTermMarks[$tid] = $row;
             }
-            $avg     = $subjCount > 0 ? round($total / $subjCount, 1) : null;
-            $conduct = $avg !== null ? conductGradeRc($avg) : '—';
-            $age     = $st['date_of_birth']
-                ? (int)date_diff(new DateTime($st['date_of_birth']), new DateTime())->y
-                : '—';
+
+            // Per-term totals & averages
+            $termTotals = []; $termAvgs = [];
+            foreach ($allCardTerms as $ct) {
+                $tid = $ct['id'];
+                $tot = 0;
+                foreach ($subjects as $subj) {
+                    $m = $studentTermMarks[$tid][$subj['id']];
+                    if ($m !== null) $tot += $m;
+                }
+                $termTotals[$tid] = $tot;
+                $termAvgs[$tid]   = $numSubj > 0 ? round($tot / $numSubj, 1) : null;
+            }
+
+            // Per-subject cumulative average across ALL shown terms
+            $subjCumAvg = [];
+            foreach ($subjects as $subj) {
+                $vals = [];
+                foreach ($allCardTerms as $ct) {
+                    $m = $studentTermMarks[$ct['id']][$subj['id']];
+                    if ($m !== null) $vals[] = $m;
+                }
+                // Divide by total number of terms (not just those with marks) for fair comparison
+                $subjCumAvg[$subj['id']] = count($allCardTerms) > 0
+                    ? round(array_sum($vals) / count($allCardTerms), 1)
+                    : null;
+            }
+
+            // Overall cumulative average: avg of all term totals / num_subjects
+            $allTotalsSum = array_sum($termTotals);
+            $cumAvg       = ($numSubj > 0 && count($allCardTerms) > 0)
+                ? round($allTotalsSum / ($numSubj * count($allCardTerms)), 1)
+                : null;
+
+            $conduct      = $conductMap[$sid] ?? null;
+            $conductLabel = $conduct ? ($conductLabelsRc[$conduct] ?? $conduct) : 'Not Entered';
+            $curAvg       = $termAvgs[$selTerm] ?? null;
+            $remark       = $curAvg !== null ? ($curAvg >= 50 ? 'Passed' : 'Failed') : '—';
+            $age          = $st['date_of_birth']
+                ? (int)date_diff(new DateTime($st['date_of_birth']), new DateTime())->y : '—';
 
             $cards[] = [
-                'student'  => $st,
-                'marks'    => $subjectMarks,
-                'total'    => $total,
-                'avg'      => $avg,
-                'conduct'  => $conduct,
-                'remark'   => $conduct !== '—' ? remarkRc($conduct) : '—',
-                'rank'     => $rankMap[$st['id']] ?? '—',
-                'ab_days'  => $abMap[$st['id']] ?? 0,
-                'age'      => $age,
+                'student'      => $st,
+                'term_marks'   => $studentTermMarks,  // [term_id][subj_id] => mark|null
+                'subj_cum_avg' => $subjCumAvg,         // [subj_id] => float|null
+                'term_totals'  => $termTotals,          // [term_id] => float
+                'term_avgs'    => $termAvgs,            // [term_id] => float|null
+                'cum_avg'      => $cumAvg,              // overall cumulative %
+                'total'        => $termTotals[$selTerm] ?? 0,
+                'avg'          => $curAvg,
+                'conduct'      => $conduct,
+                'conductLabel' => $conductLabel,
+                'remark'       => $remark,
+                'rank'         => $rankMap[$sid] ?? '—',
+                'ab_days'      => $abMap[$sid] ?? 0,
+                'age'          => $age,
             ];
         }
     }
@@ -285,32 +373,71 @@ ob_start();
         </div>
 
         <!-- Marks Table -->
+        <?php
+            $numTermCols  = count($allCardTerms); // prev terms + current
+            $hasPrevTerms = count($prevTerms) > 0;
+            // Avg column label: "Avg (T1, T2, T3)" using short term names
+            $avgColLabel  = 'Avg (' . implode(', ', array_map(fn($t) => $t['name'], $allCardTerms)) . ')';
+        ?>
         <table class="w-full text-sm border border-gray-200 rounded-lg overflow-hidden mb-6">
             <thead class="bg-gray-800 text-white">
                 <tr>
                     <th class="px-4 py-2.5 text-left font-medium">Subjects</th>
-                    <th class="px-4 py-2.5 text-center font-medium w-24"><?= e($termName) ?></th>
-                    <th class="px-4 py-2.5 text-center font-medium w-20">Grade</th>
+                    <?php foreach ($allCardTerms as $ct): ?>
+                    <th class="px-3 py-2.5 text-center font-medium w-20
+                               <?= $ct['id'] == $selTerm ? 'bg-primary-700' : 'bg-gray-700' ?>">
+                        <?= e($ct['name']) ?>
+                    </th>
+                    <?php endforeach; ?>
+                    <?php if ($hasPrevTerms): ?>
+                    <th class="px-3 py-2.5 text-center font-medium w-20 bg-gray-600" title="<?= e($avgColLabel) ?>">
+                        Avg
+                    </th>
+                    <?php endif; ?>
+                    <th class="px-3 py-2.5 text-center font-medium w-16">Grade</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 <?php foreach ($subjects as $subj): ?>
                 <?php
-                    $mark  = $card['marks'][$subj['id']] ?? null;
-                    $grade = $mark !== null ? conductGradeRc((float)$mark) : '—';
-                    $markCls = $mark !== null
-                        ? ((float)$mark >= 50 ? 'text-gray-900' : 'text-red-600 font-bold')
-                        : 'text-gray-400';
+                    $cumAvgMark = $card['subj_cum_avg'][$subj['id']] ?? null;
+                    $gradeMark  = $hasPrevTerms ? $cumAvgMark : ($card['term_marks'][$selTerm][$subj['id']] ?? null);
+                    $grade      = $gradeMark !== null ? academicGrade((float)$gradeMark) : '—';
                 ?>
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-2 text-gray-800"><?= e($subj['name']) ?></td>
-                    <td class="px-4 py-2 text-center <?= $markCls ?>">
-                        <?= $mark !== null ? number_format((float)$mark, 0) : '—' ?>
+                    <?php foreach ($allCardTerms as $ct): ?>
+                    <?php
+                        $m   = $card['term_marks'][$ct['id']][$subj['id']] ?? null;
+                        $cls = $m !== null
+                            ? ((float)$m >= 50 ? 'text-gray-900' : 'text-red-600 font-bold')
+                            : 'text-gray-400';
+                    ?>
+                    <td class="px-3 py-2 text-center <?= $cls ?>
+                               <?= $ct['id'] == $selTerm ? 'bg-blue-50/40' : '' ?>">
+                        <?= $m !== null ? number_format((float)$m, 0) : '—' ?>
                     </td>
-                    <td class="px-4 py-2 text-center">
-                        <?php if ($mark !== null): ?>
+                    <?php endforeach; ?>
+                    <?php if ($hasPrevTerms): ?>
+                    <?php
+                        $avgCls = $cumAvgMark !== null
+                            ? ((float)$cumAvgMark >= 50 ? 'text-gray-700 font-semibold' : 'text-red-600 font-bold')
+                            : 'text-gray-400';
+                    ?>
+                    <td class="px-3 py-2 text-center <?= $avgCls ?> bg-amber-50/40">
+                        <?= $cumAvgMark !== null ? number_format($cumAvgMark, 1) : '—' ?>
+                    </td>
+                    <?php endif; ?>
+                    <td class="px-3 py-2 text-center">
+                        <?php if ($gradeMark !== null): ?>
                             <span class="px-2 py-0.5 rounded text-xs font-semibold
-                                <?= match(true) { (float)$mark>=90=>'bg-green-100 text-green-800', (float)$mark>=80=>'bg-blue-100 text-blue-800', (float)$mark>=70=>'bg-yellow-100 text-yellow-800', (float)$mark>=60=>'bg-orange-100 text-orange-800', default=>'bg-red-100 text-red-800' } ?>">
+                                <?= match(true) {
+                                    (float)$gradeMark>=90=>'bg-green-100 text-green-800',
+                                    (float)$gradeMark>=80=>'bg-blue-100 text-blue-800',
+                                    (float)$gradeMark>=70=>'bg-yellow-100 text-yellow-800',
+                                    (float)$gradeMark>=60=>'bg-orange-100 text-orange-800',
+                                    default=>'bg-red-100 text-red-800'
+                                } ?>">
                                 <?= $grade ?>
                             </span>
                         <?php else: ?>
@@ -320,37 +447,77 @@ ob_start();
                 </tr>
                 <?php endforeach; ?>
             </tbody>
-            <tfoot class="bg-gray-50 border-t-2 border-gray-300">
+            <tfoot class="bg-gray-50 border-t-2 border-gray-300 text-sm">
+                <!-- Total row -->
                 <tr class="font-semibold">
-                    <td class="px-4 py-2.5 text-gray-800">Total</td>
-                    <td class="px-4 py-2.5 text-center text-gray-900 font-bold"><?= $card['total'] > 0 ? number_format($card['total'], 0) : '—' ?></td>
+                    <td class="px-4 py-2 text-gray-700">Total</td>
+                    <?php foreach ($allCardTerms as $ct): ?>
+                    <td class="px-3 py-2 text-center text-gray-900 <?= $ct['id'] == $selTerm ? 'bg-blue-50/40' : '' ?>">
+                        <?= ($card['term_totals'][$ct['id']] ?? 0) > 0
+                            ? number_format($card['term_totals'][$ct['id']], 0)
+                            : '—' ?>
+                    </td>
+                    <?php endforeach; ?>
+                    <?php if ($hasPrevTerms): ?>
+                    <td class="px-3 py-2 text-center text-amber-700 bg-amber-50/40 font-bold">
+                        <?= $card['cum_avg'] !== null ? number_format(array_sum($card['term_totals']), 0) : '—' ?>
+                    </td>
+                    <?php endif; ?>
                     <td></td>
                 </tr>
+                <!-- Average row -->
                 <tr>
-                    <td class="px-4 py-2.5 text-gray-800">Average</td>
-                    <td class="px-4 py-2.5 text-center font-bold <?= $card['avg'] !== null ? ($card['avg'] >= 50 ? 'text-green-700' : 'text-red-700') : 'text-gray-400' ?>">
-                        <?= $card['avg'] !== null ? number_format($card['avg'], 1) . '%' : '—' ?>
+                    <td class="px-4 py-2 text-gray-700">Average</td>
+                    <?php foreach ($allCardTerms as $ct): ?>
+                    <?php $tAvg = $card['term_avgs'][$ct['id']] ?? null; ?>
+                    <td class="px-3 py-2 text-center font-bold <?= $ct['id'] == $selTerm ? 'bg-blue-50/40' : '' ?>
+                               <?= $tAvg !== null ? ($tAvg >= 50 ? 'text-green-700' : 'text-red-700') : 'text-gray-400' ?>">
+                        <?= $tAvg !== null ? number_format($tAvg, 1) . '%' : '—' ?>
+                    </td>
+                    <?php endforeach; ?>
+                    <?php if ($hasPrevTerms): ?>
+                    <td class="px-3 py-2 text-center font-bold bg-amber-50/40
+                               <?= $card['cum_avg'] !== null ? ($card['cum_avg'] >= 50 ? 'text-amber-700' : 'text-red-700') : 'text-gray-400' ?>">
+                        <?= $card['cum_avg'] !== null ? number_format($card['cum_avg'], 1) . '%' : '—' ?>
+                    </td>
+                    <?php endif; ?>
+                    <td></td>
+                </tr>
+                <!-- Conduct -->
+                <tr>
+                    <td class="px-4 py-2 text-gray-700">Conduct</td>
+                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center font-bold text-primary-800">
+                        <?php if ($card['conduct']): ?>
+                        <span title="<?= e($card['conductLabel']) ?>"><?= e($card['conduct']) ?></span>
+                        <span class="text-xs font-normal text-gray-500 ml-1"><?= e($card['conductLabel']) ?></span>
+                        <?php else: ?>
+                        <span class="text-gray-400 text-xs font-normal">Not Entered</span>
+                        <?php endif; ?>
                     </td>
                     <td></td>
                 </tr>
+                <!-- Rank -->
                 <tr>
-                    <td class="px-4 py-2.5 text-gray-800">Conduct</td>
-                    <td class="px-4 py-2.5 text-center font-bold text-primary-800"><?= e($card['conduct']) ?></td>
+                    <td class="px-4 py-2 text-gray-700">Rank</td>
+                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center font-bold text-gray-900">
+                        <?= $card['rank'] ?>
+                    </td>
                     <td></td>
                 </tr>
+                <!-- Absent days -->
                 <tr>
-                    <td class="px-4 py-2.5 text-gray-800">Rank</td>
-                    <td class="px-4 py-2.5 text-center font-bold text-gray-900"><?= $card['rank'] ?></td>
+                    <td class="px-4 py-2 text-gray-700">Absent Days</td>
+                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center text-gray-700">
+                        <?= $card['ab_days'] ?>
+                    </td>
                     <td></td>
                 </tr>
+                <!-- Remark -->
                 <tr>
-                    <td class="px-4 py-2.5 text-gray-800">Absent Days</td>
-                    <td class="px-4 py-2.5 text-center text-gray-700"><?= $card['ab_days'] ?></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td class="px-4 py-2.5 text-gray-800">Remark</td>
-                    <td class="px-4 py-2.5 text-center text-gray-700"><?= e($card['remark']) ?></td>
+                    <td class="px-4 py-2 text-gray-700">Remark</td>
+                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center text-gray-700">
+                        <?= e($card['remark']) ?>
+                    </td>
                     <td></td>
                 </tr>
             </tfoot>

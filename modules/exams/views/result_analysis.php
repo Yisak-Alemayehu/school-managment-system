@@ -41,13 +41,6 @@ if ($generate && $sessionId) {
     $termName = $term['name'] ?? '';
     $printTs  = date('d M Y, H:i');
 
-    // Find assessment(s) for this class/subject/term
-    $assessments = db_fetch_all(
-        "SELECT id FROM assessments WHERE class_id=? AND term_id=? AND session_id=? AND subject_id=? ORDER BY id",
-        [$selClass, $selTerm, $sessionId, $selSubject]
-    );
-    $assessmentIds = array_column($assessments, 'id');
-
     // Enrolled students (active) with gender
     $enrolled = db_fetch_all("
         SELECT s.id, s.gender
@@ -67,20 +60,24 @@ if ($generate && $sessionId) {
     }
     $cntTotal = count($enrolled);
 
-    // Marks per student (use highest assessment if multiple, or first found)
-    $marks = []; // student_id => marks_obtained | null (absent)
-    if ($assessmentIds && $enrolledIds) {
-        $aPh  = implode(',', array_fill(0, count($assessmentIds), '?'));
-        $sPh  = implode(',', array_fill(0, count($enrolledIds), '?'));
-        $res  = db_fetch_all(
-            "SELECT sr.student_id, sr.marks_obtained, sr.is_absent
+    // SUM all assessment marks per student for this class/subject/term (same as roster/report cards)
+    // A student's subject score = Test1 + Test2 + Assignment + Final Exam (up to 100)
+    $marks = []; // student_id => float (summed) | null (all absent / no entry)
+    if ($enrolledIds) {
+        $sPh = implode(',', array_fill(0, count($enrolledIds), '?'));
+        $res = db_fetch_all(
+            "SELECT sr.student_id,
+                    SUM(CASE WHEN sr.is_absent=0 THEN sr.marks_obtained ELSE 0 END) AS total_marks,
+                    MAX(CASE WHEN sr.is_absent=0 THEN 1 ELSE 0 END) AS has_marks
              FROM student_results sr
-             WHERE sr.assessment_id IN ({$aPh}) AND sr.student_id IN ({$sPh})",
-            array_merge($assessmentIds, $enrolledIds)
+             JOIN assessments a ON a.id = sr.assessment_id
+             WHERE a.class_id=? AND a.term_id=? AND a.session_id=? AND a.subject_id=?
+               AND sr.student_id IN ({$sPh})
+             GROUP BY sr.student_id",
+            array_merge([$selClass, $selTerm, $sessionId, $selSubject], $enrolledIds)
         );
-        /* If a student appears in multiple assessments, last write wins (fine for analysis) */
         foreach ($res as $r) {
-            $marks[$r['student_id']] = $r['is_absent'] ? null : (float)$r['marks_obtained'];
+            $marks[$r['student_id']] = $r['has_marks'] ? (float)$r['total_marks'] : null;
         }
     }
 

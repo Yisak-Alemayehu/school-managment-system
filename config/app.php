@@ -12,9 +12,20 @@ if (!defined('APP_ROOT')) {
 // ── Application ──────────────────────────────────────────────
 define('APP_NAME', 'Urjiberi School ERP');
 define('APP_VERSION', '1.0.0');
-define('APP_ENV', getenv('APP_ENV') ?: 'development'); // development | production
+define('APP_ENV', getenv('APP_ENV') ?: 'production'); // default to production on live servers
 define('APP_DEBUG', APP_ENV === 'development');
-define('APP_URL', getenv('APP_URL') ?: 'http://localhost:8080');
+
+// Auto-detect APP_URL if not set in .env
+if (getenv('APP_URL')) {
+    define('APP_URL', rtrim(getenv('APP_URL'), '/'));
+} else {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    // Detect if running in a subdirectory by looking at SCRIPT_NAME
+    $scriptDir = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/\\');
+    define('APP_URL', $scheme . '://' . $host . $scriptDir);
+}
+
 define('APP_TIMEZONE', 'Africa/Addis_Ababa');
 
 // ── Paths ────────────────────────────────────────────────────
