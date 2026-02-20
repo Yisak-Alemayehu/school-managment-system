@@ -70,7 +70,6 @@ ob_start();
 ?>
 
 <div class="max-w-7xl mx-auto">
-    <?php require APP_ROOT . '/templates/partials/academics_nav.php'; ?>
 
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div>

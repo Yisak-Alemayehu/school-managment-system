@@ -43,7 +43,6 @@ ob_start();
 ?>
 
 <div class="max-w-5xl mx-auto">
-    <?php require APP_ROOT . '/templates/partials/academics_nav.php'; ?>
 
     <h1 class="text-xl font-bold text-gray-900 mb-6">Assign Subjects to Classes</h1>
 

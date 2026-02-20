@@ -10,14 +10,48 @@ $isAccountant = auth_has_role('accountant');
 $isStudent = auth_has_role('student');
 $isParent = auth_has_role('parent');
 
+// Whether we are currently inside the academics module (for auto-expand)
+$inAcademics = route_is('academics');
+
 $navItems = [];
 
 // Dashboard — everyone
 $navItems[] = ['icon' => 'home', 'label' => 'Dashboard', 'url' => '/dashboard', 'module' => 'dashboard'];
 
-// Academics — admin/teacher
+// Academics — admin/teacher  (tree item with children)
 if ($isAdmin || $isTeacher) {
-    $navItems[] = ['icon' => 'academic-cap', 'label' => 'Academics', 'url' => '/academics', 'module' => 'academics'];
+    $navItems[] = [
+        'icon'   => 'academic-cap',
+        'label'  => 'Academics',
+        'module' => 'academics',
+        'tree'   => true,
+        'groups' => [
+            'Setup'       => [
+                ['action' => 'sessions',          'label' => 'Sessions'],
+                ['action' => 'terms',             'label' => 'Terms'],
+                ['action' => 'mediums',           'label' => 'Mediums'],
+                ['action' => 'streams',           'label' => 'Streams'],
+                ['action' => 'shifts',            'label' => 'Shifts'],
+            ],
+            'Structure'   => [
+                ['action' => 'classes',           'label' => 'Classes'],
+                ['action' => 'sections',          'label' => 'Sections'],
+                ['action' => 'subjects',          'label' => 'Subjects'],
+            ],
+            'Assignments' => [
+                ['action' => 'class-subjects',    'label' => 'Class Subjects'],
+                ['action' => 'elective-subjects', 'label' => 'Elective Subjects'],
+                ['action' => 'class-teachers',    'label' => 'Class Teachers'],
+                ['action' => 'subject-teachers',  'label' => 'Subject Teachers'],
+            ],
+            'Actions'     => [
+                ['action' => 'promote',           'label' => 'Promote Students'],
+            ],
+            'Schedule'    => [
+                ['action' => 'timetable',         'label' => 'Timetable'],
+            ],
+        ],
+    ];
 }
 
 // Students — admin/teacher/parent
@@ -77,8 +111,56 @@ if ($isAdmin) {
     <!-- Navigation -->
     <nav class="mt-2 px-3 pb-4 space-y-1">
         <?php foreach ($navItems as $item):
-            $active = route_is($item['module']);
-            $activeClass = $active ? 'bg-sidebar-active text-white' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-white';
+            // ── Tree item (Academics) ───────────────────────────────────────
+            if (!empty($item['tree'])):
+                $parentActive = $inAcademics;
+                $parentCls = $parentActive
+                    ? 'bg-sidebar-active text-white'
+                    : 'text-sidebar-text hover:bg-sidebar-hover hover:text-white';
+                $curAction = current_action();
+        ?>
+        <div>
+            <button type="button"
+                    onclick="sidebarTreeToggle('academics-submenu','academics-arrow')"
+                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors <?= $parentCls ?>">
+                <?= sidebar_icon($item['icon']) ?>
+                <span><?= e($item['label']) ?></span>
+                <svg id="academics-arrow"
+                     class="ml-auto w-4 h-4 flex-shrink-0 transition-transform duration-200 <?= $parentActive ? 'rotate-180' : '' ?>"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+
+            <!-- Sub-menu -->
+            <div id="academics-submenu"
+                 class="overflow-hidden transition-all duration-200 <?= $parentActive ? '' : 'hidden' ?>">
+                <div class="mt-1 ml-3 pl-3 border-l border-white/10 space-y-0.5 pb-1">
+                    <?php foreach ($item['groups'] as $groupLabel => $children): ?>
+                    <p class="px-2 pt-2 pb-0.5 text-xs font-semibold uppercase tracking-wider"
+                       style="color:rgba(255,255,255,0.35)"><?= e($groupLabel) ?></p>
+                    <?php foreach ($children as $child):
+                        $childActive = ($curAction === $child['action']);
+                        $childCls = $childActive
+                            ? 'bg-sidebar-active/80 text-white font-semibold'
+                            : 'text-sidebar-text hover:bg-sidebar-hover hover:text-white';
+                    ?>
+                    <a href="<?= url('academics', $child['action']) ?>"
+                       class="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition-colors <?= $childCls ?>">
+                        <span class="w-1 h-1 rounded-full bg-current flex-shrink-0 opacity-60"></span>
+                        <?= e($child['label']) ?>
+                    </a>
+                    <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+
+        <?php
+            // ── Regular link item ───────────────────────────────────────────
+            else:
+                $active = route_is($item['module']);
+                $activeClass = $active ? 'bg-sidebar-active text-white' : 'text-sidebar-text hover:bg-sidebar-hover hover:text-white';
         ?>
         <a href="<?= url($item['url']) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors <?= $activeClass ?>">
             <?= sidebar_icon($item['icon']) ?>
@@ -89,6 +171,7 @@ if ($isAdmin) {
                 <?php endif; ?>
             <?php endif; ?>
         </a>
+        <?php endif; ?>
         <?php endforeach; ?>
     </nav>
 
@@ -104,6 +187,27 @@ if ($isAdmin) {
     </div>
     <?php endif; ?>
 </aside>
+
+<script>
+/**
+ * Toggle an academics-style sidebar tree.
+ * submenuId  — id of the <div> to show/hide
+ * arrowId    — id of the <svg> to rotate
+ */
+function sidebarTreeToggle(submenuId, arrowId) {
+    var menu  = document.getElementById(submenuId);
+    var arrow = document.getElementById(arrowId);
+    if (!menu) return;
+    var isHidden = menu.classList.contains('hidden');
+    if (isHidden) {
+        menu.classList.remove('hidden');
+        if (arrow) arrow.classList.add('rotate-180');
+    } else {
+        menu.classList.add('hidden');
+        if (arrow) arrow.classList.remove('rotate-180');
+    }
+}
+</script>
 
 <?php
 function sidebar_icon(string $name): string {
