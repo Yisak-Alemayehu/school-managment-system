@@ -43,9 +43,9 @@ try {
 
         if ($existing) {
             db_update('attendance', [
-                'status'   => $status,
-                'remarks'  => $remarks,
-                'taken_by' => $takenBy,
+                'status'    => $status,
+                'remarks'   => $remarks,
+                'marked_by' => $takenBy,
             ], 'id = ?', [$existing['id']]);
         } else {
             db_insert('attendance', [
@@ -57,7 +57,7 @@ try {
                 'date'       => $date,
                 'status'     => $status,
                 'remarks'    => $remarks,
-                'taken_by'   => $takenBy,
+                'marked_by'  => $takenBy,
             ]);
         }
     }
