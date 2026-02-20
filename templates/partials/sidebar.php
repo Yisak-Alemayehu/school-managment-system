@@ -97,9 +97,27 @@ if ($isAdmin || $isTeacher || $isStudent || $isParent) {
     ];
 }
 
-// Exams & Marks — admin/teacher/student/parent
+// Results — admin/teacher/student/parent (tree)
 if ($isAdmin || $isTeacher || $isStudent || $isParent) {
-    $navItems[] = ['icon' => 'document-text', 'label' => 'Exams', 'url' => '/exams', 'module' => 'exams'];
+    $navItems[] = [
+        'icon'   => 'academic-cap',
+        'label'  => 'Results',
+        'module' => 'exams',
+        'tree'   => true,
+        'groups' => [
+            'Setup' => [
+                ['action' => 'add-assessment', 'label' => 'Add Assessment'],
+            ],
+            'Results' => [
+                ['action' => 'enter-results',  'label' => 'Enter Students\' Results'],
+            ],
+            'Reports' => [
+                ['action' => 'roster',          'label' => 'Generate Roster'],
+                ['action' => 'result-cards',    'label' => 'Report Card'],
+                ['action' => 'result-analysis', 'label' => 'Result Analysis'],
+            ],
+        ],
+    ];
 }
 
 // Finance — admin/accountant/student/parent

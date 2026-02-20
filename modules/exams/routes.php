@@ -58,6 +58,53 @@ switch ($action) {
         $pageTitle = 'Enter Marks';
         require __DIR__ . '/views/marks.php';
         break;
+
+    // ===== Assessments (Results module) =====
+    case 'add-assessment':
+        auth_require_permission('exam.manage');
+        $pageTitle = 'Add Assessment';
+        require __DIR__ . '/views/assessment_add.php';
+        break;
+    case 'assessment-save':
+        auth_require_permission('exam.manage');
+        require __DIR__ . '/actions/assessment_save.php';
+        break;
+    case 'assessment-delete':
+        auth_require_permission('exam.manage');
+        require __DIR__ . '/actions/assessment_delete.php';
+        break;
+
+    // ===== Enter Results =====
+    case 'enter-results':
+        auth_require_permission('marks.view');
+        $pageTitle = 'Enter Students\' Results';
+        require __DIR__ . '/views/enter_results.php';
+        break;
+    case 'results-save':
+        auth_require_permission('marks.manage');
+        require __DIR__ . '/actions/results_save.php';
+        break;
+
+    // ===== Roster =====
+    case 'roster':
+        auth_require_permission('report_card.view');
+        $pageTitle = 'Generate Roster';
+        require __DIR__ . '/views/roster.php';
+        break;
+
+    // ===== Report Cards (Results) =====
+    case 'result-cards':
+        auth_require_permission('report_card.view');
+        $pageTitle = 'Report Cards';
+        require __DIR__ . '/views/result_cards.php';
+        break;
+
+    // ===== Result Analysis =====
+    case 'result-analysis':
+        auth_require_permission('exam.view');
+        $pageTitle = 'Result Analysis';
+        require __DIR__ . '/views/result_analysis.php';
+        break;
     case 'marks-save':
         auth_require_permission('marks.manage');
         require __DIR__ . '/actions/marks_save.php';
@@ -89,6 +136,45 @@ switch ($action) {
         $pageTitle = 'Print Report Card';
         require __DIR__ . '/views/report_card_print.php';
         break;
+
+    // ===== AJAX: current total marks committed for class+subject+term =====
+    case 'ajax-subject-total':
+        auth_require_permission('exam.view');
+        $ajClassId   = input_int('class_id');
+        $ajSubjectId = input_int('subject_id');
+        $ajTermId    = input_int('term_id') ?: null;
+        $ajSession   = get_active_session();
+        $ajSessionId = $ajSession['id'] ?? 0;
+        $ajTotal     = 0;
+        if ($ajClassId && $ajSubjectId && $ajSessionId) {
+            $tw = $ajTermId ? ' AND term_id = ?' : ' AND term_id IS NULL';
+            $tp = $ajTermId ? [$ajSessionId, $ajClassId, $ajSubjectId, $ajTermId]
+                           : [$ajSessionId, $ajClassId, $ajSubjectId];
+            $ajTotal = (int) db_fetch_value(
+                "SELECT COALESCE(SUM(total_marks),0) FROM assessments
+                 WHERE session_id=? AND class_id=? AND subject_id=?{$tw}",
+                $tp
+            );
+        }
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['total' => $ajTotal, 'remaining' => 100 - $ajTotal]);
+        exit;
+
+    // ===== AJAX: subjects for a given class (used by result-analysis dropdown) =====
+    case 'ajax-subjects':
+        auth_require_permission('exam.view');
+        $classId   = input_int('class_id');
+        $sessionId = (get_active_session() ?? [])['id'] ?? 0;
+        $subjects  = $classId && $sessionId
+            ? db_fetch_all(
+                "SELECT s.id, s.name FROM subjects s
+                 JOIN class_subjects cs ON cs.subject_id = s.id
+                 WHERE cs.class_id = ? AND cs.session_id = ? ORDER BY s.name",
+                [$classId, $sessionId])
+            : [];
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(array_values($subjects));
+        exit;
 
     default:
         http_response_code(404);
