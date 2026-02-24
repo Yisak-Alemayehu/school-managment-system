@@ -172,7 +172,9 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
-                <select name="class_id" id="classSelect" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <select name="class_id" id="raClassSel"
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        onchange="ajaxLoadSubjects(this.value,'<?= $sessionId ?>','raSubjectSel',<?= (int)$selSubject ?>)">
                     <option value="">Select Class</option>
                     <?php foreach ($allClasses as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $selClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -182,7 +184,9 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Subject <span class="text-red-500">*</span></label>
-                <select name="subject_id" id="subjectSelect" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[180px]">
+                <select name="subject_id" id="raSubjectSel" required
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[180px]"
+                        <?= !$selClass ? 'disabled' : '' ?>>
                     <option value="">— Select Class First —</option>
                     <?php foreach ($subjectsForClass as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= $selSubject == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>

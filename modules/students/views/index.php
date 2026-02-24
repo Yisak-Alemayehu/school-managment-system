@@ -103,13 +103,17 @@ ob_start();
         <input type="hidden" name="module" value="students">
         <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search name, admission no..."
                class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
-        <select name="class_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" onchange="this.form.submit()">
+        <select name="class_id" id="stdClassSel"
+                class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                onchange="ajaxLoadSections(this.value,'stdSecSel',<?= (int)$sectionFilter ?>,'All Sections')">
             <option value="">All Classes</option>
             <?php foreach ($classes as $cls): ?>
                 <option value="<?= $cls['id'] ?>" <?= $classFilter == $cls['id'] ? 'selected' : '' ?>><?= e($cls['name']) ?></option>
             <?php endforeach; ?>
         </select>
-        <select name="section_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+        <select name="section_id" id="stdSecSel"
+                class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                <?= !$classFilter ? 'disabled' : '' ?>>
             <option value="">All Sections</option>
             <?php foreach ($sections as $sec): ?>
                 <option value="<?= $sec['id'] ?>" <?= $sectionFilter == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>

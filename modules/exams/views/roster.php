@@ -230,7 +230,9 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
-                <select name="class_id" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <select name="class_id" id="rosterClassSel" required
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        onchange="ajaxLoadSections(this.value,'rosterSecSel',0,'All Sections')">
                     <option value="">Select Class</option>
                     <?php foreach ($allClasses as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $selClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -240,8 +242,8 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                    <option value="0">All Sections</option>
+                <select name="section_id" id="rosterSecSel" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <option value="">All Sections</option>
                     <?php foreach ($allSections as $s): ?>
                         <?php if ($s['class_id'] == $selClass): ?>
                             <option value="<?= $s['id'] ?>" <?= $selSection == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
@@ -249,6 +251,10 @@ ob_start();
                     <?php endforeach; ?>
                 </select>
             </div>
+
+            <?php if (!$selClass): ?>
+            <script>document.getElementById('rosterSecSel').disabled = true;</script>
+            <?php endif; ?>
 
             <button type="submit" name="generate" value="1"
                     class="px-5 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900 transition">

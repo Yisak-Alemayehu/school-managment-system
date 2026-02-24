@@ -89,7 +89,96 @@
     
     <!-- Core JS -->
     <script src="<?= url('/assets/js/app.js') ?>"></script>
-    
+
+    <!-- ── Shared AJAX helpers (class → sections / subjects) ───────── -->
+    <script>
+    (function () {
+        var BASE = '<?= rtrim(APP_URL, '/') ?>';
+
+        /**
+         * Populate a <select> with sections that belong to the given class.
+         *
+         * @param {string|number} classId       - selected class_id value
+         * @param {string}        selectId       - id of the section <select> element
+         * @param {string|number} [preselected]  - section_id to pre-select
+         * @param {string}        [defaultLabel] - first empty-value option label
+         */
+        window.ajaxLoadSections = function (classId, selectId, preselected, defaultLabel) {
+            var sel = document.getElementById(selectId);
+            if (!sel) return;
+            preselected  = preselected  || 0;
+            defaultLabel = defaultLabel || 'All Sections';
+
+            if (!classId) {
+                sel.innerHTML = '<option value="">' + defaultLabel + '</option>';
+                sel.disabled = true;
+                return;
+            }
+
+            sel.disabled = true;
+            sel.innerHTML = '<option value="">Loading…</option>';
+
+            fetch(BASE + '/api/sections?' + new URLSearchParams({ class_id: classId }))
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    sel.innerHTML = '<option value="">' + defaultLabel + '</option>';
+                    data.forEach(function (s) {
+                        var o = document.createElement('option');
+                        o.value       = s.id;
+                        o.textContent = s.name;
+                        if (String(s.id) === String(preselected)) o.selected = true;
+                        sel.appendChild(o);
+                    });
+                    sel.disabled = false;
+                })
+                .catch(function () {
+                    sel.innerHTML = '<option value="">' + defaultLabel + '</option>';
+                    sel.disabled = false;
+                });
+        };
+
+        /**
+         * Populate a <select> with subjects for the given class + session.
+         *
+         * @param {string|number} classId    - class_id
+         * @param {string|number} sessionId  - session_id
+         * @param {string}        selectId   - id of the subject <select> element
+         * @param {string|number} [preselected] - subject_id to pre-select
+         */
+        window.ajaxLoadSubjects = function (classId, sessionId, selectId, preselected) {
+            var sel = document.getElementById(selectId);
+            if (!sel) return;
+
+            if (!classId || !sessionId) {
+                sel.innerHTML = '<option value="">— Select Class First —</option>';
+                sel.disabled = true;
+                return;
+            }
+
+            sel.disabled = true;
+            sel.innerHTML = '<option value="">Loading…</option>';
+
+            fetch(BASE + '/api/subjects?' + new URLSearchParams({ class_id: classId, session_id: sessionId }))
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    sel.innerHTML = '<option value="">Select Subject</option>';
+                    data.forEach(function (s) {
+                        var o = document.createElement('option');
+                        o.value       = s.id;
+                        o.textContent = s.name;
+                        if (String(s.id) === String(preselected)) o.selected = true;
+                        sel.appendChild(o);
+                    });
+                    sel.disabled = data.length === 0;
+                })
+                .catch(function () {
+                    sel.innerHTML = '<option value="">— Select Class First —</option>';
+                    sel.disabled = false;
+                });
+        };
+    })();
+    </script>
+
     <!-- PWA registration -->
     <?= pwa_register_script() ?>
 </body>

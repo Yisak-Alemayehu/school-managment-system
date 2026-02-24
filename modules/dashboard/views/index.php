@@ -46,6 +46,98 @@ if ($isAdmin) {
     ) ?: 0;
 }
 
+// ── Super Admin Extended Stats ────────────────────────────
+$superAdminStats   = [];
+$recentStudents    = [];
+$recentPayments    = [];
+$attendanceByClass = [];
+
+if ($isSuperAdmin) {
+    // People
+    $superAdminStats['total_users']    = db_fetch_value("SELECT COUNT(*) FROM users WHERE deleted_at IS NULL AND is_active = 1") ?: 0;
+    $superAdminStats['total_parents']  = db_fetch_value(
+        "SELECT COUNT(DISTINCT g.id) FROM guardians g JOIN student_guardians sg ON g.id = sg.guardian_id"
+    ) ?: 0;
+    $superAdminStats['total_subjects'] = db_fetch_value("SELECT COUNT(*) FROM subjects WHERE is_active = 1") ?: 0;
+    $superAdminStats['total_sections'] = db_fetch_value("SELECT COUNT(*) FROM sections WHERE is_active = 1") ?: 0;
+
+    // Gender breakdown
+    $superAdminStats['male_students']   = db_fetch_value("SELECT COUNT(*) FROM students WHERE gender = 'male'   AND status = 'active' AND deleted_at IS NULL") ?: 0;
+    $superAdminStats['female_students'] = db_fetch_value("SELECT COUNT(*) FROM students WHERE gender = 'female' AND status = 'active' AND deleted_at IS NULL") ?: 0;
+
+    // New admissions this month
+    $monthStart = date('Y-m-01');
+    $superAdminStats['new_admissions_month'] = db_fetch_value(
+        "SELECT COUNT(*) FROM students WHERE status = 'active' AND deleted_at IS NULL AND created_at >= ?",
+        [$monthStart]
+    ) ?: 0;
+
+    // Attendance rate today (among enrolled students)
+    $totalEnrolled = db_fetch_value("SELECT COUNT(DISTINCT student_id) FROM attendance WHERE date = ?", [$today]) ?: 0;
+    $superAdminStats['attendance_rate'] = $totalEnrolled > 0
+        ? round(($stats['attendance_today'] / $totalEnrolled) * 100, 1)
+        : 0;
+    $superAdminStats['total_marked_today'] = $totalEnrolled;
+
+    // Exams & results
+    $activeSession = $activeSession ?? get_active_session();
+    if ($activeSession) {
+        $superAdminStats['total_exams'] = db_fetch_value(
+            "SELECT COUNT(*) FROM exams WHERE session_id = ?", [$activeSession['id']]
+        ) ?: 0;
+        $superAdminStats['paid_invoices'] = db_fetch_value(
+            "SELECT COUNT(*) FROM invoices WHERE session_id = ? AND status = 'paid'", [$activeSession['id']]
+        ) ?: 0;
+        $superAdminStats['unpaid_invoices'] = db_fetch_value(
+            "SELECT COUNT(*) FROM invoices WHERE session_id = ? AND status IN ('unpaid','partial')", [$activeSession['id']]
+        ) ?: 0;
+        $superAdminStats['payment_this_month'] = db_fetch_value(
+            "SELECT COALESCE(SUM(p.amount),0) FROM payments p JOIN invoices i ON p.invoice_id = i.id WHERE p.status = 'completed' AND i.session_id = ? AND p.created_at >= ?",
+            [$activeSession['id'], $monthStart]
+        ) ?: 0;
+    }
+
+    // Recent 6 students
+    $recentStudents = db_fetch_all(
+        "SELECT s.id, s.full_name, s.admission_no, s.gender, s.created_at,
+                c.name AS class_name, sec.name AS section_name
+         FROM students s
+         LEFT JOIN enrollments e  ON s.id = e.student_id AND e.status = 'active'
+         LEFT JOIN sections sec   ON e.section_id = sec.id
+         LEFT JOIN classes c      ON sec.class_id  = c.id
+         WHERE s.status = 'active' AND s.deleted_at IS NULL
+         ORDER BY s.created_at DESC LIMIT 6"
+    );
+
+    // Recent 6 payments
+    $recentPayments = db_fetch_all(
+        "SELECT p.id, p.amount, p.payment_date, p.method, p.status,
+                s.full_name AS student_name, s.admission_no
+         FROM payments p
+         JOIN invoices i  ON p.invoice_id = i.id
+         JOIN students s  ON i.student_id  = s.id
+         WHERE p.status = 'completed'
+         ORDER BY p.created_at DESC LIMIT 6"
+    );
+
+    // Top 5 classes by attendance today
+    $attendanceByClass = db_fetch_all(
+        "SELECT c.name AS class_name,
+                COUNT(CASE WHEN a.status='present' THEN 1 END) AS present,
+                COUNT(CASE WHEN a.status='absent'  THEN 1 END) AS absent,
+                COUNT(*) AS total
+         FROM attendance a
+         JOIN students s  ON a.student_id = s.id
+         JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
+         JOIN sections sec  ON e.section_id = sec.id
+         JOIN classes c     ON sec.class_id  = c.id
+         WHERE a.date = ?
+         GROUP BY c.id, c.name
+         ORDER BY total DESC LIMIT 5",
+        [$today]
+    );
+}
+
 // Recent announcements
 $announcements = db_fetch_all(
     "SELECT title, content, type, created_at FROM announcements 
@@ -163,6 +255,272 @@ ob_start();
     </div>
 </div>
 <?php endif; ?>
+
+<?php if ($isSuperAdmin): ?>
+<!-- ══════════════════════════════════════════════════════
+     SUPER ADMIN EXTENDED STATISTICS
+     ══════════════════════════════════════════════════════ -->
+
+<!-- Row: Academic & People KPIs -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+    <!-- Total Users -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500">System Users</p>
+            <p class="text-2xl font-bold text-gray-900"><?= number_format($superAdminStats['total_users']) ?></p>
+            <a href="<?= url('users') ?>" class="text-xs text-primary-600 hover:underline">Manage &rarr;</a>
+        </div>
+    </div>
+    <!-- Parents -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500">Parents / Guardians</p>
+            <p class="text-2xl font-bold text-gray-900"><?= number_format($superAdminStats['total_parents']) ?></p>
+        </div>
+    </div>
+    <!-- Subjects -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500">Active Subjects</p>
+            <p class="text-2xl font-bold text-gray-900"><?= number_format($superAdminStats['total_subjects']) ?></p>
+            <a href="<?= url('academics', 'subjects') ?>" class="text-xs text-primary-600 hover:underline">View &rarr;</a>
+        </div>
+    </div>
+    <!-- New Admissions This Month -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500">New Admissions</p>
+            <p class="text-2xl font-bold text-gray-900"><?= number_format($superAdminStats['new_admissions_month']) ?></p>
+            <p class="text-xs text-gray-400">This month</p>
+        </div>
+    </div>
+</div>
+
+<!-- Row: Finance extra + Attendance rate + Exams -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+    <!-- Revenue This Month -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500">Revenue This Month</p>
+            <p class="text-xl font-bold text-emerald-700"><?= format_money($superAdminStats['payment_this_month'] ?? 0) ?></p>
+        </div>
+    </div>
+    <!-- Paid Invoices -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500">Paid Invoices</p>
+            <p class="text-2xl font-bold text-green-700"><?= number_format($superAdminStats['paid_invoices'] ?? 0) ?></p>
+        </div>
+    </div>
+    <!-- Unpaid / Partial -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500">Unpaid / Partial</p>
+            <p class="text-2xl font-bold text-red-700"><?= number_format($superAdminStats['unpaid_invoices'] ?? 0) ?></p>
+            <a href="<?= url('finance') ?>" class="text-xs text-primary-600 hover:underline">View &rarr;</a>
+        </div>
+    </div>
+    <!-- Total Exams -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500">Exams (Session)</p>
+            <p class="text-2xl font-bold text-gray-900"><?= number_format($superAdminStats['total_exams'] ?? 0) ?></p>
+            <a href="<?= url('exams') ?>" class="text-xs text-primary-600 hover:underline">View &rarr;</a>
+        </div>
+    </div>
+</div>
+
+<!-- Row: Gender breakdown + Attendance rate -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <!-- Gender Breakdown -->
+    <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <h3 class="text-sm font-semibold text-gray-700 mb-4">Student Gender Breakdown</h3>
+        <?php
+        $totalG   = $superAdminStats['male_students'] + $superAdminStats['female_students'];
+        $malePct  = $totalG > 0 ? round($superAdminStats['male_students']   / $totalG * 100) : 50;
+        $femPct   = $totalG > 0 ? round($superAdminStats['female_students'] / $totalG * 100) : 50;
+        ?>
+        <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs w-14 text-gray-500 text-right">Male</span>
+            <div class="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                <div class="bg-blue-500 h-4 rounded-full" style="width:<?= $malePct ?>%"></div>
+            </div>
+            <span class="text-xs w-16 text-gray-700 font-medium"><?= number_format($superAdminStats['male_students']) ?> (<?= $malePct ?>%)</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="text-xs w-14 text-gray-500 text-right">Female</span>
+            <div class="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                <div class="bg-pink-500 h-4 rounded-full" style="width:<?= $femPct ?>%"></div>
+            </div>
+            <span class="text-xs w-16 text-gray-700 font-medium"><?= number_format($superAdminStats['female_students']) ?> (<?= $femPct ?>%)</span>
+        </div>
+        <p class="text-xs text-gray-400 mt-3">Total active students: <?= number_format($totalG) ?></p>
+    </div>
+
+    <!-- Today's Attendance Rate + Class Breakdown -->
+    <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-gray-700">Today's Attendance Rate</h3>
+            <span class="text-2xl font-bold <?= $superAdminStats['attendance_rate'] >= 75 ? 'text-green-600' : ($superAdminStats['attendance_rate'] >= 50 ? 'text-yellow-600' : 'text-red-600') ?>">
+                <?= $superAdminStats['attendance_rate'] ?>%
+            </span>
+        </div>
+        <!-- Overall bar -->
+        <div class="w-full bg-gray-100 rounded-full h-3 mb-4 overflow-hidden">
+            <div class="h-3 rounded-full <?= $superAdminStats['attendance_rate'] >= 75 ? 'bg-green-500' : ($superAdminStats['attendance_rate'] >= 50 ? 'bg-yellow-500' : 'bg-red-500') ?>"
+                 style="width:<?= $superAdminStats['attendance_rate'] ?>%"></div>
+        </div>
+        <?php if (!empty($attendanceByClass)): ?>
+        <div class="space-y-1">
+            <?php foreach ($attendanceByClass as $ac):
+                $pct = $ac['total'] > 0 ? round($ac['present'] / $ac['total'] * 100) : 0;
+            ?>
+            <div class="flex items-center gap-2 text-xs text-gray-600">
+                <span class="w-20 truncate font-medium"><?= e($ac['class_name']) ?></span>
+                <div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div class="bg-blue-400 h-2 rounded-full" style="width:<?= $pct ?>%"></div>
+                </div>
+                <span class="w-16 text-right text-gray-500"><?= $ac['present'] ?>/<?= $ac['total'] ?> (<?= $pct ?>%)</span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php else: ?>
+            <p class="text-xs text-gray-400">No attendance recorded today.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Row: Recent Students + Recent Payments -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Recent Admissions -->
+    <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-gray-900">Recent Admissions</h3>
+            <a href="<?= url('students') ?>" class="text-xs text-primary-600 hover:underline">View all &rarr;</a>
+        </div>
+        <?php if (empty($recentStudents)): ?>
+            <p class="text-sm text-gray-400">No students found.</p>
+        <?php else: ?>
+        <div class="overflow-x-auto -mx-1">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="text-left text-gray-500 border-b">
+                        <th class="pb-2 pl-1 font-medium">Name</th>
+                        <th class="pb-2 font-medium">Adm. No</th>
+                        <th class="pb-2 font-medium">Class</th>
+                        <th class="pb-2 font-medium">Date</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <?php foreach ($recentStudents as $rs): ?>
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="py-2 pl-1">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-xs font-bold flex-shrink-0 <?= ($rs['gender'] ?? '') === 'female' ? 'bg-pink-400' : 'bg-blue-400' ?>">
+                                    <?= strtoupper(substr($rs['full_name'], 0, 1)) ?>
+                                </span>
+                                <a href="<?= url('students', 'view', $rs['id']) ?>" class="text-gray-800 hover:text-primary-600 font-medium truncate max-w-[100px]"><?= e($rs['full_name']) ?></a>
+                            </div>
+                        </td>
+                        <td class="py-2 text-gray-500"><?= e($rs['admission_no']) ?></td>
+                        <td class="py-2 text-gray-600"><?= e(($rs['class_name'] ?? '-') . ' ' . ($rs['section_name'] ?? '')) ?></td>
+                        <td class="py-2 text-gray-400"><?= date('d M', strtotime($rs['created_at'])) ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Recent Payments -->
+    <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-gray-900">Recent Payments</h3>
+            <a href="<?= url('finance') ?>" class="text-xs text-primary-600 hover:underline">View all &rarr;</a>
+        </div>
+        <?php if (empty($recentPayments)): ?>
+            <p class="text-sm text-gray-400">No payments recorded yet.</p>
+        <?php else: ?>
+        <div class="overflow-x-auto -mx-1">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="text-left text-gray-500 border-b">
+                        <th class="pb-2 pl-1 font-medium">Student</th>
+                        <th class="pb-2 font-medium">Amount</th>
+                        <th class="pb-2 font-medium">Method</th>
+                        <th class="pb-2 font-medium">Date</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <?php foreach ($recentPayments as $rp): ?>
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="py-2 pl-1">
+                            <p class="font-medium text-gray-800 truncate max-w-[110px]"><?= e($rp['student_name']) ?></p>
+                            <p class="text-gray-400"><?= e($rp['admission_no']) ?></p>
+                        </td>
+                        <td class="py-2 font-semibold text-green-700"><?= format_money($rp['amount']) ?></td>
+                        <td class="py-2">
+                            <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
+                                <?= match(strtolower($rp['method'] ?? '')) {
+                                    'cash'     => 'bg-gray-100 text-gray-700',
+                                    'chapa'    => 'bg-blue-100 text-blue-700',
+                                    'telebirr' => 'bg-teal-100 text-teal-700',
+                                    default    => 'bg-purple-100 text-purple-700'
+                                } ?>">
+                                <?= e(ucfirst($rp['method'] ?? 'N/A')) ?>
+                            </span>
+                        </td>
+                        <td class="py-2 text-gray-400"><?= date('d M', strtotime($rp['payment_date'] ?? $rp['created_at'] ?? 'now')) ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; /* end $isSuperAdmin */ ?>
 
 <!-- Quick Actions -->
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">

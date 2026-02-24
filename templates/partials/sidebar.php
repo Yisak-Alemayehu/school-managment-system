@@ -123,7 +123,32 @@ if ($isAdmin || $isTeacher || $isStudent || $isParent) {
 
 // Finance — admin/accountant/student/parent
 if ($isAdmin || $isAccountant || $isStudent || $isParent) {
-    $navItems[] = ['icon' => 'currency-dollar', 'label' => 'Finance', 'url' => '/finance', 'module' => 'finance'];
+    $financeItem = [
+        'icon'   => 'currency-dollar',
+        'label'  => 'Finance',
+        'module' => 'finance',
+        'tree'   => true,
+        'groups' => [
+            'Overview' => [
+                ['action' => 'fm-generate-invoice', 'label' => 'Generate Invoice'],
+                ['action' => 'fm-payment',          'label' => 'Record Payment'],
+            ],
+        ],
+    ];
+
+    // Fee Management sub-items for admin/accountant
+    if ($isAdmin || $isAccountant) {
+        $financeItem['groups']['Fee Management'] = [
+            ['action' => 'fm-dashboard',    'label' => 'Fee Dashboard'],
+            ['action' => 'fm-create-fee',   'label' => 'Create Fee'],
+            ['action' => 'fm-manage-fees',  'label' => 'Manage Fees'],
+            ['action' => 'fm-assign-fees',  'label' => 'Assign Fees'],
+            ['action' => 'fm-groups',       'label' => 'Student Groups'],
+            ['action' => 'fm-reports',      'label' => 'Fee Reports'],
+        ];
+    }
+
+    $navItems[] = $financeItem;
 }
 
 // Communication — everyone

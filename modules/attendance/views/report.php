@@ -139,8 +139,9 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
-                <select name="class_id" required
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="class_id" id="repClassSel" required
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                        onchange="ajaxLoadSections(this.value,'repSecSel',<?= (int)$filterSection ?>,'All Sections')">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -150,17 +151,9 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-
-                <select name="class_id" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                    <option value="">Select</option>
-                    <?php foreach ($classes as $c): ?>
-                        <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="section_id" id="repSecSel"
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                        <?= !$filterClass ? 'disabled' : '' ?>>
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $s): ?>
                         <?php if ($s['class_id'] == $filterClass): ?>

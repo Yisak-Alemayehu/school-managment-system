@@ -70,7 +70,9 @@ ob_start();
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
-                <select name="class_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <select name="class_id" id="rcClassSel" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        onchange="ajaxLoadSections(this.value,'rcSecSel',<?= (int)$filterSection ?>,'All')">
                     <option value="">Select</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -79,7 +81,9 @@ ob_start();
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <select name="section_id" id="rcSecSel"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        <?= !$filterClass ? 'disabled' : '' ?>>
                     <option value="">All</option>
                     <?php foreach ($sections as $s): ?>
                         <?php if ($s['class_id'] == $filterClass): ?>

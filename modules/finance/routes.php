@@ -1,12 +1,154 @@
 <?php
 /**
  * Finance Module Routes
- * Handles: fee categories, fee structures, invoices, payments, discounts, online payment
+ * Handles: fee categories, fee structures, invoices, payments, discounts, online payment,
+ *          AND the new Fee Management System (fees, assignments, groups, reports)
  */
 
-$action = $_GET['action'] ?? 'invoices';
+$action = $_GET['action'] ?? current_action();
+if ($action === 'index') $action = 'invoices'; // default landing
 
 switch ($action) {
+
+    // ══════════════════════════════════════════════════════════
+    // ── NEW FEE MANAGEMENT SYSTEM ────────────────────────────
+    // ══════════════════════════════════════════════════════════
+
+    // ── Generate Invoice (Professional Print) ──
+    case 'fm-generate-invoice':
+        auth_require_permission('fee_management.view_dashboard');
+        require __DIR__ . '/views/fm_generate_invoice.php';
+        break;
+
+    // ── Fee Management Dashboard ──
+    case 'fm-dashboard':
+        auth_require_permission('fee_management.view_dashboard');
+        require __DIR__ . '/views/fm_dashboard.php';
+        break;
+
+    // ── Create / Edit Fee ──
+    case 'fm-create-fee':
+    case 'fm-edit-fee':
+        auth_require_permission('fee_management.create_fee');
+        require __DIR__ . '/views/fm_fee_form.php';
+        break;
+    case 'fm-fee-save':
+        auth_require_permission('fee_management.create_fee');
+        require __DIR__ . '/actions/fm_fee_save.php';
+        break;
+
+    // ── Manage Fees ──
+    case 'fm-manage-fees':
+        auth_require_permission('fee_management.view_dashboard');
+        require __DIR__ . '/views/fm_manage_fees.php';
+        break;
+    case 'fm-fee-toggle':
+        auth_require_permission('fee_management.activate_fee');
+        require __DIR__ . '/actions/fm_fee_toggle.php';
+        break;
+    case 'fm-fee-delete':
+        auth_require_permission('fee_management.delete_fee');
+        require __DIR__ . '/actions/fm_fee_delete.php';
+        break;
+    case 'fm-fee-duplicate':
+        auth_require_permission('fee_management.create_fee');
+        require __DIR__ . '/actions/fm_fee_duplicate.php';
+        break;
+    case 'fm-fee-view':
+        auth_require_permission('fee_management.view_dashboard');
+        require __DIR__ . '/views/fm_fee_view.php';
+        break;
+
+    // ── Assign Fees ──
+    case 'fm-assign-fees':
+        auth_require_permission('fee_management.assign_fee');
+        require __DIR__ . '/views/fm_assign_fees.php';
+        break;
+    case 'fm-assignment-save':
+        auth_require_permission('fee_management.assign_fee');
+        require __DIR__ . '/actions/fm_assignment_save.php';
+        break;
+    case 'fm-assignment-delete':
+        auth_require_permission('fee_management.assign_fee');
+        require __DIR__ . '/actions/fm_assignment_delete.php';
+        break;
+    case 'fm-exemption-save':
+        auth_require_permission('fee_management.manage_exemptions');
+        require __DIR__ . '/actions/fm_exemption_save.php';
+        break;
+    case 'fm-exemption-delete':
+        auth_require_permission('fee_management.manage_exemptions');
+        require __DIR__ . '/actions/fm_exemption_delete.php';
+        break;
+
+    // ── Student Groups ──
+    case 'fm-groups':
+        auth_require_permission('fee_management.manage_groups');
+        require __DIR__ . '/views/fm_groups.php';
+        break;
+    case 'fm-group-form':
+        auth_require_permission('fee_management.manage_groups');
+        require __DIR__ . '/views/fm_group_form.php';
+        break;
+    case 'fm-group-save':
+        auth_require_permission('fee_management.manage_groups');
+        require __DIR__ . '/actions/fm_group_save.php';
+        break;
+    case 'fm-group-delete':
+        auth_require_permission('fee_management.manage_groups');
+        require __DIR__ . '/actions/fm_group_delete.php';
+        break;
+    case 'fm-group-members':
+        auth_require_permission('fee_management.manage_groups');
+        require __DIR__ . '/views/fm_group_members.php';
+        break;
+    case 'fm-group-member-add':
+        auth_require_permission('fee_management.manage_groups');
+        require __DIR__ . '/actions/fm_group_member_add.php';
+        break;
+    case 'fm-group-member-remove':
+        auth_require_permission('fee_management.manage_groups');
+        require __DIR__ . '/actions/fm_group_member_remove.php';
+        break;
+
+    // ── Fee Reports ──
+    case 'fm-reports':
+        auth_require_permission('fee_management.view_reports');
+        require __DIR__ . '/views/fm_reports.php';
+        break;
+    case 'fm-report-export':
+        auth_require_permission('fee_management.export_reports');
+        require __DIR__ . '/actions/fm_report_export.php';
+        break;
+
+    // ── AJAX endpoints ──
+    case 'fm-api-students':
+        auth_require_permission('fee_management.assign_fee');
+        require __DIR__ . '/actions/fm_api_students.php';
+        break;
+    case 'fm-api-fee-students':
+        auth_require_permission('fee_management.assign_fee');
+        require __DIR__ . '/actions/fm_api_fee_students.php';
+        break;
+    case 'fm-charge-waive':
+        auth_require_permission('fee_management.manage_charges');
+        require __DIR__ . '/actions/fm_charge_waive.php';
+        break;
+
+    // ── Record Payment (Fee Charges → Invoice → Payment) ──
+    case 'fm-payment':
+        auth_require_permission('fee_management.view_dashboard');
+        require __DIR__ . '/views/fm_payment.php';
+        break;
+    case 'fm-payment-save':
+        auth_require_permission('fee_management.manage_charges');
+        require __DIR__ . '/actions/fm_payment_save.php';
+        break;
+
+    // ══════════════════════════════════════════════════════════
+    // ── EXISTING FINANCE ROUTES (unchanged) ──────────────────
+    // ══════════════════════════════════════════════════════════
+
     // ── Fee Categories ──
     case 'fee-categories':
         require_permission('manage_finance');
