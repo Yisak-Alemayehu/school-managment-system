@@ -193,10 +193,12 @@ function auth_has_any_permission(array $permissions): bool {
 }
 
 /**
- * Check if user has a specific role
+ * Check if user has a specific role (case-insensitive)
  */
 function auth_has_role(string $roleSlug): bool {
-    return in_array($roleSlug, $_SESSION['user_roles'] ?? []);
+    $roleSlug = strtolower($roleSlug);
+    $userRoles = array_map('strtolower', $_SESSION['user_roles'] ?? []);
+    return in_array($roleSlug, $userRoles);
 }
 
 /**

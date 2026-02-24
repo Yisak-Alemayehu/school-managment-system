@@ -27,6 +27,7 @@ require APP_ROOT . '/core/csrf.php';
 require APP_ROOT . '/core/validation.php';
 require APP_ROOT . '/core/response.php';
 require APP_ROOT . '/core/router.php';
+require APP_ROOT . '/core/rbac.php';
 require APP_ROOT . '/core/pwa.php';
 
 // Set security headers

@@ -1,14 +1,18 @@
 <?php
 /**
  * Sidebar Navigation Partial
+ * Role-Based Access Control — shows only permitted navigation items
+ *
+ * Roles: super_admin, admin, teacher, student, parent, accountant
  */
 $user = auth_user();
 $roles = $user['roles'];
-$isAdmin = auth_is_super_admin() || auth_has_role('admin');
-$isTeacher = auth_has_role('teacher');
+$isSuperAdmin = auth_is_super_admin();
+$isAdmin      = $isSuperAdmin || auth_has_role('admin');
+$isTeacher    = auth_has_role('teacher');
 $isAccountant = auth_has_role('accountant');
-$isStudent = auth_has_role('student');
-$isParent = auth_has_role('parent');
+$isStudent    = auth_has_role('student');
+$isParent     = auth_has_role('parent');
 
 // Auto-expand flags
 $inAcademics = route_is('academics');
@@ -16,11 +20,14 @@ $inStudents  = route_is('students');
 
 $navItems = [];
 
-// Dashboard — everyone
+// ── Dashboard — everyone ──
 $navItems[] = ['icon' => 'home', 'label' => 'Dashboard', 'url' => '/dashboard', 'module' => 'dashboard'];
 
-// Academics — admin/teacher  (tree item with children)
-if ($isAdmin || $isTeacher) {
+// ══════════════════════════════════════════════════════════════
+// ACADEMICS — Role-specific visibility per permission matrix
+// ══════════════════════════════════════════════════════════════
+if ($isAdmin) {
+    // 🔴🔵 Super Admin / School Admin: Full access to all academics
     $navItems[] = [
         'icon'   => 'academic-cap',
         'label'  => 'Academics',
@@ -53,10 +60,57 @@ if ($isAdmin || $isTeacher) {
             ],
         ],
     ];
+} elseif ($isTeacher) {
+    // 🟢 Teacher: NO access to Setup, Structure, Assignments, Promote, Schedule
+    //    Only sees Timetable (view) and Subjects (view) for their assigned classes
+    $navItems[] = [
+        'icon'   => 'academic-cap',
+        'label'  => 'Academics',
+        'module' => 'academics',
+        'tree'   => true,
+        'groups' => [
+            'View' => [
+                ['action' => 'subjects',          'label' => 'Subjects'],
+                ['action' => 'timetable',         'label' => 'Time Table'],
+            ],
+        ],
+    ];
+} elseif ($isStudent) {
+    // 🟡 Student: View assigned subjects & daily timetable
+    $navItems[] = [
+        'icon'   => 'academic-cap',
+        'label'  => 'Academics',
+        'module' => 'academics',
+        'tree'   => true,
+        'groups' => [
+            'View' => [
+                ['action' => 'subjects',          'label' => 'Assigned Subjects'],
+                ['action' => 'timetable',         'label' => 'Daily Time Table'],
+            ],
+        ],
+    ];
+} elseif ($isParent) {
+    // 🟠 Parent: View child's subjects & daily timetable
+    $navItems[] = [
+        'icon'   => 'academic-cap',
+        'label'  => 'Academics',
+        'module' => 'academics',
+        'tree'   => true,
+        'groups' => [
+            'View' => [
+                ['action' => 'subjects',          'label' => 'Assigned Subjects'],
+                ['action' => 'timetable',         'label' => 'Daily Time Table'],
+            ],
+        ],
+    ];
 }
+// 🟣 Accountant: NO access to academics (not shown)
 
-// Students — admin/teacher/parent (tree)
-if ($isAdmin || $isTeacher || $isParent) {
+// ══════════════════════════════════════════════════════════════
+// STUDENTS — Role-specific visibility
+// ══════════════════════════════════════════════════════════════
+if ($isAdmin) {
+    // 🔴🔵 Super Admin / School Admin: Full student management
     $navItems[] = [
         'icon'   => 'users',
         'label'  => 'Students',
@@ -78,10 +132,43 @@ if ($isAdmin || $isTeacher || $isParent) {
             ],
         ],
     ];
+} elseif ($isTeacher) {
+    // 🟢 Teacher: View student details & ID cards only (assigned classes)
+    //    NO access to Admission, Roll Numbers, Bulk Data, Credentials
+    $navItems[] = [
+        'icon'   => 'users',
+        'label'  => 'Students',
+        'module' => 'students',
+        'tree'   => true,
+        'groups' => [
+            'Records' => [
+                ['action' => 'details',        'label' => 'Student Details'],
+                ['action' => 'id-cards',       'label' => 'Generate ID Card'],
+            ],
+        ],
+    ];
+} elseif ($isParent) {
+    // 🟠 Parent: View children only
+    $navItems[] = [
+        'icon'   => 'users',
+        'label'  => 'Students',
+        'module' => 'students',
+        'tree'   => true,
+        'groups' => [
+            'My Children' => [
+                ['action' => 'details',        'label' => 'Student Details'],
+            ],
+        ],
+    ];
 }
+// 🟡 Student: Views own profile via Dashboard (no Students menu)
+// 🟣 Accountant: NO access to student details (except fee-related)
 
-// Attendance — admin/teacher/student/parent (tree)
-if ($isAdmin || $isTeacher || $isStudent || $isParent) {
+// ══════════════════════════════════════════════════════════════
+// ATTENDANCE — Role-specific visibility
+// ══════════════════════════════════════════════════════════════
+if ($isAdmin) {
+    // 🔴🔵 Admin: Full attendance management
     $navItems[] = [
         'icon'   => 'clipboard-check',
         'label'  => 'Attendance',
@@ -95,10 +182,43 @@ if ($isAdmin || $isTeacher || $isStudent || $isParent) {
             ],
         ],
     ];
+} elseif ($isTeacher) {
+    // 🟢 Teacher: Can submit attendance (but cannot modify after submission — only Admin can edit)
+    $navItems[] = [
+        'icon'   => 'clipboard-check',
+        'label'  => 'Attendance',
+        'module' => 'attendance',
+        'tree'   => true,
+        'groups' => [
+            'Manage' => [
+                ['action' => 'index',  'label' => 'Take Attendance'],
+                ['action' => 'view',   'label' => 'View Attendance'],
+                ['action' => 'report', 'label' => 'Attendance Report'],
+            ],
+        ],
+    ];
+} elseif ($isStudent || $isParent) {
+    // 🟡🟠 Student/Parent: View attendance performance only
+    $navItems[] = [
+        'icon'   => 'clipboard-check',
+        'label'  => 'Attendance',
+        'module' => 'attendance',
+        'tree'   => true,
+        'groups' => [
+            'View' => [
+                ['action' => 'view',   'label' => 'Attendance Performance'],
+                ['action' => 'report', 'label' => 'Attendance Report'],
+            ],
+        ],
+    ];
 }
+// 🟣 Accountant: NO access to attendance
 
-// Results — admin/teacher/student/parent (tree)
-if ($isAdmin || $isTeacher || $isStudent || $isParent) {
+// ══════════════════════════════════════════════════════════════
+// RESULTS / EXAMS — Role-specific visibility
+// ══════════════════════════════════════════════════════════════
+if ($isAdmin) {
+    // 🔴🔵 Admin: Full results management
     $navItems[] = [
         'icon'   => 'academic-cap',
         'label'  => 'Results',
@@ -119,52 +239,112 @@ if ($isAdmin || $isTeacher || $isStudent || $isParent) {
             ],
         ],
     ];
+} elseif ($isTeacher) {
+    // 🟢 Teacher: Marks Entry, Homework, Assignments for assigned classes
+    $navItems[] = [
+        'icon'   => 'academic-cap',
+        'label'  => 'Results',
+        'module' => 'exams',
+        'tree'   => true,
+        'groups' => [
+            'Results' => [
+                ['action' => 'enter-results',  'label' => 'Enter Students\' Results'],
+                ['action' => 'enter-conduct',  'label' => 'Enter Conduct Grades'],
+            ],
+            'Reports' => [
+                ['action' => 'roster',          'label' => 'Generate Roster'],
+                ['action' => 'result-cards',    'label' => 'Report Card'],
+                ['action' => 'result-analysis', 'label' => 'Result Analysis'],
+            ],
+        ],
+    ];
+} elseif ($isStudent || $isParent) {
+    // 🟡🟠 Student/Parent: View all assessment results & report cards
+    $navItems[] = [
+        'icon'   => 'academic-cap',
+        'label'  => 'Results',
+        'module' => 'exams',
+        'tree'   => true,
+        'groups' => [
+            'Reports' => [
+                ['action' => 'result-cards',    'label' => 'Report Card'],
+                ['action' => 'result-analysis', 'label' => 'Result Analysis'],
+            ],
+        ],
+    ];
 }
+// 🟣 Accountant: NO access to assessments
 
-// Finance — admin/accountant/student/parent
-if ($isAdmin || $isAccountant || $isStudent || $isParent) {
+// ══════════════════════════════════════════════════════════════
+// FINANCE — Role-specific visibility
+// ══════════════════════════════════════════════════════════════
+if ($isAdmin || $isAccountant) {
+    // 🔴🔵 Admin: Full access | 🟣 Accountant: Fee Management + Reports
     $financeItem = [
         'icon'   => 'currency-dollar',
         'label'  => 'Finance',
         'module' => 'finance',
         'tree'   => true,
         'groups' => [
-            'Overview' => [
-                ['action' => 'fm-generate-invoice', 'label' => 'Generate Invoice'],
-                ['action' => 'fm-payment',          'label' => 'Record Payment'],
+            'Fee Management' => [
+                ['action' => 'fm-dashboard',        'label' => 'Fee Dashboard'],
+                ['action' => 'fm-generate-invoice',  'label' => 'Generate Invoice'],
+                ['action' => 'fm-payment',           'label' => 'Record Payment'],
+                ['action' => 'fm-reports',           'label' => 'Fee Reports'],
             ],
         ],
     ];
 
-    // Fee Management sub-items for admin/accountant
-    if ($isAdmin || $isAccountant) {
-        $financeItem['groups']['Fee Management'] = [
-            ['action' => 'fm-dashboard',    'label' => 'Fee Dashboard'],
+    // Admin gets full fee management; Accountant gets read-only on create/manage/assign
+    if ($isAdmin) {
+        $financeItem['groups']['Fee Setup'] = [
             ['action' => 'fm-create-fee',   'label' => 'Create Fee'],
             ['action' => 'fm-manage-fees',  'label' => 'Manage Fees'],
             ['action' => 'fm-assign-fees',  'label' => 'Assign Fees'],
             ['action' => 'fm-groups',       'label' => 'Student Groups'],
-            ['action' => 'fm-reports',      'label' => 'Fee Reports'],
+        ];
+    } else {
+        // Accountant: Read-only access to these
+        $financeItem['groups']['Fee Setup (Read-Only)'] = [
+            ['action' => 'fm-create-fee',   'label' => 'Create Fee'],
+            ['action' => 'fm-manage-fees',  'label' => 'Manage Fees'],
+            ['action' => 'fm-assign-fees',  'label' => 'Assign Fees'],
+            ['action' => 'fm-groups',       'label' => 'Student Groups'],
         ];
     }
 
     $navItems[] = $financeItem;
+} elseif ($isStudent || $isParent) {
+    // 🟡 Student: Fee Status | 🟠 Parent: Paid/Due Invoices, Payment History
+    $financeItem = [
+        'icon'   => 'currency-dollar',
+        'label'  => 'Finance',
+        'module' => 'finance',
+        'tree'   => true,
+        'groups' => [
+            'My Fees' => [
+                ['action' => 'pay-online',   'label' => 'Fee Status & Payment'],
+            ],
+        ],
+    ];
+    $navItems[] = $financeItem;
 }
+// 🟢 Teacher: NO access to finance
 
-// Communication — everyone
+// ── Communication — everyone ──
 $navItems[] = ['icon' => 'chat-alt', 'label' => 'Messages', 'url' => '/communication', 'module' => 'communication'];
 
-// Users — admin only
+// ── Users — admin only ──
 if ($isAdmin) {
     $navItems[] = ['icon' => 'user-group', 'label' => 'Users', 'url' => '/users', 'module' => 'users'];
 }
 
-// Reports — admin/accountant
+// ── Reports — admin/accountant ──
 if ($isAdmin || $isAccountant) {
     $navItems[] = ['icon' => 'chart-bar', 'label' => 'Reports', 'url' => '/reports', 'module' => 'reports'];
 }
 
-// Settings — admin
+// ── Settings — admin only (super admin gets backup too) ──
 if ($isAdmin) {
     $navItems[] = ['icon' => 'cog', 'label' => 'Settings', 'url' => '/settings', 'module' => 'settings'];
 }

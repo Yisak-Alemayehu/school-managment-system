@@ -13,18 +13,18 @@ switch ($action) {
         break;
     case 'announcement-create':
     case 'announcement-edit':
-        require_permission('manage_communication');
+        auth_require_permission('communication.create');
         require __DIR__ . '/views/announcement_form.php';
         break;
     case 'announcement-save':
-        require_permission('manage_communication');
+        auth_require_permission('communication.create');
         require __DIR__ . '/actions/announcement_save.php';
         break;
     case 'announcement-view':
         require __DIR__ . '/views/announcement_view.php';
         break;
     case 'announcement-delete':
-        require_permission('manage_communication');
+        auth_require_permission('communication.delete');
         require __DIR__ . '/actions/announcement_delete.php';
         break;
 

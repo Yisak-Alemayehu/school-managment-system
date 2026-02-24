@@ -5,11 +5,11 @@
  */
 $user = auth_user();
 $isSuperAdmin = auth_is_super_admin();
-$isAdmin      = auth_has_role('Admin') || $isSuperAdmin;
-$isTeacher    = auth_has_role('Teacher');
-$isStudent    = auth_has_role('Student');
-$isParent     = auth_has_role('Parent');
-$isAccountant = auth_has_role('Accountant');
+$isAdmin      = auth_has_role('admin') || $isSuperAdmin;
+$isTeacher    = auth_has_role('teacher');
+$isStudent    = auth_has_role('student');
+$isParent     = auth_has_role('parent');
+$isAccountant = auth_has_role('accountant');
 
 // ── Gather Stats ─────────────────────────────────────────
 $stats = [];

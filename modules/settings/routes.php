@@ -7,19 +7,19 @@ $action = $_GET['action'] ?? 'general';
 
 switch ($action) {
     case 'general':
-        require_permission('manage_settings');
+        auth_require_permission('settings.view');
         require __DIR__ . '/views/general.php';
         break;
     case 'general-save':
-        require_permission('manage_settings');
+        auth_require_permission('settings.update');
         require __DIR__ . '/actions/general_save.php';
         break;
     case 'audit-logs':
-        require_permission('manage_settings');
+        auth_require_permission('audit_logs.view');
         require __DIR__ . '/views/audit_logs.php';
         break;
     case 'backup':
-        require_permission('super_admin');
+        if (!auth_is_super_admin()) { http_response_code(403); include TEMPLATES_PATH . '/errors/403.php'; exit; }
         require __DIR__ . '/views/backup.php';
         break;
     default:
