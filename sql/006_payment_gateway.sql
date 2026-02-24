@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 006: Payment Gateway
+-- Urji Beri School SMS — Migration 006: Payment Gateway
 -- Gateway tables, transactions, webhooks, reconciliation
 -- ============================================================
 

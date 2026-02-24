@@ -1,7 +1,7 @@
 <?php
 /**
  * Helper Functions
- * Urjiberi School Management ERP
+ * Urji Beri School Management System
  */
 
 if (!defined('APP_ROOT')) {

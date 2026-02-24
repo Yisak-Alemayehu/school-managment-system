@@ -1,4 +1,4 @@
-// Urjiberi School ERP — Service Worker
+// Urji Beri School SMS — Service Worker
 const CACHE_VERSION = 'urjiberi-v1.0.0';
 const APP_SHELL_CACHE = CACHE_VERSION + '-shell';
 const DATA_CACHE = CACHE_VERSION + '-data';
@@ -9,8 +9,7 @@ const APP_SHELL_FILES = [
     '/offline.html',
     '/assets/css/app.css',
     '/assets/js/app.js',
-    '/assets/icons/icon.php?s=192',
-    '/assets/icons/icon.php?s=512',
+    '/img/Logo.png',
     '/manifest.webmanifest'
 ];
 

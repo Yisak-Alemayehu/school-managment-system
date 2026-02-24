@@ -1,5 +1,5 @@
 /**
- * Urjiberi School ERP — Core JavaScript
+ * Urji Beri School SMS — Core JavaScript
  * Minimal vanilla JS for UI interactions
  */
 
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Notify user of new version
         navigator.serviceWorker.addEventListener('controllerchange', function() {
-            if (confirm('A new version of Urjiberi School ERP is available. Reload now?')) {
+            if (confirm('A new version of Urji Beri School SMS is available. Reload now?')) {
                 window.location.reload();
             }
         });

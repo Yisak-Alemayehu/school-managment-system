@@ -148,12 +148,10 @@ if ($isAdmin) {
 <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-sidebar-bg sidebar-transition transform -translate-x-full lg:translate-x-0 overflow-y-auto no-print">
     <!-- Logo / School Name -->
     <div class="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-        <div class="w-9 h-9 rounded-lg bg-primary-600 flex items-center justify-center flex-shrink-0">
-            <span class="text-white font-bold text-lg">U</span>
-        </div>
+        <img src="<?= url('/img/Logo.png') ?>" alt="Urji Beri School" class="w-9 h-9 rounded-lg flex-shrink-0 object-contain">
         <div class="min-w-0">
             <h1 class="text-white font-semibold text-sm truncate"><?= e(get_school_name()) ?></h1>
-            <p class="text-sidebar-text text-xs truncate">School ERP</p>
+            <p class="text-sidebar-text text-xs truncate">School SMS</p>
         </div>
         <button onclick="toggleSidebar()" class="lg:hidden ml-auto text-sidebar-text hover:text-white p-1">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>

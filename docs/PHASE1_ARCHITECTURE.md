@@ -1,8 +1,8 @@
-# Urjiberi School Management ERP — Phase 1: Architecture & Assumptions
+# Urji Beri School Management System — Phase 1: Architecture & Assumptions
 
 ## 1. System Overview
 
-**Urjiberi School ERP** is a single-school, single-tenant web-based School Management System built with:
+**Urji Beri School SMS** is a single-school, single-tenant web-based School Management System built with:
 - **Backend:** Procedural PHP 8.2+
 - **Database:** MySQL 8+
 - **Frontend:** Tailwind CSS + minimal vanilla JS

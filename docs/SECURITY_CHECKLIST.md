@@ -1,4 +1,4 @@
-# Urjiberi School ERP — Security Hardening Checklist
+# Urji Beri School SMS — Security Hardening Checklist
 
 ## Pre-Deployment Security Checklist
 

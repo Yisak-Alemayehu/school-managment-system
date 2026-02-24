@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 011: Extended Academics
+-- Urji Beri School SMS — Migration 011: Extended Academics
 -- Mediums, Streams, Shifts, Elective Subject Assignments
 -- ============================================================
 

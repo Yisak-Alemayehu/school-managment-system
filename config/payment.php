@@ -1,7 +1,7 @@
 <?php
 /**
  * Payment Gateway Configuration
- * Urjiberi School Management ERP
+ * Urji Beri School Management System
  */
 
 if (!defined('APP_ROOT')) {

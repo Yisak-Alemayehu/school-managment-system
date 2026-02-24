@@ -1,7 +1,7 @@
 <?php
 /**
  * Router
- * Urjiberi School Management ERP
+ * Urji Beri School Management System
  * 
  * Simple procedural router: maps URL paths to module files.
  */

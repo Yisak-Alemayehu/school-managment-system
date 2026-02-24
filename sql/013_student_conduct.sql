@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 013: Student Conduct
+-- Urji Beri School SMS — Migration 013: Student Conduct
 -- Conduct is a BEHAVIORAL assessment (separate from academics).
 -- Grades: A=Excellent, B=Very Good, C=Good, D=Satisfactory, F=Needs Improvement
 -- ============================================================

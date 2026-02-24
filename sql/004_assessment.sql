@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 004: Teaching & Assessment
+-- Urji Beri School SMS — Migration 004: Teaching & Assessment
 -- Attendance, Assignments, Exams, Marks, Grades, Report Cards
 -- ============================================================
 

@@ -1,4 +1,4 @@
-# Urjiberi School ERP — cPanel Deployment Guide
+# Urji Beri School SMS — cPanel Deployment Guide
 
 ## Prerequisites
 - cPanel shared hosting with **PHP 8.1+** and **MySQL 5.7+**

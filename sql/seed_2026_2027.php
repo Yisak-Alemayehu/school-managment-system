@@ -331,28 +331,54 @@ $adminUid = val($pdo, "SELECT id FROM users WHERE username='admin' LIMIT 1");
 if (!$adminUid) $adminUid = val($pdo, "SELECT MIN(id) FROM users");
 $adminUid = (int)$adminUid;
 
+// ── Safety: ensure unique key exists on assessments (run dedup migration if not) ──
+$ukExists = val($pdo,
+    "SELECT COUNT(*) FROM information_schema.statistics
+     WHERE table_schema=DATABASE() AND table_name='assessments' AND index_name='uk_assessment'"
+);
+if (!$ukExists) {
+    // Remove duplicates first, then add unique key
+    $pdo->exec("
+        DELETE a FROM assessments a
+        INNER JOIN assessments b
+            ON  b.name       = a.name
+            AND b.class_id   = a.class_id
+            AND b.subject_id = a.subject_id
+            AND b.session_id = a.session_id
+            AND (b.term_id   = a.term_id OR (b.term_id IS NULL AND a.term_id IS NULL))
+            AND b.id < a.id
+    ");
+    $pdo->exec("ALTER TABLE `assessments` ADD UNIQUE KEY `uk_assessment` (`name`(100),`class_id`,`subject_id`,`session_id`,`term_id`)");
+    say("  ✓ Deduped assessments table and added unique key");
+}
+
+// ── Also deduplicate student_results just in case ──────────────────────────
+$pdo->exec("
+    DELETE sr FROM student_results sr
+    INNER JOIN student_results sr2
+        ON sr2.assessment_id = sr.assessment_id
+        AND sr2.student_id   = sr.student_id
+        AND sr2.id < sr.id
+");
+
 $assessmentIds = []; // [class_id][subject_id][term_id][name] => assessment_id
 foreach ($classIds as $cName => $cid) {
     $subIds = $classSubjectIds[$cid];
     foreach ($termIds as $tName => $tid) {
         foreach ($subIds as $subId) {
             foreach ($assessmentStructure as [$aName, $marks]) {
-                // Check if exists
+                // Use INSERT IGNORE — safe even if unique key exists
+                $pdo->prepare(
+                    "INSERT IGNORE INTO `assessments`
+                     (`name`,`class_id`,`subject_id`,`session_id`,`term_id`,`total_marks`,`created_by`)
+                     VALUES (?,?,?,?,?,?,?)"
+                )->execute([$aName, $cid, $subId, $sessId, $tid, $marks, $adminUid]);
+
+                // Fetch the canonical id (could be pre-existing)
                 $aid = val($pdo,
-                    "SELECT id FROM assessments WHERE class_id=? AND subject_id=? AND session_id=? AND term_id=? AND name=?",
-                    [$cid, $subId, $sessId, $tid, $aName]
+                    "SELECT id FROM assessments WHERE name=? AND class_id=? AND subject_id=? AND session_id=? AND term_id=?",
+                    [$aName, $cid, $subId, $sessId, $tid]
                 );
-                if (!$aid) {
-                    $aid = ins($pdo, 'assessments', [
-                        'name'        => $aName,
-                        'class_id'    => $cid,
-                        'subject_id'  => $subId,
-                        'session_id'  => $sessId,
-                        'term_id'     => $tid,
-                        'total_marks' => $marks,
-                        'created_by'  => $adminUid,
-                    ]);
-                }
                 $assessmentIds[$cid][$subId][$tid][$aName] = (int)$aid;
             }
         }
@@ -384,19 +410,12 @@ foreach ($classIds as $cName => $cid) {
 
             foreach ($studentsMap as $stId => $isLazy) {
                 $marks = randomMark($maxMarks, $isLazy, $seed);
-                // Upsert
-                $existing = val($pdo, "SELECT id FROM student_results WHERE assessment_id=? AND student_id=?", [$aid, $stId]);
-                if (!$existing) {
-                    ins($pdo, 'student_results', [
-                        'assessment_id'  => $aid,
-                        'student_id'     => $stId,
-                        'class_id'       => $cid,
-                        'section_id'     => $secId,
-                        'marks_obtained' => $marks,
-                        'is_absent'      => 0,
-                        'entered_by'     => $adminUid,
-                    ]);
-                }
+                // INSERT IGNORE — unique key (assessment_id, student_id) prevents duplicates
+                $pdo->prepare(
+                    "INSERT IGNORE INTO `student_results`
+                     (`assessment_id`,`student_id`,`class_id`,`section_id`,`marks_obtained`,`is_absent`,`entered_by`)
+                     VALUES (?,?,?,?,?,0,?)"
+                )->execute([$aid, $stId, $cid, $secId, $marks, $adminUid]);
             }
         }
     }

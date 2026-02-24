@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 005: Finance
+-- Urji Beri School SMS — Migration 005: Finance
 -- Fee categories, structures, invoices, payments
 -- ============================================================
 

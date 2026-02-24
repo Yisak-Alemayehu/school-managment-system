@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 012: Results Module
+-- Urji Beri School SMS — Migration 012: Results Module
 -- Assessments (per class/subject, max=100) + Student Results
 -- ============================================================
 

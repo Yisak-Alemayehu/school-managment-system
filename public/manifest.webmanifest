@@ -1,7 +1,7 @@
 {
-    "name": "Urjiberi School ERP",
-    "short_name": "Urjiberi",
-    "description": "Urjiberi School Management System - Complete School ERP",
+    "name": "Urji Beri School SMS",
+    "short_name": "Urji Beri",
+    "description": "Urji Beri School Management System",
     "start_url": "/",
     "display": "standalone",
     "orientation": "portrait-primary",
@@ -10,62 +10,14 @@
     "categories": ["education", "productivity"],
     "icons": [
         {
-            "src": "/assets/icons/icon.php?s=72",
-            "sizes": "72x72",
+            "src": "/img/Logo.png",
+            "sizes": "any",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "/assets/icons/icon.php?s=96",
-            "sizes": "96x96",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/icons/icon.php?s=128",
-            "sizes": "128x128",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/icons/icon.php?s=144",
-            "sizes": "144x144",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/icons/icon.php?s=152",
-            "sizes": "152x152",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/icons/icon.php?s=192",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/icons/icon.php?s=384",
-            "sizes": "384x384",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/icons/icon.php?s=512",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/assets/icons/icon.php?s=192",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "/assets/icons/icon.php?s=512",
-            "sizes": "512x512",
+            "src": "/img/Logo.png",
+            "sizes": "any",
             "type": "image/png",
             "purpose": "maskable"
         }
@@ -75,17 +27,17 @@
         {
             "name": "Dashboard",
             "url": "/dashboard",
-            "icons": [{"src": "/assets/icons/icon.php?s=96", "sizes": "96x96"}]
+            "icons": [{"src": "/img/Logo.png", "sizes": "any", "type": "image/png"}]
         },
         {
             "name": "Students",
             "url": "/students",
-            "icons": [{"src": "/assets/icons/icon.php?s=96", "sizes": "96x96"}]
+            "icons": [{"src": "/img/Logo.png", "sizes": "any", "type": "image/png"}]
         },
         {
             "name": "Attendance",
             "url": "/attendance",
-            "icons": [{"src": "/assets/icons/icon.php?s=96", "sizes": "96x96"}]
+            "icons": [{"src": "/img/Logo.png", "sizes": "any", "type": "image/png"}]
         }
     ]
 }

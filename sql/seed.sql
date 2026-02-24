@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — COMPLETE SEED DATA
+-- Urji Beri School SMS — COMPLETE SEED DATA
 -- Session: 2025/2026  |  4 Terms  |  12 Grades × 2 Sections
 -- 5 students per section (120 total)  |  10 subjects per class
 -- 5 assessments per subject per term (Terms 1 & 2 filled)
@@ -379,7 +379,7 @@ INSERT INTO `payment_gateways` (`name`, `slug`, `display_name`, `description`, `
 -- ============================================================
 INSERT INTO `settings` (`setting_group`, `setting_key`, `setting_value`, `setting_type`, `description`, `is_public`) VALUES
 -- School info
-('school',     'name',               'Urjiberi School',           'string',  'School name',           1),
+('school',     'name',               'Urji Beri School',          'string',  'School name',           1),
 ('school',     'tagline',            'Excellence in Education',   'string',  'Motto / tagline',       1),
 ('school',     'email',              'info@urjiberi.edu.et',      'string',  'School email',          1),
 ('school',     'phone',              '+251111000000',             'string',  'School phone',          1),
@@ -387,7 +387,7 @@ INSERT INTO `settings` (`setting_group`, `setting_key`, `setting_value`, `settin
 ('school',     'city',               'Addis Ababa',               'string',  'City',                  1),
 ('school',     'region',             'Addis Ababa',               'string',  'Region/State',          1),
 ('school',     'country',            'Ethiopia',                  'string',  'Country',               1),
-('school',     'logo',               '',                          'string',  'School logo path',      1),
+('school',     'logo',               '/img/Logo.png',             'string',  'School logo path',      1),
 ('school',     'favicon',            '',                          'string',  'Favicon path',          1),
 -- System
 ('system',     'timezone',           'Africa/Addis_Ababa',        'string',  'Default timezone',      0),
@@ -411,7 +411,7 @@ INSERT INTO `settings` (`setting_group`, `setting_key`, `setting_value`, `settin
 ('email',      'smtp_user',          '',                          'string',  'SMTP username',         0),
 ('email',      'smtp_pass',          '',                          'string',  'SMTP password',         0),
 ('email',      'from_email',         'noreply@urjiberi.edu.et',   'string',  'From email',            0),
-('email',      'from_name',          'Urjiberi School',           'string',  'From name',             0),
+('email',      'from_name',          'Urji Beri School',          'string',  'From name',             0),
 -- SMS
 ('sms',        'provider',           '',                          'string',  'SMS provider',          0),
 ('sms',        'api_key',            '',                          'string',  'SMS API key',           0),

@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 003: Students
+-- Urji Beri School SMS — Migration 003: Students
 -- Students, Guardians, Enrollments, Promotions, Documents
 -- ============================================================
 

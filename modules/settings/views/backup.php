@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'backu
         try {
             $pdo = db_connect();
             $fp  = fopen($filepath, 'w');
-            fwrite($fp, "-- Urjiberi School ERP Database Backup\n");
+            fwrite($fp, "-- Urji Beri School SMS Database Backup\n");
             fwrite($fp, "-- Date: " . date('Y-m-d H:i:s') . "\n");
             fwrite($fp, "-- Database: $dbName\n\n");
             fwrite($fp, "SET FOREIGN_KEY_CHECKS=0;\n\n");

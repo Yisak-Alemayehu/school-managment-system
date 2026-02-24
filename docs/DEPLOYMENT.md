@@ -1,4 +1,4 @@
-# Urjiberi School ERP — Deployment Guide
+# Urji Beri School SMS — Deployment Guide
 
 ## System Requirements
 

@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — COMPLETE SCHEMA (All Tables + Constraints)
+-- Urji Beri School SMS — COMPLETE SCHEMA (All Tables + Constraints)
 -- Fresh install file — run this FIRST, then seed.sql
 -- Generated: 2026-02-20
 -- ============================================================

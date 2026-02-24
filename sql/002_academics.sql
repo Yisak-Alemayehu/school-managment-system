@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 002: Academics
+-- Urji Beri School SMS — Migration 002: Academics
 -- Sessions, Terms, Classes, Sections, Subjects, Timetable
 -- ============================================================
 

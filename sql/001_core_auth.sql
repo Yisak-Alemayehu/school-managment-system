@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 001: Core Tables
+-- Urji Beri School SMS — Migration 001: Core Tables
 -- Auth, Roles, Permissions
 -- ============================================================
 

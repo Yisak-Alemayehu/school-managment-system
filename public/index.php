@@ -1,7 +1,7 @@
 <?php
 /**
  * Front Controller
- * Urjiberi School Management ERP
+ * Urji Beri School Management System
  *
  * All requests go through this file.
  */

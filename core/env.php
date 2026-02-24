@@ -1,7 +1,7 @@
 <?php
 /**
  * Environment File Loader
- * Urjiberi School Management ERP
+ * Urji Beri School Management System
  *
  * Loads .env file from the project root and makes values
  * available via getenv(), $_ENV, and $_SERVER.

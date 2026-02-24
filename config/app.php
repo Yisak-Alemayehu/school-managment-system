@@ -1,7 +1,7 @@
 <?php
 /**
  * Application Configuration
- * Urjiberi School Management ERP
+ * Urji Beri School Management System
  */
 
 // Prevent direct access
@@ -10,7 +10,7 @@ if (!defined('APP_ROOT')) {
 }
 
 // ── Application ──────────────────────────────────────────────
-define('APP_NAME', 'Urjiberi School ERP');
+define('APP_NAME', 'Urji Beri School SMS');
 define('APP_VERSION', '1.0.0');
 define('APP_ENV', getenv('APP_ENV') ?: 'production'); // default to production on live servers
 define('APP_DEBUG', APP_ENV === 'development');

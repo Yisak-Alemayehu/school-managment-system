@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 007: Communication
+-- Urji Beri School SMS — Migration 007: Communication
 -- Announcements, Messages, Notifications
 -- ============================================================
 

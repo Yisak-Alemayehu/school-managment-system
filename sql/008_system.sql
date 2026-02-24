@@ -1,5 +1,5 @@
 -- ============================================================
--- Urjiberi School ERP — Migration 008: System
+-- Urji Beri School SMS — Migration 008: System
 -- Audit logs, Settings
 -- ============================================================
 

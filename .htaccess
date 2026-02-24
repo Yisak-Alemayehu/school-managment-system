@@ -1,4 +1,4 @@
-# Urjiberi School ERP — Root .htaccess
+# Urji Beri School SMS — Root .htaccess
 # Redirect all traffic to public/ directory
 # and block access to sensitive directories
 #
