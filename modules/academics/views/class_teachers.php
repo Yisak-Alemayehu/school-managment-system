@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Academics — Class Teacher Assignment View (Fixed)
  * Uses CONCAT(first_name, last_name), is_class_teacher=1, sub-nav.
@@ -49,14 +49,14 @@ ob_start();
 
 <div class="max-w-5xl mx-auto">
 
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Assign Class Teachers</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Assign Class Teachers</h1>
 
     <!-- Session selector -->
     <div class="flex flex-wrap items-end gap-4 mb-6">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Session</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Session</label>
             <select onchange="window.location='<?= url('academics', 'class-teachers') ?>&session_id='+this.value"
-                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                 <?php foreach ($sessions as $s): ?>
                     <option value="<?= $s['id'] ?>" <?= $filterSession == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
                 <?php endforeach; ?>
@@ -65,16 +65,16 @@ ob_start();
     </div>
 
     <!-- Add form -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4"><?= 'Assign Class Teacher' ?></h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4"><?= 'Assign Class Teacher' ?></h2>
         <form method="POST" action="<?= url('academics', 'class-teacher-save') ?>" class="flex flex-wrap items-end gap-4">
             <?= csrf_field() ?>
             <input type="hidden" name="session_id" value="<?= $filterSession ?>">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                 <select name="class_id" id="ctClass" required onchange="filterCTSections(this.value)"
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[150px]">
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm min-w-[150px]">
                     <option value="">-- Select --</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
@@ -83,15 +83,15 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section <span class="text-red-500">*</span></label>
-                <select name="section_id" id="ctSection" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[120px]">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section <span class="text-red-500">*</span></label>
+                <select name="section_id" id="ctSection" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm min-w-[120px]">
                     <option value="">-- Select Class First --</option>
                 </select>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Teacher <span class="text-red-500">*</span></label>
-                <select name="teacher_id" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teacher <span class="text-red-500">*</span></label>
+                <select name="teacher_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm min-w-[200px]">
                     <option value="">-- Select --</option>
                     <?php foreach ($teachers as $t): ?>
                         <option value="<?= $t['id'] ?>"><?= e($t['full_name']) ?></option>
@@ -106,28 +106,28 @@ ob_start();
     </div>
 
     <!-- Current assignments -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-4 py-3 bg-gray-50 border-b">
-            <h2 class="text-sm font-semibold text-gray-900">Current Class Teacher Assignments</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden overflow-x-auto">
+        <div class="px-4 py-3 bg-gray-50 dark:bg-dark-bg border-b">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text">Current Class Teacher Assignments</h2>
         </div>
         <?php if (empty($assignments)): ?>
-            <div class="px-4 py-8 text-center text-gray-500 text-sm">No class teachers assigned for this session yet.</div>
+            <div class="px-4 py-8 text-center text-gray-500 dark:text-dark-muted text-sm">No class teachers assigned for this session yet.</div>
         <?php else: ?>
             <table class="w-full">
-                <thead class="bg-gray-50 border-b">
+                <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Section</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teacher</th>
-                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Section</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Teacher</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php foreach ($assignments as $a): ?>
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-sm text-gray-900"><?= e($a['class_name']) ?></td>
-                            <td class="px-4 py-3 text-sm text-gray-700"><?= e($a['section_name']) ?></td>
-                            <td class="px-4 py-3 text-sm text-gray-700"><?= e($a['teacher_name']) ?></td>
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text"><?= e($a['class_name']) ?></td>
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300"><?= e($a['section_name']) ?></td>
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300"><?= e($a['teacher_name']) ?></td>
                             <td class="px-4 py-3 text-right">
                                 <form method="POST" action="<?= url('academics', 'class-teacher-save') ?>&delete=<?= $a['id'] ?>" class="inline"
                                       onsubmit="return confirm('Remove this assignment?')">

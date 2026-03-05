@@ -12,7 +12,8 @@ if (!defined('APP_ROOT')) {
  * Get PWA meta tags for head section
  */
 function pwa_meta_tags(): string {
-    $themeColor = '#1e40af'; // Blue-800
+    $isDark = ($_COOKIE['theme'] ?? 'light') === 'dark';
+    $themeColor = $isDark ? '#0f172a' : '#1e40af';
     $html = '';
     $html .= '<meta name="theme-color" content="' . $themeColor . '">' . "\n";
     $html .= '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n";

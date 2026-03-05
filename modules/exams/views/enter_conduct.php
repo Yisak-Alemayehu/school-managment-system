@@ -91,8 +91,8 @@ ob_start();
 
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-xl font-bold text-gray-900">Enter Student Conduct</h1>
-            <p class="text-sm text-gray-500 mt-0.5">
+            <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Enter Student Conduct</h1>
+            <p class="text-sm text-gray-500 dark:text-dark-muted mt-0.5">
                 Conduct grades reflect <strong>behavior, social skills, and classroom habits</strong> —
                 independent of academic performance.
             </p>
@@ -109,14 +109,14 @@ ob_start();
     </div>
 
     <!-- Filter -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6">
         <form method="GET" class="flex flex-wrap items-end gap-4">
             <input type="hidden" name="module" value="exams">
             <input type="hidden" name="action" value="enter-conduct">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Term <span class="text-red-500">*</span></label>
-                <select name="term_id" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Term <span class="text-red-500">*</span></label>
+                <select name="term_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">Select Term</option>
                     <?php foreach ($allTerms as $t): ?>
                         <option value="<?= $t['id'] ?>" <?= $selTerm == $t['id'] ? 'selected' : '' ?>>
@@ -127,8 +127,8 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
-                <select name="class_id" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
+                <select name="class_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">Select Class</option>
                     <?php foreach ($allClasses as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $selClass == $c['id'] ? 'selected' : '' ?>>
@@ -139,8 +139,8 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
+                <select name="section_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="0">All Sections</option>
                     <?php foreach ($allSections as $s): ?>
                         <?php if (!$selClass || $s['class_id'] == $selClass): ?>
@@ -173,14 +173,14 @@ ob_start();
         </div>
 
         <?php if (empty($students)): ?>
-        <div class="bg-white rounded-xl border border-gray-200 p-10 text-center text-gray-500">
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-10 text-center text-gray-500 dark:text-dark-muted">
             No active students found for <strong><?= e($className) ?></strong>
             <?= $selSection ? '— ' . e($sectionName) : '' ?>.
         </div>
         <?php else: ?>
 
         <!-- Context banner -->
-        <div class="text-sm text-gray-600 mb-3">
+        <div class="text-sm text-gray-600 dark:text-dark-muted mb-3">
             <span class="font-medium"><?= e($className) ?></span>
             <?= $selSection ? ' &mdash; ' . e($sectionName) : '' ?>
             &nbsp;·&nbsp; <?= e($termName) ?>
@@ -199,45 +199,45 @@ ob_start();
             <input type="hidden" name="section_id" value="<?= $selSection ?>">
             <?php endif; ?>
 
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead class="bg-gray-50 dark:bg-dark-bg border-b border-gray-200 dark:border-dark-border">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide w-8">#</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Student</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide w-16">Adm. No</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide w-8">Sex</th>
-                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wide w-44">
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase tracking-wide w-8">#</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase tracking-wide">Student</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase tracking-wide w-16">Adm. No</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase tracking-wide w-8">Sex</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase tracking-wide w-44">
                                 Conduct Grade
-                                <div class="text-gray-400 font-normal normal-case tracking-normal">Behavior / Social / Habits</div>
+                                <div class="text-gray-400 dark:text-gray-500 font-normal normal-case tracking-normal">Behavior / Social / Habits</div>
                             </th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                Teacher Remark <span class="text-gray-400 font-normal">(optional)</span>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase tracking-wide">
+                                Teacher Remark <span class="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                         <?php foreach ($students as $i => $st):
                             $saved   = $conductMap[$st['id']] ?? null;
                             $conduct = $saved['conduct'] ?? 'B'; // default Very Good
                             $remarks = $saved['remarks'] ?? '';
                             $isSaved = $saved !== null;
                         ?>
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="px-4 py-2.5 text-gray-400 text-xs"><?= $i + 1 ?></td>
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg transition">
+                            <td class="px-4 py-2.5 text-gray-400 dark:text-gray-500 text-xs"><?= $i + 1 ?></td>
                             <td class="px-4 py-2.5">
-                                <div class="font-medium text-gray-900">
+                                <div class="font-medium text-gray-900 dark:text-dark-text">
                                     <?= e($st['first_name'] . ' ' . $st['last_name']) ?>
                                 </div>
                                 <?php if ($st['roll_no']): ?>
-                                <div class="text-xs text-gray-400">Roll <?= e($st['roll_no']) ?></div>
+                                <div class="text-xs text-gray-400 dark:text-gray-500">Roll <?= e($st['roll_no']) ?></div>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-4 py-2.5 text-gray-500 text-xs"><?= e($st['admission_no'] ?? '—') ?></td>
-                            <td class="px-4 py-2.5 text-gray-500 text-xs"><?= e($st['gender'][0] ?? '—') ?></td>
+                            <td class="px-4 py-2.5 text-gray-500 dark:text-dark-muted text-xs"><?= e($st['admission_no'] ?? '—') ?></td>
+                            <td class="px-4 py-2.5 text-gray-500 dark:text-dark-muted text-xs"><?= e($st['gender'][0] ?? '—') ?></td>
                             <td class="px-4 py-2.5 text-center">
                                 <select name="conduct[<?= $st['id'] ?>]"
-                                        class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium w-full max-w-xs
+                                        class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm font-medium w-full max-w-xs
                                                conduct-select"
                                         data-student="<?= $st['id'] ?>">
                                     <?php foreach (CONDUCT_GRADES as $gk => $gl): ?>
@@ -253,13 +253,13 @@ ob_start();
                                        value="<?= e($remarks) ?>"
                                        maxlength="255"
                                        placeholder="e.g., Participates actively, respectful…"
-                                       class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                                       class="w-full px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
                             </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            </div>
+            </div></div>
 
             <!-- Bottom save button -->
             <div class="flex justify-end mt-4">

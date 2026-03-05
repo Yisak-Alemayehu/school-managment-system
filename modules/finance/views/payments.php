@@ -74,7 +74,7 @@ ob_start();
 
 <div class="space-y-4">
     <div class="flex items-center justify-between flex-wrap gap-2">
-        <h1 class="text-xl font-bold text-gray-900">School Payment History</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">School Payment History</h1>
         <div class="flex gap-2">
             <a href="<?= url('finance', 'export-pdf') ?>&<?= $exportQs ?>"
                class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 font-medium inline-flex items-center gap-1">
@@ -90,26 +90,26 @@ ob_start();
     </div>
 
     <!-- Filters -->
-    <form method="GET" action="<?= url('finance', 'payments') ?>" class="bg-white rounded-xl border border-gray-200 p-4">
+    <form method="GET" action="<?= url('finance', 'payments') ?>" class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4">
         <div class="flex flex-wrap gap-3">
             <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search student, code, receipt…"
-                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
 
-            <select name="fee_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <select name="fee_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="">All Fees</option>
                 <?php foreach ($fees as $f): ?>
                     <option value="<?= $f['id'] ?>" <?= $feeId == $f['id'] ? 'selected' : '' ?>><?= e($f['description']) ?></option>
                 <?php endforeach; ?>
             </select>
 
-            <select name="class_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <select name="class_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="">All Classes</option>
                 <?php foreach ($classes as $c): ?>
                     <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
                 <?php endforeach; ?>
             </select>
 
-            <select name="channel" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <select name="channel" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="">All Channels</option>
                 <option value="cash" <?= $channel === 'cash' ? 'selected' : '' ?>>Cash</option>
                 <option value="bank" <?= $channel === 'bank' ? 'selected' : '' ?>>Bank</option>
@@ -118,49 +118,49 @@ ob_start();
             </select>
 
             <input type="date" name="date_from" value="<?= e($dateFrom) ?>" placeholder="From"
-                   class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
             <input type="date" name="date_to" value="<?= e($dateTo) ?>" placeholder="To"
-                   class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
 
             <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Search</button>
-            <a href="<?= url('finance', 'payments') ?>" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>
+            <a href="<?= url('finance', 'payments') ?>" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>
         </div>
     </form>
 
     <!-- Payments Table -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 responsive-table">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
+                <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Code</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Fee</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Channel</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Receipt #</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Processed By</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Code</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Fee</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Amount</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Channel</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Receipt #</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Processed By</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($rows)): ?>
-                    <tr><td colspan="9" class="px-4 py-8 text-center text-gray-400">No payment records found.</td></tr>
+                    <tr><td colspan="9" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No payment records found.</td></tr>
                     <?php else: ?>
                     <?php foreach ($rows as $r): ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Date"><?= format_datetime($r['created_at']) ?></td>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg transition-colors">
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Date"><?= format_datetime($r['created_at']) ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Student">
                             <a href="<?= url('finance', 'student-detail', $r['student_id']) ?>" class="text-primary-600 hover:underline font-medium"><?= e($r['full_name']) ?></a>
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Code"><?= e($r['admission_no']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Class"><?= e($r['class_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Fee"><?= e($r['fee_desc'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm font-semibold text-gray-900" data-label="Amount"><?= format_money($r['amount']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Channel"><?= ucfirst(e($r['channel'] ?? '—')) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Receipt"><?= e($r['receipt_no'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="By"><?= e($r['processed_by_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Code"><?= e($r['admission_no']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Class"><?= e($r['class_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Fee"><?= e($r['fee_desc'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-dark-text" data-label="Amount"><?= format_money($r['amount']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Channel"><?= ucfirst(e($r['channel'] ?? '—')) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Receipt"><?= e($r['receipt_no'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="By"><?= e($r['processed_by_name'] ?? '—') ?></td>
                     </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>

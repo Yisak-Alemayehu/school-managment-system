@@ -49,7 +49,7 @@ ob_start();
 
 <div class="max-w-6xl mx-auto">
 
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Assign Subject Teachers</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Assign Subject Teachers</h1>
 
     <?php if (!$sessionId): ?>
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
@@ -58,16 +58,16 @@ ob_start();
     <?php else: ?>
 
     <!-- Form -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4"><?= $editing ? 'Edit Assignment' : 'Assign Subject Teacher' ?></h2>
-        <form method="POST" action="<?= url('academics', 'subject-teacher-save') ?>" class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4"><?= $editing ? 'Edit Assignment' : 'Assign Subject Teacher' ?></h2>
+        <form method="POST" action="<?= url('academics', 'subject-teacher-save') ?>" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <?= csrf_field() ?>
             <?php if ($editing): ?><input type="hidden" name="id" value="<?= $editing['id'] ?>"><?php endif; ?>
             <input type="hidden" name="session_id" value="<?= $sessionId ?>">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Teacher <span class="text-red-500">*</span></label>
-                <select name="teacher_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teacher <span class="text-red-500">*</span></label>
+                <select name="teacher_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Teacher</option>
                     <?php foreach ($teachers as $t): ?>
                         <option value="<?= $t['id'] ?>" <?= ($editing['teacher_id'] ?? '') == $t['id'] ? 'selected' : '' ?>><?= e($t['full_name']) ?></option>
@@ -75,8 +75,8 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Subject <span class="text-red-500">*</span></label>
-                <select name="subject_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-red-500">*</span></label>
+                <select name="subject_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Subject</option>
                     <?php foreach ($subjects as $sub): ?>
                         <option value="<?= $sub['id'] ?>" <?= ($editing['subject_id'] ?? '') == $sub['id'] ? 'selected' : '' ?>><?= e($sub['name']) ?> (<?= e($sub['code']) ?>)</option>
@@ -84,9 +84,9 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                 <select name="class_id" required id="stClassSelect" onchange="filterSTSections(this.value)"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= ($editing['class_id'] ?? '') == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -94,8 +94,8 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" id="stSectionSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
+                <select name="section_id" id="stSectionSelect" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $s): ?>
                         <option value="<?= $s['id'] ?>" data-class="<?= $s['class_id'] ?>"
@@ -111,43 +111,44 @@ ob_start();
                     <?= $editing ? 'Update' : 'Assign' ?>
                 </button>
                 <?php if ($editing): ?>
-                    <a href="<?= url('academics', 'subject-teachers') ?>" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
+                    <a href="<?= url('academics', 'subject-teachers') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                 <?php endif; ?>
             </div>
         </form>
     </div>
 
     <!-- List -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full">
-            <thead class="bg-gray-50 border-b">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full responsive-table">
+            <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teacher</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Section</th>
-                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Teacher</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Subject</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Class</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Section</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php if (empty($assignments)): ?>
-                    <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500">No subject teacher assignments for this session.</td></tr>
+                    <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500 dark:text-dark-muted">No subject teacher assignments for this session.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($assignments as $a): ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900"><?= e($a['teacher_name']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= e($a['subject_name']) ?> <span class="text-xs text-gray-400">(<?= e($a['subject_code']) ?>)</span></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= e($a['class_name']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= $a['section_name'] ? e($a['section_name']) : '<span class="text-gray-400">All</span>' ?></td>
-                        <td class="px-4 py-3 text-right flex items-center justify-end gap-1">
-                            <a href="<?= url('academics', 'subject-teachers') ?>&edit=<?= $a['id'] ?>" class="p-1.5 text-gray-400 hover:text-yellow-600 rounded" title="Edit">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                        <td data-label="Teacher" class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($a['teacher_name']) ?></td>
+                        <td data-label="Subject" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($a['subject_name']) ?> <span class="text-xs text-gray-400 dark:text-gray-500">(<?= e($a['subject_code']) ?>)</span></td>
+                        <td data-label="Class" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($a['class_name']) ?></td>
+                        <td data-label="Section" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= $a['section_name'] ? e($a['section_name']) : '<span class="text-gray-400 dark:text-gray-500">All</span>' ?></td>
+                        <td data-label="Actions" class="px-4 py-3 text-right flex items-center justify-end gap-1">
+                            <a href="<?= url('academics', 'subject-teachers') ?>&edit=<?= $a['id'] ?>" class="p-2 text-gray-400 dark:text-gray-500 hover:text-yellow-600 rounded" title="Edit">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </a>
                             <form method="POST" action="<?= url('academics', 'subject-teacher-delete') ?>" class="inline" onsubmit="return confirm('Remove this assignment?')">
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="id" value="<?= $a['id'] ?>">
-                                <button type="submit" class="p-1.5 text-gray-400 hover:text-red-600 rounded" title="Remove">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                <button type="submit" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 rounded" title="Remove">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                             </form>
                         </td>
@@ -155,6 +156,7 @@ ob_start();
                 <?php endforeach; ?>
             </tbody>
         </table>
+      </div>
     </div>
 
     <?php endif; ?>

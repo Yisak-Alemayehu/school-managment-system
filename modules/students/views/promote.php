@@ -12,31 +12,31 @@ ob_start();
 
 <div class="max-w-4xl mx-auto">
     <div class="flex items-center gap-3 mb-6">
-        <a href="<?= url('students') ?>" class="p-1 text-gray-400 hover:text-gray-600">
+        <a href="<?= url('students') ?>" class="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-dark-muted">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </a>
-        <h1 class="text-xl font-bold text-gray-900">Student Promotion</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Student Promotion</h1>
     </div>
 
     <!-- Step 1: Select Source Class -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Select Students to Promote</h2>
-        <form method="GET" action="<?= url('students', 'promote') ?>" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Select Students to Promote</h2>
+        <form method="GET" action="<?= url('students', 'promote') ?>" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <input type="hidden" name="module" value="students">
             <input type="hidden" name="action" value="promote">
-            <select name="from_session" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <select name="from_session" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                 <option value="">From Session...</option>
                 <?php foreach ($sessions as $sess): ?>
                     <option value="<?= $sess['id'] ?>" <?= input_int('from_session') == $sess['id'] ? 'selected' : '' ?>><?= e($sess['name']) ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="from_class" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <select name="from_class" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                 <option value="">From Class...</option>
                 <?php foreach ($classes as $cls): ?>
                     <option value="<?= $cls['id'] ?>" <?= input_int('from_class') == $cls['id'] ? 'selected' : '' ?>><?= e($cls['name']) ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="from_section" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <select name="from_section" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                 <option value="">All Sections</option>
                 <?php foreach ($sections as $sec): ?>
                     <option value="<?= $sec['id'] ?>" <?= input_int('from_section') == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?> (Class <?= $sec['class_id'] ?>)</option>
@@ -76,49 +76,49 @@ ob_start();
         <?= csrf_field() ?>
         <input type="hidden" name="from_session" value="<?= $fromSession ?>">
 
-        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-4">
-            <h2 class="text-sm font-semibold text-gray-900 mb-4">Promote To</h2>
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-4">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Promote To</h2>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <select name="to_session" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <select name="to_session" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">To Session...</option>
                     <?php foreach ($sessions as $sess): ?>
                         <option value="<?= $sess['id'] ?>"><?= e($sess['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select name="to_class" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm" onchange="loadToSections(this.value)">
+                <select name="to_class" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" onchange="loadToSections(this.value)">
                     <option value="">To Class...</option>
                     <?php foreach ($classes as $cls): ?>
                         <option value="<?= $cls['id'] ?>"><?= e($cls['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select name="to_section" id="to_section" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <select name="to_section" id="to_section" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">To Section...</option>
                 </select>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-4">
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden overflow-x-auto mb-4">
             <table class="w-full">
-                <thead class="bg-gray-50 border-b">
+                <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                     <tr>
                         <th class="px-4 py-3 text-left"><input type="checkbox" onclick="toggleSelectAll(this, 'promote-cb')" class="rounded"></th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Student</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Current Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($studentsToPromote)): ?>
-                        <tr><td colspan="4" class="px-4 py-8 text-center text-sm text-gray-400">No students found.</td></tr>
+                        <tr><td colspan="4" class="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">No students found.</td></tr>
                     <?php endif; ?>
                     <?php foreach ($studentsToPromote as $sp): ?>
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                             <td class="px-4 py-3"><input type="checkbox" name="student_ids[]" value="<?= $sp['id'] ?>" class="promote-cb rounded"></td>
                             <td class="px-4 py-3">
-                                <p class="text-sm font-medium text-gray-900"><?= e($sp['full_name']) ?></p>
-                                <p class="text-xs text-gray-500"><?= e($sp['admission_no']) ?></p>
+                                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($sp['full_name']) ?></p>
+                                <p class="text-xs text-gray-500 dark:text-dark-muted"><?= e($sp['admission_no']) ?></p>
                             </td>
-                            <td class="px-4 py-3 text-sm text-gray-700"><?= e($sp['class_name']) ?> <?= e($sp['section_name']) ?></td>
+                            <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300"><?= e($sp['class_name']) ?> <?= e($sp['section_name']) ?></td>
                             <td class="px-4 py-3">
                                 <select name="promote_status[<?= $sp['id'] ?>]" class="px-2 py-1 border rounded text-xs">
                                     <option value="promoted">Promote</option>
@@ -130,7 +130,7 @@ ob_start();
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
+        </div></div>
 
         <div class="flex justify-end">
             <button type="submit" class="px-6 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition" onclick="return confirm('Promote selected students?')">

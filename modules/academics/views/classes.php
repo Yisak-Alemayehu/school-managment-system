@@ -30,29 +30,29 @@ ob_start();
 
 <div class="max-w-6xl mx-auto">
 
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Classes / Grades</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Classes / Grades</h1>
 
     <!-- Form -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4"><?= $editing ? 'Edit Class' : 'Add New Class' ?></h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4"><?= $editing ? 'Edit Class' : 'Add New Class' ?></h2>
         <form method="POST" action="<?= url('academics', 'class-save') ?>" class="space-y-4">
             <?= csrf_field() ?>
             <?php if ($editing): ?><input type="hidden" name="id" value="<?= $editing['id'] ?>"><?php endif; ?>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Class Name <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class Name <span class="text-red-500">*</span></label>
                     <input type="text" name="name" value="<?= e($editing['name'] ?? '') ?>" required placeholder="e.g. Grade 1"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Numeric Level</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Numeric Level</label>
                     <input type="number" name="numeric_name" value="<?= e($editing['numeric_name'] ?? '') ?>" min="0" max="20" placeholder="e.g. 1"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Medium</label>
-                    <select name="medium_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Medium</label>
+                    <select name="medium_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         <option value="">None</option>
                         <?php foreach ($mediums as $m): ?>
                             <option value="<?= $m['id'] ?>" <?= ($editing['medium_id'] ?? '') == $m['id'] ? 'selected' : '' ?>><?= e($m['name']) ?></option>
@@ -60,8 +60,8 @@ ob_start();
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Stream</label>
-                    <select name="stream_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stream</label>
+                    <select name="stream_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         <option value="">None</option>
                         <?php foreach ($streams as $s): ?>
                             <option value="<?= $s['id'] ?>" <?= ($editing['stream_id'] ?? '') == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
@@ -69,8 +69,8 @@ ob_start();
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Shift</label>
-                    <select name="shift_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Shift</label>
+                    <select name="shift_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         <option value="">None</option>
                         <?php foreach ($shifts as $sh): ?>
                             <option value="<?= $sh['id'] ?>" <?= ($editing['shift_id'] ?? '') == $sh['id'] ? 'selected' : '' ?>><?= e($sh['name']) ?></option>
@@ -82,7 +82,7 @@ ob_start();
                         <?= $editing ? 'Update' : 'Add' ?>
                     </button>
                     <?php if ($editing): ?>
-                        <a href="<?= url('academics', 'classes') ?>" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
+                        <a href="<?= url('academics', 'classes') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -90,42 +90,44 @@ ob_start();
     </div>
 
     <!-- List -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full">
-            <thead class="bg-gray-50 border-b">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full responsive-table">
+            <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Level</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Medium</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stream</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Shift</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sections</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Students</th>
-                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Class</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Level</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Medium</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Stream</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Shift</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Sections</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Students</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php if (empty($classes)): ?>
-                    <tr><td colspan="8" class="px-4 py-6 text-center text-sm text-gray-500">No classes found. Add one above.</td></tr>
+                    <tr><td colspan="8" class="px-4 py-6 text-center text-sm text-gray-500 dark:text-dark-muted">No classes found. Add one above.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($classes as $c): ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900"><?= e($c['name']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= $c['numeric_name'] ?? '—' ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= e($c['medium_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= e($c['stream_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= e($c['shift_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= $c['section_count'] ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= $c['student_count'] ?></td>
-                        <td class="px-4 py-3 text-right">
-                            <a href="<?= url('academics', 'classes') ?>&edit=<?= $c['id'] ?>" class="p-1.5 text-gray-400 hover:text-yellow-600 rounded inline-block" title="Edit">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                        <td data-label="Class" class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($c['name']) ?></td>
+                        <td data-label="Level" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= $c['numeric_name'] ?? '—' ?></td>
+                        <td data-label="Medium" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($c['medium_name'] ?? '—') ?></td>
+                        <td data-label="Stream" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($c['stream_name'] ?? '—') ?></td>
+                        <td data-label="Shift" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($c['shift_name'] ?? '—') ?></td>
+                        <td data-label="Sections" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= $c['section_count'] ?></td>
+                        <td data-label="Students" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= $c['student_count'] ?></td>
+                        <td data-label="Actions" class="px-4 py-3 text-right">
+                            <a href="<?= url('academics', 'classes') ?>&edit=<?= $c['id'] ?>" class="p-2 text-gray-400 dark:text-gray-500 hover:text-yellow-600 rounded inline-block" title="Edit">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+      </div>
     </div>
 </div>
 

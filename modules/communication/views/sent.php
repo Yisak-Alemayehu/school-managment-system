@@ -18,35 +18,35 @@ ob_start();
 ?>
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 class="text-2xl font-bold text-gray-900">Sent Messages</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-dark-text">Sent Messages</h1>
         <div class="flex gap-2">
             <a href="<?= url('communication', 'message-compose') ?>"
                class="px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900">Compose</a>
             <a href="<?= url('communication', 'inbox') ?>"
-               class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Inbox</a>
+               class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Inbox</a>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-sm border overflow-hidden">
         <?php if (empty($messages['data'])): ?>
-            <div class="p-8 text-center text-gray-500">No sent messages.</div>
+            <div class="p-8 text-center text-gray-500 dark:text-dark-muted">No sent messages.</div>
         <?php else: ?>
-            <div class="divide-y divide-gray-200">
+            <div class="divide-y divide-gray-200 dark:divide-dark-border">
                 <?php foreach ($messages['data'] as $m): ?>
                     <a href="<?= url('communication', 'message-view') ?>&id=<?= $m['id'] ?>"
-                       class="block p-4 hover:bg-gray-50 transition">
+                       class="block p-4 hover:bg-gray-50 dark:bg-dark-bg transition">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex-1 min-w-0">
-                                <span class="font-medium text-gray-900">To: <?= e($m['receiver_name']) ?></span>
-                                <p class="text-sm font-semibold text-gray-800 mt-0.5 truncate"><?= e($m['subject']) ?></p>
-                                <p class="text-xs text-gray-500 mt-0.5 truncate"><?= e(substr(strip_tags($m['body']), 0, 100)) ?></p>
+                                <span class="font-medium text-gray-900 dark:text-dark-text">To: <?= e($m['receiver_name']) ?></span>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-dark-text mt-0.5 truncate"><?= e($m['subject']) ?></p>
+                                <p class="text-xs text-gray-500 dark:text-dark-muted mt-0.5 truncate"><?= e(substr(strip_tags($m['body']), 0, 100)) ?></p>
                             </div>
                             <div class="text-right flex-shrink-0">
-                                <span class="text-xs text-gray-400"><?= format_datetime($m['created_at']) ?></span>
+                                <span class="text-xs text-gray-400 dark:text-gray-500"><?= format_datetime($m['created_at']) ?></span>
                                 <?php if ($m['is_read']): ?>
                                     <div class="text-xs text-green-600">Read</div>
                                 <?php else: ?>
-                                    <div class="text-xs text-gray-400">Unread</div>
+                                    <div class="text-xs text-gray-400 dark:text-gray-500">Unread</div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -55,7 +55,7 @@ ob_start();
             </div>
         <?php endif; ?>
         <?php if ($messages['last_page'] > 1): ?>
-            <div class="px-6 py-3 border-t bg-gray-50">
+            <div class="px-6 py-3 border-t bg-gray-50 dark:bg-dark-bg">
                 <?= render_pagination($messages, url('communication', 'sent')) ?>
             </div>
         <?php endif; ?>

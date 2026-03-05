@@ -59,111 +59,111 @@ $schoolName = get_school_name();
         }
     </style>
 </head>
-<body class="bg-white p-4 max-w-3xl mx-auto text-sm">
+<body class="bg-white dark:bg-dark-card p-4 max-w-3xl mx-auto text-sm">
 
     <!-- Print button -->
     <div class="no-print mb-4 flex gap-3">
         <button onclick="window.print()" class="px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium">Print</button>
         <a href="<?= url('exams', 'report-cards') ?>&exam_id=<?= $rc['exam_id'] ?>&class_id=<?= $rc['class_id'] ?>"
-           class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Back</a>
+           class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Back</a>
     </div>
 
     <!-- Header -->
     <div class="text-center border-b-2 border-gray-800 pb-4 mb-4">
-        <h1 class="text-xl font-bold text-gray-900"><?= e($schoolName) ?></h1>
-        <p class="text-gray-600">Student Report Card</p>
-        <p class="text-xs text-gray-500 mt-1"><?= e($rc['session_name'] ?? '') ?> — <?= e($rc['term_name'] ?? '') ?> — <?= e($rc['exam_name']) ?></p>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text"><?= e($schoolName) ?></h1>
+        <p class="text-gray-600 dark:text-dark-muted">Student Report Card</p>
+        <p class="text-xs text-gray-500 dark:text-dark-muted mt-1"><?= e($rc['session_name'] ?? '') ?> — <?= e($rc['term_name'] ?? '') ?> — <?= e($rc['exam_name']) ?></p>
     </div>
 
     <!-- Student Info -->
     <div class="grid grid-cols-2 gap-4 mb-6">
         <div class="space-y-1">
-            <div><span class="text-gray-500">Name:</span> <strong><?= e($rc['first_name'] . ' ' . $rc['last_name']) ?></strong></div>
-            <div><span class="text-gray-500">Admission No:</span> <?= e($rc['admission_no']) ?></div>
-            <div><span class="text-gray-500">Class:</span> <?= e($rc['class_name']) ?></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Name:</span> <strong><?= e($rc['first_name'] . ' ' . $rc['last_name']) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Admission No:</span> <?= e($rc['admission_no']) ?></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Class:</span> <?= e($rc['class_name']) ?></div>
         </div>
         <div class="space-y-1 text-right">
-            <div><span class="text-gray-500">Gender:</span> <?= ucfirst($rc['gender']) ?></div>
-            <div><span class="text-gray-500">DOB:</span> <?= format_date($rc['date_of_birth']) ?></div>
-            <div><span class="text-gray-500">Rank:</span> <strong><?= $rc['rank'] ?></strong> / <?= $rc['total_students'] ?></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Gender:</span> <?= ucfirst($rc['gender']) ?></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">DOB:</span> <?= format_date($rc['date_of_birth']) ?></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Rank:</span> <strong><?= $rc['rank'] ?></strong> / <?= $rc['total_students'] ?></div>
         </div>
     </div>
 
     <!-- Marks Table -->
-    <table class="w-full border border-gray-300 mb-6">
+    <table class="w-full border border-gray-300 dark:border-dark-border mb-6">
         <thead>
-            <tr class="bg-gray-100">
-                <th class="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-600">Subject</th>
-                <th class="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-600">Full Marks</th>
-                <th class="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-600">Pass Marks</th>
-                <th class="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-600">Obtained</th>
-                <th class="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-600">Grade</th>
-                <th class="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-600">Points</th>
+            <tr class="bg-gray-100 dark:bg-dark-card2">
+                <th class="border border-gray-300 dark:border-dark-border px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-dark-muted">Subject</th>
+                <th class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center text-xs font-medium text-gray-600 dark:text-dark-muted">Full Marks</th>
+                <th class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center text-xs font-medium text-gray-600 dark:text-dark-muted">Pass Marks</th>
+                <th class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center text-xs font-medium text-gray-600 dark:text-dark-muted">Obtained</th>
+                <th class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center text-xs font-medium text-gray-600 dark:text-dark-muted">Grade</th>
+                <th class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center text-xs font-medium text-gray-600 dark:text-dark-muted">Points</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($marks as $m): ?>
                 <tr>
-                    <td class="border border-gray-300 px-3 py-1.5"><?= e($m['subject_name']) ?></td>
-                    <td class="border border-gray-300 px-3 py-1.5 text-center"><?= $m['full_marks'] ?></td>
-                    <td class="border border-gray-300 px-3 py-1.5 text-center"><?= $m['pass_marks'] ?></td>
-                    <td class="border border-gray-300 px-3 py-1.5 text-center font-semibold">
+                    <td class="border border-gray-300 dark:border-dark-border px-3 py-1.5"><?= e($m['subject_name']) ?></td>
+                    <td class="border border-gray-300 dark:border-dark-border px-3 py-1.5 text-center"><?= $m['full_marks'] ?></td>
+                    <td class="border border-gray-300 dark:border-dark-border px-3 py-1.5 text-center"><?= $m['pass_marks'] ?></td>
+                    <td class="border border-gray-300 dark:border-dark-border px-3 py-1.5 text-center font-semibold">
                         <?= $m['is_absent'] ? '<span class="text-red-600">Abs</span>' : ($m['marks_obtained'] ?? '—') ?>
                     </td>
-                    <td class="border border-gray-300 px-3 py-1.5 text-center font-bold"><?= e($m['grade'] ?? '—') ?></td>
-                    <td class="border border-gray-300 px-3 py-1.5 text-center"><?= $m['grade_point'] !== null ? number_format($m['grade_point'], 1) : '—' ?></td>
+                    <td class="border border-gray-300 dark:border-dark-border px-3 py-1.5 text-center font-bold"><?= e($m['grade'] ?? '—') ?></td>
+                    <td class="border border-gray-300 dark:border-dark-border px-3 py-1.5 text-center"><?= $m['grade_point'] !== null ? number_format($m['grade_point'], 1) : '—' ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
         <tfoot>
-            <tr class="bg-gray-50 font-semibold">
-                <td class="border border-gray-300 px-3 py-2">Total / Average</td>
-                <td class="border border-gray-300 px-3 py-2 text-center"><?= array_sum(array_column($marks, 'full_marks')) ?></td>
-                <td class="border border-gray-300 px-3 py-2 text-center">—</td>
-                <td class="border border-gray-300 px-3 py-2 text-center"><?= number_format($rc['total_marks'], 1) ?></td>
-                <td class="border border-gray-300 px-3 py-2 text-center text-lg"><?= e($rc['grade'] ?? '') ?></td>
-                <td class="border border-gray-300 px-3 py-2 text-center"><?= number_format($rc['gpa'], 2) ?></td>
+            <tr class="bg-gray-50 dark:bg-dark-bg font-semibold">
+                <td class="border border-gray-300 dark:border-dark-border px-3 py-2">Total / Average</td>
+                <td class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center"><?= array_sum(array_column($marks, 'full_marks')) ?></td>
+                <td class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center">—</td>
+                <td class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center"><?= number_format($rc['total_marks'], 1) ?></td>
+                <td class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center text-lg"><?= e($rc['grade'] ?? '') ?></td>
+                <td class="border border-gray-300 dark:border-dark-border px-3 py-2 text-center"><?= number_format($rc['gpa'], 2) ?></td>
             </tr>
         </tfoot>
     </table>
 
     <!-- Summary -->
     <div class="grid grid-cols-3 gap-4 mb-6 text-center">
-        <div class="border border-gray-300 rounded p-3">
+        <div class="border border-gray-300 dark:border-dark-border rounded p-3">
             <div class="text-lg font-bold"><?= number_format($rc['average'], 1) ?>%</div>
-            <div class="text-xs text-gray-500">Average</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted">Average</div>
         </div>
-        <div class="border border-gray-300 rounded p-3">
+        <div class="border border-gray-300 dark:border-dark-border rounded p-3">
             <div class="text-lg font-bold"><?= number_format($rc['gpa'], 2) ?></div>
-            <div class="text-xs text-gray-500">GPA</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted">GPA</div>
         </div>
-        <div class="border border-gray-300 rounded p-3">
+        <div class="border border-gray-300 dark:border-dark-border rounded p-3">
             <div class="text-lg font-bold"><?= ($attendSummary['total'] ?? 0) > 0 ? round(($attendSummary['present'] / $attendSummary['total']) * 100) . '%' : 'N/A' ?></div>
-            <div class="text-xs text-gray-500">Attendance</div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted">Attendance</div>
         </div>
     </div>
 
     <!-- Remarks + Signatures -->
     <div class="mb-8">
         <div class="mb-4">
-            <label class="text-xs text-gray-500">Teacher's Remarks:</label>
-            <div class="border-b border-gray-300 mt-2 h-6"><?= e($rc['teacher_remarks'] ?? '') ?></div>
+            <label class="text-xs text-gray-500 dark:text-dark-muted">Teacher's Remarks:</label>
+            <div class="border-b border-gray-300 dark:border-dark-border mt-2 h-6"><?= e($rc['teacher_remarks'] ?? '') ?></div>
         </div>
     </div>
 
     <div class="grid grid-cols-3 gap-8 mt-12 pt-4">
         <div class="text-center">
-            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600">Class Teacher</div>
+            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Class Teacher</div>
         </div>
         <div class="text-center">
-            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600">Principal</div>
+            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Principal</div>
         </div>
         <div class="text-center">
-            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600">Parent/Guardian</div>
+            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Parent/Guardian</div>
         </div>
     </div>
 
-    <div class="text-center text-xs text-gray-400 mt-8">
+    <div class="text-center text-xs text-gray-400 dark:text-gray-500 mt-8">
         Generated on <?= date('F j, Y') ?> — <?= e($schoolName) ?>
     </div>
 </body>

@@ -51,17 +51,17 @@ ob_start();
 ?>
 
 <div class="max-w-5xl mx-auto">
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Report Cards</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Report Cards</h1>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6">
         <form method="GET" class="grid grid-cols-2 sm:grid-cols-5 gap-4 items-end">
             <input type="hidden" name="module" value="exams">
             <input type="hidden" name="action" value="report-cards">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Exam</label>
-                <select name="exam_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exam</label>
+                <select name="exam_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">Select Exam</option>
                     <?php foreach ($exams as $ex): ?>
                         <option value="<?= $ex['id'] ?>" <?= $filterExam == $ex['id'] ? 'selected' : '' ?>><?= e($ex['name']) ?></option>
@@ -69,9 +69,9 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                 <select name="class_id" id="rcClassSel" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
                         onchange="ajaxLoadSections(this.value,'rcSecSel',<?= (int)$filterSection ?>,'All')">
                     <option value="">Select</option>
                     <?php foreach ($classes as $c): ?>
@@ -80,9 +80,9 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
                 <select name="section_id" id="rcSecSel"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
                         <?= !$filterClass ? 'disabled' : '' ?>>
                     <option value="">All</option>
                     <?php foreach ($sections as $s): ?>
@@ -113,35 +113,35 @@ ob_start();
     </div>
 
     <?php if ($filterClass && $filterExam && !empty($students)): ?>
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full">
-            <thead class="bg-gray-50 border-b">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full">
+            <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Total</th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Average</th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Grade</th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Rank</th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">#</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Student</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Total</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Average</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Grade</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Rank</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Status</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php foreach ($students as $i => $st): ?>
                     <?php $rc = $reportCards[$st['id']] ?? null; ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm text-gray-500"><?= $i + 1 ?></td>
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900"><?= e($st['first_name'] . ' ' . $st['last_name']) ?></td>
-                        <td class="px-4 py-3 text-sm text-center text-gray-600"><?= $rc ? number_format($rc['total_marks'], 1) : '—' ?></td>
-                        <td class="px-4 py-3 text-sm text-center text-gray-600"><?= $rc ? number_format($rc['average'], 1) . '%' : '—' ?></td>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= $i + 1 ?></td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($st['first_name'] . ' ' . $st['last_name']) ?></td>
+                        <td class="px-4 py-3 text-sm text-center text-gray-600 dark:text-dark-muted"><?= $rc ? number_format($rc['total_marks'], 1) : '—' ?></td>
+                        <td class="px-4 py-3 text-sm text-center text-gray-600 dark:text-dark-muted"><?= $rc ? number_format($rc['average'], 1) . '%' : '—' ?></td>
                         <td class="px-4 py-3 text-sm text-center font-bold"><?= e($rc['grade'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-center text-gray-600"><?= $rc['rank'] ?? '—' ?></td>
+                        <td class="px-4 py-3 text-sm text-center text-gray-600 dark:text-dark-muted"><?= $rc['rank'] ?? '—' ?></td>
                         <td class="px-4 py-3 text-center">
                             <?php if ($rc): ?>
                                 <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Generated</span>
                             <?php else: ?>
-                                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Pending</span>
+                                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-dark-card2 text-gray-500 dark:text-dark-muted">Pending</span>
                             <?php endif; ?>
                         </td>
                         <td class="px-4 py-3 text-right">
@@ -156,7 +156,7 @@ ob_start();
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
+    </div></div>
     <?php endif; ?>
 </div>
 

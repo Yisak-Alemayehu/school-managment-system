@@ -52,7 +52,7 @@ ob_start();
 
 <div class="space-y-4">
     <div class="flex items-center justify-between">
-        <h1 class="text-xl font-bold text-gray-900">Student Details</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Student Details</h1>
         <a href="<?= url('students', 'admission') ?>"
            class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 font-medium">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -61,12 +61,12 @@ ob_start();
     </div>
 
     <!-- Filters -->
-    <form method="GET" action="<?= url('students', 'details') ?>" class="bg-white rounded-xl border border-gray-200 p-4">
+    <form method="GET" action="<?= url('students', 'details') ?>" class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4">
         <div class="flex flex-wrap gap-3">
             <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search name, admission no, phone…"
-                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
             <select name="class_id" onchange="this.form.submit()"
-                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="">All Classes</option>
                 <?php foreach ($classes as $c): ?>
                     <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -74,7 +74,7 @@ ob_start();
             </select>
             <?php if (!empty($sections)): ?>
             <select name="section_id"
-                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="">All Sections</option>
                 <?php foreach ($sections as $sec): ?>
                     <option value="<?= $sec['id'] ?>" <?= $sectionId == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
@@ -82,7 +82,7 @@ ob_start();
             </select>
             <?php endif; ?>
             <select name="status"
-                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="active"    <?= $statusFilter === 'active'    ? 'selected' : '' ?>>Active</option>
                 <option value="inactive"  <?= $statusFilter === 'inactive'  ? 'selected' : '' ?>>Inactive</option>
                 <option value="graduated" <?= $statusFilter === 'graduated' ? 'selected' : '' ?>>Graduated</option>
@@ -93,36 +93,36 @@ ob_start();
     </form>
 
     <!-- Table -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
         <?php if (empty($students)): ?>
         <div class="p-12 text-center">
             <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
-            <p class="text-gray-400 text-sm">No students found.</p>
+            <p class="text-gray-400 dark:text-gray-500 text-sm">No students found.</p>
         </div>
         <?php else: ?>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 border-b border-gray-200">
+                <thead class="bg-gray-50 dark:bg-dark-bg border-b border-gray-200 dark:border-dark-border">
                     <tr>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Photo</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Name</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Adm. No.</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Class</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Section</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Roll</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Gender</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">DOB</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Phone</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Blood</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Status</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Actions</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Photo</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Name</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Adm. No.</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Class</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Section</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Roll</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Gender</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">DOB</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Phone</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Blood</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Status</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php foreach ($students as $st): ?>
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                         <td class="px-4 py-3">
                             <?php if ($st['photo']): ?>
                                 <img src="/uploads/students/<?= e($st['photo']) ?>" class="w-8 h-8 rounded-full object-cover">
@@ -132,18 +132,18 @@ ob_start();
                                 </div>
                             <?php endif; ?>
                         </td>
-                        <td class="px-4 py-3 font-medium text-gray-900"><?= e($st['full_name']) ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?= e($st['admission_no']) ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?= e($st['class_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?= e($st['section_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?= e($st['roll_no'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-gray-600 capitalize"><?= e($st['gender']) ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?= $st['date_of_birth'] ? e(date('d M Y', strtotime($st['date_of_birth']))) : '—' ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?= e($st['phone'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?= e($st['blood_group'] ?? '—') ?></td>
+                        <td class="px-4 py-3 font-medium text-gray-900 dark:text-dark-text"><?= e($st['full_name']) ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['admission_no']) ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['class_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['section_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['roll_no'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted capitalize"><?= e($st['gender']) ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= $st['date_of_birth'] ? e(date('d M Y', strtotime($st['date_of_birth']))) : '—' ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['phone'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['blood_group'] ?? '—') ?></td>
                         <td class="px-4 py-3">
                             <span class="px-2 py-0.5 text-xs rounded-full font-medium
-                                <?= $st['status'] === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' ?>">
+                                <?= $st['status'] === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 dark:bg-dark-card2 text-gray-600 dark:text-dark-muted' ?>">
                                 <?= ucfirst($st['status']) ?>
                             </span>
                         </td>
@@ -152,7 +152,7 @@ ob_start();
                                 <a href="<?= url('students', 'view') ?>&id=<?= $st['id'] ?>"
                                    class="text-primary-600 hover:text-primary-800 text-xs font-medium">View</a>
                                 <a href="<?= url('students', 'edit') ?>&id=<?= $st['id'] ?>"
-                                   class="text-gray-500 hover:text-gray-700 text-xs font-medium">Edit</a>
+                                   class="text-gray-500 dark:text-dark-muted hover:text-gray-700 dark:text-gray-300 text-xs font-medium">Edit</a>
                             </div>
                         </td>
                     </tr>
@@ -162,16 +162,16 @@ ob_start();
         </div>
         <!-- Pagination -->
         <?php if ($total > $perPage): ?>
-        <div class="px-4 py-3 border-t border-gray-200 flex items-center justify-between text-sm text-gray-600">
+        <div class="px-4 py-3 border-t border-gray-200 dark:border-dark-border flex items-center justify-between text-sm text-gray-600 dark:text-dark-muted">
             <span>Showing <?= $offset + 1 ?>–<?= min($offset + $perPage, $total) ?> of <?= $total ?></span>
             <div class="flex gap-2">
                 <?php if ($page > 1): ?>
                     <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>"
-                       class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
+                       class="px-3 py-1 border border-gray-300 dark:border-dark-border rounded-md hover:bg-gray-50 dark:bg-dark-bg">Previous</a>
                 <?php endif; ?>
                 <?php if ($offset + $perPage < $total): ?>
                     <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>"
-                       class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50">Next</a>
+                       class="px-3 py-1 border border-gray-300 dark:border-dark-border rounded-md hover:bg-gray-50 dark:bg-dark-bg">Next</a>
                 <?php endif; ?>
             </div>
         </div>

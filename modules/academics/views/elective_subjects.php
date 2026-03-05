@@ -64,7 +64,7 @@ ob_start();
 
 <div class="max-w-7xl mx-auto">
 
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Assign Elective Subjects to Students</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Assign Elective Subjects to Students</h1>
 
     <?php if (!$sessionId): ?>
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
@@ -73,12 +73,12 @@ ob_start();
     <?php else: ?>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6">
         <form method="GET" action="" class="flex flex-wrap items-end gap-4">
             <input type="hidden" name="route" value="academics/elective-subjects">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
-                <select name="class_id" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
+                <select name="class_id" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -87,8 +87,8 @@ ob_start();
             </div>
             <?php if ($filterClass && !empty($sectionsForClass)): ?>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
+                <select name="section_id" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">All Sections</option>
                     <?php foreach ($sectionsForClass as $sec): ?>
                         <option value="<?= $sec['id'] ?>" <?= $filterSection == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
@@ -121,34 +121,34 @@ ob_start();
             <input type="hidden" name="student_ids[]" value="<?= $st['id'] ?>">
         <?php endforeach; ?>
 
-        <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-gray-50 border-b">
+                <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">Student</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase sticky left-0 bg-gray-50">Adm No</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase sticky left-0 bg-gray-50 dark:bg-dark-bg">Student</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase sticky left-0 bg-gray-50 dark:bg-dark-bg">Adm No</th>
                         <?php foreach ($electiveSubjects as $es): ?>
-                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">
                                 <?= e($es['subject_name']) ?><br>
-                                <span class="text-gray-400 font-normal">(<?= e($es['subject_code']) ?>)</span>
+                                <span class="text-gray-400 dark:text-gray-500 font-normal">(<?= e($es['subject_code']) ?>)</span>
                             </th>
                         <?php endforeach; ?>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php foreach ($students as $st): ?>
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-2 text-sm font-medium text-gray-900 sticky left-0 bg-white">
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                            <td class="px-4 py-2 text-sm font-medium text-gray-900 dark:text-dark-text sticky left-0 bg-white dark:bg-dark-card">
                                 <?= e($st['first_name'] . ' ' . $st['last_name']) ?>
                             </td>
-                            <td class="px-4 py-2 text-sm text-gray-500"><?= e($st['admission_no']) ?></td>
+                            <td class="px-4 py-2 text-sm text-gray-500 dark:text-dark-muted"><?= e($st['admission_no']) ?></td>
                             <?php foreach ($electiveSubjects as $es): ?>
                                 <td class="px-4 py-2 text-center">
                                     <input type="checkbox"
                                            name="electives[<?= $st['id'] ?>][]"
                                            value="<?= $es['class_subject_id'] ?>"
                                            <?= isset($currentAssignments[$st['id']][$es['class_subject_id']]) ? 'checked' : '' ?>
-                                           class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                                           class="rounded border-gray-300 dark:border-dark-border text-primary-600 focus:ring-primary-500">
                                 </td>
                             <?php endforeach; ?>
                         </tr>

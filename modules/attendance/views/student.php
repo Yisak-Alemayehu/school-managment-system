@@ -49,20 +49,20 @@ ob_start();
 
 <div class="max-w-3xl mx-auto">
     <div class="flex items-center gap-3 mb-6">
-        <a href="<?= url('attendance', 'report') ?>" class="p-2 hover:bg-gray-100 rounded-lg">
-            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <a href="<?= url('attendance', 'report') ?>" class="p-2 hover:bg-gray-100 dark:hover:bg-dark-card2 rounded-lg">
+            <svg class="w-5 h-5 text-gray-500 dark:text-dark-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </a>
         <div>
-            <h1 class="text-xl font-bold text-gray-900"><?= e($student['first_name'] . ' ' . $student['last_name']) ?></h1>
-            <p class="text-sm text-gray-500"><?= e($student['admission_no']) ?> — Attendance Record</p>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text"><?= e($student['first_name'] . ' ' . $student['last_name']) ?></h1>
+            <p class="text-sm text-gray-500 dark:text-dark-muted"><?= e($student['admission_no']) ?> — Attendance Record</p>
         </div>
     </div>
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
-        <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
-            <div class="text-2xl font-bold text-gray-900"><?= $summary['total'] ?? 0 ?></div>
-            <div class="text-xs text-gray-500 mt-1">Total Days</div>
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 text-center">
+            <div class="text-2xl font-bold text-gray-900 dark:text-dark-text"><?= $summary['total'] ?? 0 ?></div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">Total Days</div>
         </div>
         <div class="bg-green-50 rounded-xl border border-green-200 p-4 text-center">
             <div class="text-2xl font-bold text-green-700"><?= $summary['present'] ?? 0 ?></div>
@@ -83,17 +83,17 @@ ob_start();
     </div>
 
     <!-- Records -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full">
-            <thead class="bg-gray-50 border-b">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full">
+            <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Date</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Class</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Status</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Remarks</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php foreach ($records as $r): ?>
                     <?php
                     $badge = match($r['status']) {
@@ -101,23 +101,23 @@ ob_start();
                         'absent'  => 'bg-red-100 text-red-800',
                         'late'    => 'bg-yellow-100 text-yellow-800',
                         'excused' => 'bg-blue-100 text-blue-800',
-                        default   => 'bg-gray-100 text-gray-800',
+                        default   => 'bg-gray-100 dark:bg-dark-card2 text-gray-800 dark:text-dark-text',
                     };
                     ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2.5 text-sm text-gray-900"><?= format_date($r['date']) ?></td>
-                        <td class="px-4 py-2.5 text-sm text-gray-600"><?= e($r['class_name']) ?></td>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                        <td class="px-4 py-2.5 text-sm text-gray-900 dark:text-dark-text"><?= format_date($r['date']) ?></td>
+                        <td class="px-4 py-2.5 text-sm text-gray-600 dark:text-dark-muted"><?= e($r['class_name']) ?></td>
                         <td class="px-4 py-2.5">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <?= $badge ?>">
                                 <?= ucfirst($r['status']) ?>
                             </span>
                         </td>
-                        <td class="px-4 py-2.5 text-sm text-gray-500"><?= e($r['remarks']) ?></td>
+                        <td class="px-4 py-2.5 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['remarks']) ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
+    </div></div>
 </div>
 
 <?php

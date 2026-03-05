@@ -73,9 +73,9 @@ ob_start();
 
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div>
-            <h1 class="text-xl font-bold text-gray-900">Timetable</h1>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Timetable</h1>
             <?php if ($sessionId): ?>
-                <p class="text-sm text-gray-600 mt-1">Session: <?= e($activeSession['name'] ?? '') ?></p>
+                <p class="text-sm text-gray-600 dark:text-dark-muted mt-1">Session: <?= e($activeSession['name'] ?? '') ?></p>
             <?php endif; ?>
         </div>
         <button onclick="document.getElementById('addSlotModal').classList.remove('hidden')"
@@ -92,21 +92,21 @@ ob_start();
     <?php endif; ?>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6">
         <div class="flex flex-wrap items-end gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                 <select onchange="window.location='<?= url('academics', 'timetable') ?>?class_id='+this.value"
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
                 <select onchange="window.location='<?= url('academics', 'timetable') ?>?class_id=<?= $filterClass ?>&section_id='+this.value"
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="0">All Sections</option>
                     <?php foreach ($sections as $s): ?>
                         <?php if ($s['class_id'] == $filterClass): ?>
@@ -119,21 +119,21 @@ ob_start();
     </div>
 
     <!-- Weekly Grid -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-x-auto">
         <table class="w-full min-w-[800px]">
-            <thead class="bg-gray-50 border-b">
+            <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-28">Day</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Periods</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase w-28">Day</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Periods</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php foreach ($days as $idx => $day): ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-4 text-sm font-semibold text-gray-900 align-top"><?= $dayLabels[$idx] ?></td>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                        <td class="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-dark-text align-top"><?= $dayLabels[$idx] ?></td>
                         <td class="px-4 py-4">
                             <?php if (empty($grid[$day])): ?>
-                                <span class="text-xs text-gray-400 italic">No slots scheduled</span>
+                                <span class="text-xs text-gray-400 dark:text-gray-500 italic">No slots scheduled</span>
                             <?php else: ?>
                                 <div class="flex flex-wrap gap-2">
                                     <?php foreach ($grid[$day] as $slot): ?>
@@ -166,11 +166,11 @@ ob_start();
 
 <!-- Add Slot Modal -->
 <div id="addSlotModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-xl w-full max-w-md p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Add Timetable Slot</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-dark-text">Add Timetable Slot</h3>
             <button type="button" onclick="document.getElementById('addSlotModal').classList.add('hidden')"
-                    class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+                    class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-dark-muted text-xl leading-none">&times;</button>
         </div>
         <form method="POST" action="<?= url('academics', 'timetable-save') ?>" class="space-y-4">
             <?= csrf_field() ?>
@@ -180,8 +180,8 @@ ob_start();
                 <input type="hidden" name="section_id" value="<?= $filterSection ?>">
             <?php else: ?>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                    <select name="section_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
+                    <select name="section_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         <option value="">All / None</option>
                         <?php foreach ($sections as $s): ?>
                             <?php if ($s['class_id'] == $filterClass): ?>
@@ -193,8 +193,8 @@ ob_start();
             <?php endif; ?>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Day <span class="text-red-500">*</span></label>
-                <select name="day_of_week" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Day <span class="text-red-500">*</span></label>
+                <select name="day_of_week" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <?php foreach ($days as $idx => $d): ?>
                         <option value="<?= $d ?>"><?= $dayLabels[$idx] ?></option>
                     <?php endforeach; ?>
@@ -202,8 +202,8 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Subject <span class="text-red-500">*</span></label>
-                <select name="subject_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-red-500">*</span></label>
+                <select name="subject_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Subject</option>
                     <?php if (!empty($classSubjects)): ?>
                         <?php foreach ($classSubjects as $cs): ?>
@@ -218,8 +218,8 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Teacher</label>
-                <select name="teacher_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teacher</label>
+                <select name="teacher_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Teacher (optional)</option>
                     <?php foreach ($teachers as $t): ?>
                         <option value="<?= $t['id'] ?>"><?= e($t['full_name']) ?></option>
@@ -229,18 +229,18 @@ ob_start();
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Start Time <span class="text-red-500">*</span></label>
-                    <input type="time" name="start_time" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Time <span class="text-red-500">*</span></label>
+                    <input type="time" name="start_time" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">End Time <span class="text-red-500">*</span></label>
-                    <input type="time" name="end_time" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Time <span class="text-red-500">*</span></label>
+                    <input type="time" name="end_time" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Room (optional)</label>
-                <input type="text" name="room" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="e.g. Room 101">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Room (optional)</label>
+                <input type="text" name="room" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="e.g. Room 101">
             </div>
 
             <div class="flex gap-3 pt-2">
@@ -248,7 +248,7 @@ ob_start();
                     Save Slot
                 </button>
                 <button type="button" onclick="document.getElementById('addSlotModal').classList.add('hidden')"
-                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition">Cancel</button>
+                        class="flex-1 px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg transition">Cancel</button>
             </div>
         </form>
     </div>

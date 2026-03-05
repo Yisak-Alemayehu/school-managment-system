@@ -75,7 +75,7 @@ ob_start();
 
 <div class="space-y-4">
     <div class="flex items-center justify-between">
-        <h1 class="text-xl font-bold text-gray-900">Inbox</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Inbox</h1>
         <a href="<?= url('messaging', 'compose') ?>"
            class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium inline-flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -84,21 +84,21 @@ ob_start();
     </div>
 
     <!-- Search -->
-    <form method="GET" action="<?= url('messaging', 'inbox') ?>" class="bg-white rounded-xl border border-gray-200 p-4">
+    <form method="GET" action="<?= url('messaging', 'inbox') ?>" class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4">
         <div class="flex gap-3">
             <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search messages…"
-                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
             <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Search</button>
             <?php if ($search): ?>
-            <a href="<?= url('messaging', 'inbox') ?>" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>
+            <a href="<?= url('messaging', 'inbox') ?>" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>
             <?php endif; ?>
         </div>
     </form>
 
     <!-- Conversation List -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden divide-y divide-gray-100 dark:divide-dark-border">
         <?php if (empty($conversations)): ?>
-        <div class="p-8 text-center text-gray-500">
+        <div class="p-8 text-center text-gray-500 dark:text-dark-muted">
             <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             <p class="font-medium">No messages yet</p>
             <p class="text-sm mt-1">Start a conversation by composing a new message.</p>
@@ -106,7 +106,7 @@ ob_start();
         <?php else: ?>
             <?php foreach ($conversations as $conv): ?>
             <a href="<?= url('messaging', 'conversation', $conv['id']) ?>"
-               class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors <?= $conv['unread_count'] > 0 ? 'bg-blue-50/50' : '' ?>">
+               class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:bg-dark-bg transition-colors <?= $conv['unread_count'] > 0 ? 'bg-blue-50/50' : '' ?>">
                 <!-- Avatar -->
                 <div class="flex-shrink-0">
                     <?php if ($conv['display_avatar']): ?>
@@ -129,13 +129,13 @@ ob_start();
                 <!-- Content -->
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-medium text-gray-900 truncate <?= $conv['unread_count'] > 0 ? 'font-bold' : '' ?>">
+                        <h3 class="text-sm font-medium text-gray-900 dark:text-dark-text truncate <?= $conv['unread_count'] > 0 ? 'font-bold' : '' ?>">
                             <?= e($conv['display_name'] ?: 'Unknown') ?>
                         </h3>
-                        <span class="text-xs text-gray-500 flex-shrink-0 ml-2"><?= $conv['last_message_at'] ? time_ago($conv['last_message_at']) : '' ?></span>
+                        <span class="text-xs text-gray-500 dark:text-dark-muted flex-shrink-0 ml-2"><?= $conv['last_message_at'] ? time_ago($conv['last_message_at']) : '' ?></span>
                     </div>
                     <div class="flex items-center justify-between mt-0.5">
-                        <p class="text-xs text-gray-500 truncate <?= $conv['unread_count'] > 0 ? 'font-semibold text-gray-700' : '' ?>">
+                        <p class="text-xs text-gray-500 dark:text-dark-muted truncate <?= $conv['unread_count'] > 0 ? 'font-semibold text-gray-700 dark:text-gray-300' : '' ?>">
                             <?= e(truncate($conv['last_message'] ?? 'No messages yet', 80)) ?>
                         </p>
                         <?php if ($conv['unread_count'] > 0): ?>

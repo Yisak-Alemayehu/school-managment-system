@@ -38,21 +38,21 @@ ob_start();
 
 <div class="space-y-6">
     <div class="flex items-center justify-between">
-        <a href="<?= url('finance', 'groups') ?>" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600">
+        <a href="<?= url('finance', 'groups') ?>" class="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-dark-muted hover:text-primary-600">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Back to Groups
         </a>
     </div>
 
-    <h1 class="text-xl font-bold text-gray-900"><?= e($group['name']) ?></h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text"><?= e($group['name']) ?></h1>
 
     <!-- Tab Nav -->
-    <div class="flex flex-wrap gap-1 border-b border-gray-200">
+    <div class="flex flex-wrap gap-1 border-b border-gray-200 dark:border-dark-border">
         <?php
         $tabs = ['info' => 'Group Information', 'assign' => 'Assign Students', 'action' => 'Take Action'];
         foreach ($tabs as $key => $label): ?>
         <a href="<?= url('finance', 'group-detail', $id) ?>&tab=<?= $key ?>"
-           class="px-4 py-2 text-sm font-medium border-b-2 transition-colors <?= $tab === $key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700' ?>">
+           class="px-4 py-2 text-sm font-medium border-b-2 transition-colors <?= $tab === $key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 dark:text-dark-muted hover:text-gray-700 dark:text-gray-300' ?>">
             <?= $label ?>
         </a>
         <?php endforeach; ?>
@@ -60,28 +60,28 @@ ob_start();
 
     <!-- ═══ TAB: GROUP INFORMATION ═══ -->
     <?php if ($tab === 'info'): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Group Information</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Group Information</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Group Name</p>
-                <p class="text-sm font-medium text-gray-900"><?= e($group['name']) ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Group Name</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($group['name']) ?></p>
             </div>
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Group Description</p>
-                <p class="text-sm text-gray-900"><?= e($group['description'] ?? '—') ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Group Description</p>
+                <p class="text-sm text-gray-900 dark:text-dark-text"><?= e($group['description'] ?? '—') ?></p>
             </div>
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Date Created</p>
-                <p class="text-sm text-gray-900"><?= format_datetime($group['created_at']) ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Date Created</p>
+                <p class="text-sm text-gray-900 dark:text-dark-text"><?= format_datetime($group['created_at']) ?></p>
             </div>
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Date Modified</p>
-                <p class="text-sm text-gray-900"><?= format_datetime($group['updated_at']) ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Date Modified</p>
+                <p class="text-sm text-gray-900 dark:text-dark-text"><?= format_datetime($group['updated_at']) ?></p>
             </div>
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Active</p>
-                <span class="px-2 py-0.5 text-xs font-semibold rounded-full <?= $group['is_active'] ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' ?>">
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Active</p>
+                <span class="px-2 py-0.5 text-xs font-semibold rounded-full <?= $group['is_active'] ? 'bg-green-100 text-green-700' : 'bg-gray-100 dark:bg-dark-card2 text-gray-500 dark:text-dark-muted' ?>">
                     <?= $group['is_active'] ? 'Yes' : 'No' ?>
                 </span>
             </div>
@@ -89,9 +89,9 @@ ob_start();
     </div>
 
     <!-- Group Members -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-gray-900">Group Members (<?= count($members) ?>)</h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text">Group Members (<?= count($members) ?>)</h2>
             <div class="flex gap-2">
                 <a href="<?= url('finance', 'export-pdf') ?>&group_id=<?= $id ?>" target="_blank"
                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-700 text-xs rounded-lg hover:bg-red-100 font-medium border border-red-200">Download PDF</a>
@@ -100,28 +100,28 @@ ob_start();
             </div>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 responsive-table">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
+                <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student Code</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Gender</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Added</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student Code</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Gender</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Added</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($members)): ?>
-                    <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No members in this group.</td></tr>
+                    <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No members in this group.</td></tr>
                     <?php else: foreach ($members as $m): ?>
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                         <td class="px-4 py-3 text-sm" data-label="Code">
                             <a href="<?= url('finance', 'student-detail', $m['student_id']) ?>" class="text-primary-600 hover:text-primary-800 font-semibold underline"><?= e($m['admission_no']) ?></a>
                         </td>
                         <td class="px-4 py-3 text-sm" data-label="Name"><?= e($m['full_name']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Class"><?= e($m['class_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Gender"><?= ucfirst(e($m['gender'])) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-500" data-label="Added"><?= format_date($m['added_at']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Class"><?= e($m['class_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Gender"><?= ucfirst(e($m['gender'])) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted" data-label="Added"><?= format_date($m['added_at']) ?></td>
                     </tr>
                     <?php endforeach; endif; ?>
                 </tbody>
@@ -131,22 +131,22 @@ ob_start();
 
     <!-- ═══ TAB: ASSIGN STUDENTS ═══ -->
     <?php elseif ($tab === 'assign'): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Assign Students to Group</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Assign Students to Group</h2>
 
         <!-- Filters -->
         <form method="GET" action="<?= url('finance', 'group-detail', $id) ?>" class="mb-4">
             <input type="hidden" name="tab" value="assign">
             <div class="flex flex-wrap gap-3">
                 <input type="text" name="assign_search" value="<?= e($assignSearch) ?>" placeholder="Search by name…"
-                       class="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
-                <select name="assign_class_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                       class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="assign_class_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">All Classes</option>
                     <?php foreach ($classes as $c): ?>
                     <option value="<?= $c['id'] ?>" <?= $assignClassId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select name="assign_gender" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <select name="assign_gender" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">All Genders</option>
                     <option value="male" <?= $assignGender === 'male' ? 'selected' : '' ?>>Male</option>
                     <option value="female" <?= $assignGender === 'female' ? 'selected' : '' ?>>Female</option>
@@ -192,26 +192,26 @@ ob_start();
             <?= csrf_field() ?>
             <input type="hidden" name="group_id" value="<?= $id ?>">
             <div class="overflow-x-auto mb-4">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+                    <thead class="bg-gray-50 dark:bg-dark-bg">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600"><input type="checkbox" id="checkAllAssign" onchange="toggleAll(this, 'student_ids[]')"></th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student Code</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Class</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Gender</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted"><input type="checkbox" id="checkAllAssign" onchange="toggleAll(this, 'student_ids[]')"></th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Gender</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                         <?php if (empty($available)): ?>
-                        <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No students available to assign.</td></tr>
+                        <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No students available to assign.</td></tr>
                         <?php else: foreach ($available as $av): ?>
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                             <td class="px-4 py-3"><input type="checkbox" name="student_ids[]" value="<?= $av['id'] ?>"></td>
                             <td class="px-4 py-3 text-sm"><?= e($av['admission_no']) ?></td>
                             <td class="px-4 py-3 text-sm"><?= e($av['full_name']) ?></td>
-                            <td class="px-4 py-3 text-sm text-gray-600"><?= e($av['class_name'] ?? '—') ?></td>
-                            <td class="px-4 py-3 text-sm text-gray-600"><?= ucfirst(e($av['gender'])) ?></td>
+                            <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($av['class_name'] ?? '—') ?></td>
+                            <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= ucfirst(e($av['gender'])) ?></td>
                         </tr>
                         <?php endforeach; endif; ?>
                     </tbody>
@@ -224,27 +224,27 @@ ob_start();
     </div>
 
     <!-- Current group members in assign tab -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Current Group Members (<?= count($members) ?>)</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Current Group Members (<?= count($members) ?>)</h2>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 responsive-table">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
+                <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student Code</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Gender</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student Code</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Gender</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($members)): ?>
-                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-400">No members yet.</td></tr>
+                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No members yet.</td></tr>
                     <?php else: foreach ($members as $m): ?>
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                         <td class="px-4 py-3 text-sm"><?= e($m['admission_no']) ?></td>
                         <td class="px-4 py-3 text-sm"><?= e($m['full_name']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= e($m['class_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= ucfirst(e($m['gender'])) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($m['class_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= ucfirst(e($m['gender'])) ?></td>
                     </tr>
                     <?php endforeach; endif; ?>
                 </tbody>
@@ -254,8 +254,8 @@ ob_start();
 
     <!-- ═══ TAB: TAKE ACTION ═══ -->
     <?php elseif ($tab === 'action'): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Take Action on Group</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Take Action on Group</h2>
 
         <form method="POST" action="<?= url('finance', 'group-action') ?>">
             <?= csrf_field() ?>
@@ -263,8 +263,8 @@ ob_start();
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Action *</label>
-                    <select name="action_type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Action *</label>
+                    <select name="action_type" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                         <option value="">— Select Action —</option>
                         <option value="assign_fee">Assign Fee</option>
                         <option value="remove_fee">Remove Fee</option>
@@ -272,8 +272,8 @@ ob_start();
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Fee *</label>
-                    <select name="fee_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fee *</label>
+                    <select name="fee_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                         <option value="">— Select Fee —</option>
                         <?php foreach ($allFees as $f): ?>
                         <option value="<?= $f['id'] ?>"><?= e($f['description']) ?> (<?= format_money($f['amount']) ?>)</option>
@@ -281,12 +281,12 @@ ob_start();
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Adjustment Amount</label>
-                    <input type="number" name="amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="For adjustments only">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adjustment Amount</label>
+                    <input type="number" name="amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="For adjustments only">
                 </div>
                 <div class="flex items-center gap-2 pt-6">
                     <input type="checkbox" name="part_payments" value="1" id="partPay" class="rounded">
-                    <label for="partPay" class="text-sm text-gray-700">Allow Part Payments</label>
+                    <label for="partPay" class="text-sm text-gray-700 dark:text-gray-300">Allow Part Payments</label>
                 </div>
             </div>
 
@@ -295,30 +295,30 @@ ob_start();
     </div>
 
     <!-- Remove Members Section -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Remove Members</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Remove Members</h2>
         <form method="POST" action="<?= url('finance', 'group-remove-members') ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="group_id" value="<?= $id ?>">
             <div class="overflow-x-auto mb-4">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+                    <thead class="bg-gray-50 dark:bg-dark-bg">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600"><input type="checkbox" id="checkAllRemove" onchange="toggleAll(this, 'remove_ids[]')"></th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student Code</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Name</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Class</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted"><input type="checkbox" id="checkAllRemove" onchange="toggleAll(this, 'remove_ids[]')"></th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student Code</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                         <?php if (empty($members)): ?>
-                        <tr><td colspan="4" class="px-4 py-8 text-center text-gray-400">No members to remove.</td></tr>
+                        <tr><td colspan="4" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No members to remove.</td></tr>
                         <?php else: foreach ($members as $m): ?>
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                             <td class="px-4 py-3"><input type="checkbox" name="remove_ids[]" value="<?= $m['gm_id'] ?>"></td>
                             <td class="px-4 py-3 text-sm"><?= e($m['admission_no']) ?></td>
                             <td class="px-4 py-3 text-sm"><?= e($m['full_name']) ?></td>
-                            <td class="px-4 py-3 text-sm text-gray-600"><?= e($m['class_name'] ?? '—') ?></td>
+                            <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($m['class_name'] ?? '—') ?></td>
                         </tr>
                         <?php endforeach; endif; ?>
                     </tbody>

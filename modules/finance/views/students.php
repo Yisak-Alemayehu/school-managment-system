@@ -58,17 +58,17 @@ ob_start();
 
 <div class="space-y-4">
     <div class="flex items-center justify-between">
-        <h1 class="text-xl font-bold text-gray-900">Finance — Manage Students</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Finance — Manage Students</h1>
     </div>
 
     <!-- Filters -->
-    <form method="GET" action="<?= url('finance', 'students') ?>" class="bg-white rounded-xl border border-gray-200 p-4">
+    <form method="GET" action="<?= url('finance', 'students') ?>" class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4">
         <div class="flex flex-wrap gap-3">
             <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search name, student code, email, phone…"
-                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
 
             <select name="class_id" onchange="this.form.submit()"
-                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="">All Classes</option>
                 <?php foreach ($classes as $c): ?>
                     <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -76,7 +76,7 @@ ob_start();
             </select>
 
             <?php if (!empty($sections)): ?>
-            <select name="section_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <select name="section_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="">All Sections</option>
                 <?php foreach ($sections as $sec): ?>
                     <option value="<?= $sec['id'] ?>" <?= $sectionId == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
@@ -84,37 +84,37 @@ ob_start();
             </select>
             <?php endif; ?>
 
-            <select name="gender" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <select name="gender" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <option value="">All Genders</option>
                 <option value="male" <?= $gender === 'male' ? 'selected' : '' ?>>Male</option>
                 <option value="female" <?= $gender === 'female' ? 'selected' : '' ?>>Female</option>
             </select>
 
             <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Search</button>
-            <a href="<?= url('finance', 'students') ?>" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>
+            <a href="<?= url('finance', 'students') ?>" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>
         </div>
     </form>
 
     <!-- Student List -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 responsive-table">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
+                <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student Code</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Gender</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Phone</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student Code</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student Name</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Gender</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Phone</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Email</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($students)): ?>
-                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No students found.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No students found.</td></tr>
                     <?php else: ?>
                     <?php foreach ($students as $stu): ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg transition-colors">
                         <td class="px-4 py-3 text-sm" data-label="Student Code">
                             <a href="<?= url('finance', 'student-detail', $stu['id']) ?>"
                                class="text-primary-600 hover:text-primary-800 font-semibold underline">
@@ -133,10 +133,10 @@ ob_start();
                                 <?= e($stu['full_name']) ?>
                             </div>
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Class"><?= e($stu['class_name'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Gender"><?= ucfirst(e($stu['gender'])) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Phone"><?= e($stu['phone'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Email"><?= e($stu['email'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Class"><?= e($stu['class_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Gender"><?= ucfirst(e($stu['gender'])) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Phone"><?= e($stu['phone'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Email"><?= e($stu['email'] ?? '—') ?></td>
                     </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>

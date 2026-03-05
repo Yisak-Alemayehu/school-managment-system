@@ -49,29 +49,29 @@ ob_start();
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div class="flex items-center gap-3">
-            <a href="<?= url('students') ?>" class="p-1 text-gray-400 hover:text-gray-600">
+            <a href="<?= url('students') ?>" class="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-dark-muted">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </a>
-            <h1 class="text-xl font-bold text-gray-900">Student Profile</h1>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Student Profile</h1>
         </div>
         <div class="flex gap-2">
             <?php if (auth_has_permission('students.edit')): ?>
                 <a href="<?= url('students', 'edit', $id) ?>" class="px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">Edit</a>
             <?php endif; ?>
-            <button onclick="printContent('student-profile')" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Print</button>
+            <button onclick="printContent('student-profile')" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">Print</button>
         </div>
     </div>
 
     <div id="student-profile">
         <!-- Profile Card -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
             <div class="flex flex-col sm:flex-row items-start gap-4">
                 <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-800 text-3xl font-bold flex-shrink-0">
                     <?= e(strtoupper(substr($student['full_name'], 0, 1))) ?>
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center gap-3 flex-wrap">
-                        <h2 class="text-lg font-semibold text-gray-900"><?= e($student['full_name']) ?></h2>
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-dark-text"><?= e($student['full_name']) ?></h2>
                         <?php
                         $statusColors = ['active' => 'green', 'graduated' => 'blue', 'transferred' => 'yellow', 'withdrawn' => 'red'];
                         $color = $statusColors[$student['status']] ?? 'gray';
@@ -80,7 +80,7 @@ ob_start();
                             <?= e(ucfirst($student['status'])) ?>
                         </span>
                     </div>
-                    <p class="text-sm text-gray-500 mt-1">
+                    <p class="text-sm text-gray-500 dark:text-dark-muted mt-1">
                         Admission No: <strong><?= e($student['admission_no']) ?></strong>
                         <?php if ($enrollment): ?>
                             &bull; <?= e($enrollment['class_name']) ?> <?= e($enrollment['section_name']) ?>
@@ -90,47 +90,47 @@ ob_start();
             </div>
 
             <dl class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6 text-sm">
-                <div><dt class="text-gray-500">Gender</dt><dd class="font-medium text-gray-900"><?= e(ucfirst($student['gender'])) ?></dd></div>
-                <div><dt class="text-gray-500">Date of Birth</dt><dd class="font-medium text-gray-900"><?= format_date($student['date_of_birth']) ?></dd></div>
-                <div><dt class="text-gray-500">Blood Group</dt><dd class="font-medium text-gray-900"><?= e($student['blood_group'] ?: 'N/A') ?></dd></div>
-                <div><dt class="text-gray-500">Phone</dt><dd class="font-medium text-gray-900"><?= e($student['phone'] ?: 'N/A') ?></dd></div>
-                <div><dt class="text-gray-500">Email</dt><dd class="font-medium text-gray-900"><?= e($student['email'] ?: 'N/A') ?></dd></div>
-                <div><dt class="text-gray-500">Religion</dt><dd class="font-medium text-gray-900"><?= e($student['religion'] ?: 'N/A') ?></dd></div>
-                <div><dt class="text-gray-500">Admission Date</dt><dd class="font-medium text-gray-900"><?= format_date($student['admission_date']) ?></dd></div>
-                <div><dt class="text-gray-500">Previous School</dt><dd class="font-medium text-gray-900"><?= e($student['previous_school'] ?: 'N/A') ?></dd></div>
-                <div><dt class="text-gray-500">Medical</dt><dd class="font-medium text-gray-900"><?= e($student['medical_notes'] ?: 'None') ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Gender</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e(ucfirst($student['gender'])) ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Date of Birth</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= format_date($student['date_of_birth']) ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Blood Group</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['blood_group'] ?: 'N/A') ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Phone</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['phone'] ?: 'N/A') ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Email</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['email'] ?: 'N/A') ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Religion</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['religion'] ?: 'N/A') ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Admission Date</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= format_date($student['admission_date']) ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Previous School</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['previous_school'] ?: 'N/A') ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Medical</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['medical_notes'] ?: 'None') ?></dd></div>
             </dl>
 
             <?php if ($student['address']): ?>
                 <div class="mt-4 text-sm">
-                    <dt class="text-gray-500">Address</dt>
-                    <dd class="font-medium text-gray-900"><?= e($student['address']) ?></dd>
+                    <dt class="text-gray-500 dark:text-dark-muted">Address</dt>
+                    <dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['address']) ?></dd>
                 </div>
             <?php endif; ?>
         </div>
 
         <!-- Summary Cards -->
         <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 text-center">
                 <p class="text-2xl font-bold text-green-600"><?= $attendanceSummary['present'] ?? 0 ?></p>
-                <p class="text-xs text-gray-500">Days Present</p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted">Days Present</p>
             </div>
-            <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 text-center">
                 <p class="text-2xl font-bold text-red-600"><?= $attendanceSummary['absent'] ?? 0 ?></p>
-                <p class="text-xs text-gray-500">Days Absent</p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted">Days Absent</p>
             </div>
         </div>
 
         <!-- Guardians -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-            <h3 class="text-sm font-semibold text-gray-900 mb-4">Guardian(s)</h3>
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Guardian(s)</h3>
             <div class="space-y-4">
                 <?php foreach ($guardians as $g): ?>
-                    <div class="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-start justify-between p-3 bg-gray-50 dark:bg-dark-bg rounded-lg">
                         <div>
-                            <p class="text-sm font-medium text-gray-900"><?= e($g['full_name']) ?></p>
-                            <p class="text-xs text-gray-500"><?= e(ucfirst($g['relationship'])) ?> <?= $g['is_primary'] ? '(Primary)' : '' ?></p>
-                            <p class="text-xs text-gray-500 mt-1">
+                            <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($g['full_name']) ?></p>
+                            <p class="text-xs text-gray-500 dark:text-dark-muted"><?= e(ucfirst($g['relationship'])) ?> <?= $g['is_primary'] ? '(Primary)' : '' ?></p>
+                            <p class="text-xs text-gray-500 dark:text-dark-muted mt-1">
                                 <?= e($g['phone']) ?>
                                 <?= $g['email'] ? ' &bull; ' . e($g['email']) : '' ?>
                             </p>
@@ -138,7 +138,7 @@ ob_start();
                     </div>
                 <?php endforeach; ?>
                 <?php if (empty($guardians)): ?>
-                    <p class="text-sm text-gray-400">No guardians linked.</p>
+                    <p class="text-sm text-gray-400 dark:text-gray-500">No guardians linked.</p>
                 <?php endif; ?>
             </div>
         </div>

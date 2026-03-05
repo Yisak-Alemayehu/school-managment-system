@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="<?= $_SESSION['lang'] ?? 'en' ?>" class="h-full <?= ($_COOKIE['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title><?= e($page_title ?? 'Dashboard') ?> — <?= e(get_school_name()) ?></title>
     
     <!-- PWA Meta -->
@@ -13,14 +13,62 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
     tailwind.config = {
+        darkMode: 'class',
         theme: {
             extend: {
                 colors: {
                     primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a"},
-                    sidebar: {"bg":"#1e293b","hover":"#334155","active":"#0f172a","text":"#cbd5e1"}
+                    sidebar: {"bg":"#1e293b","hover":"#334155","active":"#0f172a","text":"#cbd5e1"},
+                    dark: {"bg":"#0f172a","card":"#1e293b","card2":"#334155","border":"#475569","text":"#e2e8f0","muted":"#94a3b8"}
                 }
             }
         }
+    }
+    </script>
+    <!-- Prevent flash of wrong theme + theme toggle (must be in head so onclick works immediately) -->
+    <script>
+    (function(){
+        var t = document.cookie.match(/(?:^|;\s*)theme=(\w+)/);
+        if(t && t[1]==='dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+    })();
+    function toggleTheme() {
+        var html = document.documentElement;
+        html.classList.add('theme-transition');
+        var isDark = html.classList.contains('dark');
+        if (isDark) {
+            html.classList.remove('dark');
+            document.cookie = 'theme=light;path=/;max-age=' + (365*86400) + ';SameSite=Lax';
+        } else {
+            html.classList.add('dark');
+            document.cookie = 'theme=dark;path=/;max-age=' + (365*86400) + ';SameSite=Lax';
+        }
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.content = isDark ? '#1e40af' : '#0f172a';
+        setTimeout(function(){ html.classList.remove('theme-transition'); }, 350);
+    }
+    function toggleLangMenu() {
+        var menu = document.getElementById('lang-menu');
+        if (menu) menu.classList.toggle('hidden');
+    }
+    function toggleSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebar-overlay');
+        if (!sidebar) return;
+        var isOpen = !sidebar.classList.contains('-translate-x-full');
+        if (isOpen) {
+            sidebar.classList.add('-translate-x-full');
+            if (overlay) overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        } else {
+            sidebar.classList.remove('-translate-x-full');
+            if (overlay) overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    function toggleProfileMenu() {
+        var menu = document.getElementById('profile-menu');
+        if (menu) menu.classList.toggle('hidden');
     }
     </script>
     
@@ -29,18 +77,17 @@
         [x-cloak] { display: none !important; }
         .sidebar-transition { transition: transform 0.3s ease-in-out; }
         
+        /* Theme transition */
+        html.theme-transition, html.theme-transition *, html.theme-transition *::before, html.theme-transition *::after {
+            transition: background-color 0.3s ease, color 0.2s ease, border-color 0.2s ease !important;
+        }
+        
         /* Scrollbar styling */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
-        
-        /* Mobile table cards */
-        @media (max-width: 768px) {
-            .responsive-table thead { display: none; }
-            .responsive-table tr { display: block; margin-bottom: 0.75rem; background: white; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-            .responsive-table td { display: flex; justify-content: space-between; padding: 0.375rem 0; border: none; }
-            .responsive-table td::before { content: attr(data-label); font-weight: 600; color: #475569; margin-right: 1rem; }
-        }
+        .dark ::-webkit-scrollbar-track { background: #1e293b; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
         
         /* Print styles */
         @media print {
@@ -48,8 +95,9 @@
             .print-only { display: block !important; }
         }
     </style>
+    <link rel="stylesheet" href="<?= url('/assets/css/app.css') ?>">
 </head>
-<body class="h-full bg-gray-50">
+<body class="h-full bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-dark-text transition-colors">
     <?php if (auth_check()): ?>
     <div class="flex h-full" id="app">
         <!-- Mobile sidebar overlay -->
@@ -67,7 +115,7 @@
             <?php partial('flash'); ?>
             
             <!-- Page content -->
-            <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto">
+            <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto animate-fade-in">
                 <?= $content ?? '' ?>
             </main>
             

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Results — Add Assessment
  * Per-assessment marks are user-defined. Sum for a class+subject+term must total 100.
@@ -52,7 +52,7 @@ ob_start();
 ?>
 
 <div class="max-w-6xl mx-auto">
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Add Assessment</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Add Assessment</h1>
 
     <?php partial('flash'); ?>
 
@@ -60,8 +60,8 @@ ob_start();
 
         <!-- ── Left: Form (2/5) ── -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl border border-gray-200 p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">New Assessment</h2>
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
+                <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">New Assessment</h2>
 
                 <form method="POST" action="<?= url('exams', 'assessment-save') ?>" id="assessmentForm" novalidate>
                     <?= csrf_field() ?>
@@ -70,16 +70,16 @@ ob_start();
 
                         <!-- Name -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Assessment Name <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assessment Name <span class="text-red-500">*</span></label>
                             <input type="text" name="name" id="f_name" required placeholder="e.g. Test 1, Final Exam"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Term -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Term <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Term <span class="text-red-500">*</span></label>
                             <select name="term_id" id="f_term" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                                 <option value="">Select Term</option>
                                 <?php foreach ($terms as $t): ?>
                                     <option value="<?= $t['id'] ?>"><?= e($t['name']) ?></option>
@@ -89,9 +89,9 @@ ob_start();
 
                         <!-- Class (no auto-submit) -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                             <select name="class_id" id="f_class" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                                 <option value="">Select Class</option>
                                 <?php foreach ($classes as $c): ?>
                                     <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
@@ -101,29 +101,29 @@ ob_start();
 
                         <!-- Subject (loaded via AJAX) -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Subject <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-red-500">*</span></label>
                             <select name="subject_id" id="f_subject" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" disabled>
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500" disabled>
                                 <option value="">— Select Class First —</option>
                             </select>
                         </div>
 
                         <!-- Marks for this assessment -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Marks for This Assessment <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="total_marks" id="f_marks" required
                                    min="1" max="100" placeholder="e.g. 50"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
-                            <p class="text-xs text-gray-400 mt-1">All assessments for a subject must sum to exactly 100.</p>
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">All assessments for a subject must sum to exactly 100.</p>
                         </div>
 
                         <!-- Live total indicator -->
                         <div id="totalBadge" class="hidden rounded-lg px-3 py-2 text-sm border">
                             <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <span class="text-gray-600">Committed so far: <strong id="badgeCommitted">0</strong></span>
-                                <span class="text-gray-600">This entry: <strong id="badgeThis">0</strong></span>
+                                <span class="text-gray-600 dark:text-dark-muted">Committed so far: <strong id="badgeCommitted">0</strong></span>
+                                <span class="text-gray-600 dark:text-dark-muted">This entry: <strong id="badgeThis">0</strong></span>
                                 <span class="font-semibold">Total: <strong id="badgeTotal">0</strong> / 100</span>
                             </div>
                             <!-- progress bar -->
@@ -135,9 +135,9 @@ ob_start();
 
                         <!-- Description -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                             <textarea name="description" rows="2" placeholder="Optional notes…"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
                         </div>
 
                         <button type="submit" id="saveBtn"
@@ -157,8 +157,8 @@ ob_start();
                 <input type="hidden" name="module" value="exams">
                 <input type="hidden" name="action" value="add-assessment">
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1">Filter by Class</label>
-                    <select name="filter_class" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
+                    <label class="block text-xs text-gray-500 dark:text-dark-muted mb-1">Filter by Class</label>
+                    <select name="filter_class" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                         <option value="">All Classes</option>
                         <?php foreach ($classes as $c): ?>
                             <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -166,8 +166,8 @@ ob_start();
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs text-gray-500 mb-1">Filter by Term</label>
-                    <select name="filter_term" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
+                    <label class="block text-xs text-gray-500 dark:text-dark-muted mb-1">Filter by Term</label>
+                    <select name="filter_term" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                         <option value="">All Terms</option>
                         <?php foreach ($terms as $t): ?>
                             <option value="<?= $t['id'] ?>" <?= $filterTerm == $t['id'] ? 'selected' : '' ?>><?= e($t['name']) ?></option>
@@ -177,14 +177,14 @@ ob_start();
                 <button type="submit" class="px-4 py-1.5 bg-gray-700 text-white rounded-lg text-sm hover:bg-gray-800 transition">Filter</button>
             </form>
 
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                <div class="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-                    <span class="text-sm font-medium text-gray-700">Existing Assessments</span>
-                    <span class="text-xs text-gray-400"><?= count($assessments) ?> assessment(s) in <?= count($grouped) ?> group(s)</span>
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden overflow-x-auto">
+                <div class="px-4 py-3 border-b border-gray-100 dark:border-dark-border bg-gray-50 dark:bg-dark-bg flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Existing Assessments</span>
+                    <span class="text-xs text-gray-400 dark:text-gray-500"><?= count($assessments) ?> assessment(s) in <?= count($grouped) ?> group(s)</span>
                 </div>
 
                 <?php if (empty($grouped)): ?>
-                <div class="p-10 text-center text-gray-400 text-sm">No assessments found. Create one using the form.</div>
+                <div class="p-10 text-center text-gray-400 dark:text-gray-500 text-sm">No assessments found. Create one using the form.</div>
                 <?php else: ?>
 
                 <?php foreach ($grouped as $grp): ?>
@@ -207,13 +207,13 @@ ob_start();
                     $barWidth = min(100, $grpTotal);
                 ?>
                 <!-- Group header -->
-                <div class="px-4 py-2.5 bg-gray-50 border-b flex items-center justify-between gap-3">
+                <div class="px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border-b flex items-center justify-between gap-3">
                     <div class="text-sm">
-                        <span class="font-semibold text-gray-800"><?= e($grp['class']) ?></span>
-                        <span class="text-gray-400 mx-1">›</span>
-                        <span class="text-gray-700"><?= e($grp['subject']) ?></span>
-                        <span class="text-gray-400 mx-1">›</span>
-                        <span class="text-gray-500 text-xs"><?= e($grp['term']) ?></span>
+                        <span class="font-semibold text-gray-800 dark:text-dark-text"><?= e($grp['class']) ?></span>
+                        <span class="text-gray-400 dark:text-gray-500 mx-1">›</span>
+                        <span class="text-gray-700 dark:text-gray-300"><?= e($grp['subject']) ?></span>
+                        <span class="text-gray-400 dark:text-gray-500 mx-1">›</span>
+                        <span class="text-gray-500 dark:text-dark-muted text-xs"><?= e($grp['term']) ?></span>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         <div class="w-20 bg-gray-200 rounded-full h-1.5">
@@ -225,7 +225,7 @@ ob_start();
                     </div>
                 </div>
                 <table class="w-full text-sm border-b">
-                    <thead class="bg-white border-b text-xs font-medium text-gray-400 uppercase">
+                    <thead class="bg-white dark:bg-dark-card border-b text-xs font-medium text-gray-400 dark:text-gray-500 uppercase">
                         <tr>
                             <th class="px-4 py-1.5 text-left pl-8">Assessment</th>
                             <th class="px-4 py-1.5 text-center w-16">Marks</th>
@@ -234,10 +234,10 @@ ob_start();
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         <?php foreach ($grp['rows'] as $a): ?>
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-2 pl-8 text-gray-800"><?= e($a['name']) ?>
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                            <td class="px-4 py-2 pl-8 text-gray-800 dark:text-dark-text"><?= e($a['name']) ?>
                                 <?php if ($a['description']): ?>
-                                    <span class="text-gray-400 text-xs ml-1">— <?= e(mb_strimwidth($a['description'], 0, 40, '…')) ?></span>
+                                    <span class="text-gray-400 dark:text-gray-500 text-xs ml-1">— <?= e(mb_strimwidth($a['description'], 0, 40, '…')) ?></span>
                                 <?php endif; ?>
                             </td>
                             <td class="px-4 py-2 text-center">

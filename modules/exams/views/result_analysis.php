@@ -142,7 +142,7 @@ ob_start();
 <div class="max-w-4xl mx-auto">
 
     <div class="flex items-center justify-between mb-6 no-print">
-        <h1 class="text-xl font-bold text-gray-900">Result Analysis</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Result Analysis</h1>
         <?php if (!empty($rows)): ?>
         <button onclick="window.print()"
                 class="flex items-center gap-2 px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900 transition">
@@ -155,14 +155,14 @@ ob_start();
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6 no-print">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6 no-print">
         <form method="GET" id="filterForm" class="flex flex-wrap items-end gap-4">
             <input type="hidden" name="module" value="exams">
             <input type="hidden" name="action" value="result-analysis">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Term <span class="text-red-500">*</span></label>
-                <select name="term_id" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Term <span class="text-red-500">*</span></label>
+                <select name="term_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">Select Term</option>
                     <?php foreach ($allTerms as $t): ?>
                         <option value="<?= $t['id'] ?>" <?= $selTerm == $t['id'] ? 'selected' : '' ?>><?= e($t['name']) ?></option>
@@ -171,9 +171,9 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                 <select name="class_id" id="raClassSel"
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
                         onchange="ajaxLoadSubjects(this.value,'<?= $sessionId ?>','raSubjectSel',<?= (int)$selSubject ?>)">
                     <option value="">Select Class</option>
                     <?php foreach ($allClasses as $c): ?>
@@ -183,9 +183,9 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Subject <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-red-500">*</span></label>
                 <select name="subject_id" id="raSubjectSel" required
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm min-w-[180px]"
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm min-w-[180px]"
                         <?= !$selClass ? 'disabled' : '' ?>>
                     <option value="">— Select Class First —</option>
                     <?php foreach ($subjectsForClass as $s): ?>
@@ -202,7 +202,7 @@ ob_start();
     </div>
 
     <?php if (!$generate): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-16 text-center text-gray-400 text-sm">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-16 text-center text-gray-400 dark:text-gray-500 text-sm">
         Select term, class, and subject, then click <strong>Analyse</strong>.
     </div>
 
@@ -213,20 +213,20 @@ ob_start();
         <h2 class="text-xl font-bold uppercase tracking-wide">Urjiberi School</h2>
         <p class="text-sm mt-1">Result Analysis Report</p>
         <p class="text-sm font-medium mt-1">Class: <?= e($className) ?> &nbsp;|&nbsp; Subject: <?= e($subjectName) ?> &nbsp;|&nbsp; Term: <?= e($termName) ?></p>
-        <p class="text-xs text-gray-500 mt-0.5">Printed: <?= $printTs ?></p>
+        <p class="text-xs text-gray-500 dark:text-dark-muted mt-0.5">Printed: <?= $printTs ?></p>
     </div>
 
     <!-- Context info bar -->
     <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 no-print flex flex-wrap gap-4 text-sm">
-        <div><span class="text-gray-500">Class:</span> <strong><?= e($className) ?></strong></div>
-        <div><span class="text-gray-500">Subject:</span> <strong><?= e($subjectName) ?></strong></div>
-        <div><span class="text-gray-500">Term:</span> <strong><?= e($termName) ?></strong></div>
-        <div><span class="text-gray-500">Session:</span> <strong><?= e($activeSession['name'] ?? '') ?></strong></div>
+        <div><span class="text-gray-500 dark:text-dark-muted">Class:</span> <strong><?= e($className) ?></strong></div>
+        <div><span class="text-gray-500 dark:text-dark-muted">Subject:</span> <strong><?= e($subjectName) ?></strong></div>
+        <div><span class="text-gray-500 dark:text-dark-muted">Term:</span> <strong><?= e($termName) ?></strong></div>
+        <div><span class="text-gray-500 dark:text-dark-muted">Session:</span> <strong><?= e($activeSession['name'] ?? '') ?></strong></div>
     </div>
 
     <!-- Analysis Table -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full text-sm">
             <thead class="bg-gray-800 text-white">
                 <tr>
                     <th class="px-4 py-3 text-left font-medium">Category</th>
@@ -236,7 +236,7 @@ ob_start();
                     <th class="px-4 py-3 text-center font-medium">% of Enrolled</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php
                 $denomEnrolled = ($rows['Enrolled Students']['male'] ?? 0) + ($rows['Enrolled Students']['female'] ?? 0);
                 $bands = ['Mark < 50','Mark 50 – 64','Mark 65 – 79','Mark 80 – 89','Mark ≥ 90'];
@@ -250,13 +250,13 @@ ob_start();
                     $isHeader = in_array($label, ['Enrolled Students', 'Exam Sitting Students']);
                     $isBand   = in_array($label, $bands);
                     if ($isBand) { $bandTotalM += $m; $bandTotalF += $f; }
-                    $bgClass  = $rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-                    $labelCls = $isHeader ? 'font-semibold text-gray-900' : 'pl-6 text-gray-700';
+                    $bgClass  = $rowIdx % 2 === 0 ? 'bg-white dark:bg-dark-card' : 'bg-gray-50 dark:bg-dark-bg';
+                    $labelCls = $isHeader ? 'font-semibold text-gray-900 dark:text-dark-text' : 'pl-6 text-gray-700 dark:text-gray-300';
                     if ($label === 'Mark < 50') $labelCls .= ' text-red-700 font-medium';
                     if ($label === 'Mark ≥ 90') $labelCls .= ' text-green-700 font-medium';
                     $rowIdx++;
                 ?>
-                <tr class="<?= $bgClass ?> <?= $isHeader ? 'border-b-2 border-gray-300' : '' ?>">
+                <tr class="<?= $bgClass ?> <?= $isHeader ? 'border-b-2 border-gray-300 dark:border-dark-border' : '' ?>">
                     <td class="px-4 py-2.5 <?= $labelCls ?>">
                         <?php if ($label === 'Mark < 50'): ?>
                         <span class="inline-flex items-center gap-1"><svg class="w-3 h-3 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-11v4a1 1 0 002 0V7a1 1 0 00-2 0zm0 7a1 1 0 112 0 1 1 0 01-2 0z"/></svg>Fail (< 50)</span>
@@ -266,17 +266,17 @@ ob_start();
                         <?= e($label) ?>
                         <?php endif; ?>
                     </td>
-                    <td class="px-4 py-2.5 text-center font-medium <?= $m > 0 ? 'text-blue-700' : 'text-gray-400' ?>"><?= $m ?: '—' ?></td>
-                    <td class="px-4 py-2.5 text-center font-medium <?= $f > 0 ? 'text-pink-700' : 'text-gray-400' ?>"><?= $f ?: '—' ?></td>
-                    <td class="px-4 py-2.5 text-center font-bold text-gray-900"><?= $tot ?: '—' ?></td>
-                    <td class="px-4 py-2.5 text-center text-gray-600">
+                    <td class="px-4 py-2.5 text-center font-medium <?= $m > 0 ? 'text-blue-700' : 'text-gray-400 dark:text-gray-500' ?>"><?= $m ?: '—' ?></td>
+                    <td class="px-4 py-2.5 text-center font-medium <?= $f > 0 ? 'text-pink-700' : 'text-gray-400 dark:text-gray-500' ?>"><?= $f ?: '—' ?></td>
+                    <td class="px-4 py-2.5 text-center font-bold text-gray-900 dark:text-dark-text"><?= $tot ?: '—' ?></td>
+                    <td class="px-4 py-2.5 text-center text-gray-600 dark:text-dark-muted">
                         <?php
                             $pct = $denomEnrolled > 0 ? round(($tot / $denomEnrolled) * 100, 1) : 0;
                             if ($isHeader): ?>
-                            <span class="text-gray-500 text-xs"><?= $tot ?> / <?= $denomEnrolled ?></span>
+                            <span class="text-gray-500 dark:text-dark-muted text-xs"><?= $tot ?> / <?= $denomEnrolled ?></span>
                         <?php elseif ($tot > 0): ?>
                             <span class="px-2 py-0.5 rounded-full text-xs font-semibold
-                                <?= $label==='Mark < 50' ? 'bg-red-100 text-red-800' : ($label==='Mark ≥ 90' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700') ?>">
+                                <?= $label==='Mark < 50' ? 'bg-red-100 text-red-800' : ($label==='Mark ≥ 90' ? 'bg-green-100 text-green-800' : 'bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300') ?>">
                                 <?= $pct ?>%
                             </span>
                         <?php else: ?>
@@ -291,29 +291,29 @@ ob_start();
                 $bandTotalAll = $bandTotalM + $bandTotalF;
                 $bPct = $denomEnrolled > 0 ? round(($bandTotalAll / $denomEnrolled) * 100, 1) : 0;
                 ?>
-                <tr class="bg-gray-100 border-t-2 border-gray-400 font-semibold">
-                    <td class="px-4 py-3 text-gray-900">Total Students (All Grades)</td>
+                <tr class="bg-gray-100 dark:bg-dark-card2 border-t-2 border-gray-400 font-semibold">
+                    <td class="px-4 py-3 text-gray-900 dark:text-dark-text">Total Students (All Grades)</td>
                     <td class="px-4 py-3 text-center text-blue-700"><?= $bandTotalM ?: '—' ?></td>
                     <td class="px-4 py-3 text-center text-pink-700"><?= $bandTotalF ?: '—' ?></td>
-                    <td class="px-4 py-3 text-center font-bold text-gray-900"><?= $bandTotalAll ?: '—' ?></td>
+                    <td class="px-4 py-3 text-center font-bold text-gray-900 dark:text-dark-text"><?= $bandTotalAll ?: '—' ?></td>
                     <td class="px-4 py-3 text-center">
                         <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-800"><?= $bPct ?>%</span>
                     </td>
                 </tr>
             </tbody>
         </table>
-    </div>
+    </div></div>
 
     <!-- Gender legend -->
-    <div class="mt-3 flex gap-6 text-xs text-gray-500 no-print">
+    <div class="mt-3 flex gap-6 text-xs text-gray-500 dark:text-dark-muted no-print">
         <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-200 inline-block"></span>Blue = Male</span>
         <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-pink-200 inline-block"></span>Pink = Female</span>
-        <span class="text-gray-400">Percentages are relative to total enrolled students.</span>
+        <span class="text-gray-400 dark:text-gray-500">Percentages are relative to total enrolled students.</span>
     </div>
 
     <!-- Grade scale reference -->
-    <div class="mt-6 bg-white border border-gray-200 rounded-xl p-4 no-print">
-        <p class="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Grade Scale Reference</p>
+    <div class="mt-6 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl p-4 no-print">
+        <p class="text-xs font-semibold text-gray-600 dark:text-dark-muted mb-2 uppercase tracking-wide">Grade Scale Reference</p>
         <div class="flex flex-wrap gap-2">
             <?php
             $grades = [

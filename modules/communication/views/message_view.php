@@ -32,7 +32,7 @@ ob_start();
 ?>
 <div class="max-w-3xl mx-auto space-y-6">
     <div class="flex items-center justify-between">
-        <a href="<?= url('communication', $isSender ? 'sent' : 'inbox') ?>" class="text-sm text-gray-500 hover:text-gray-700">
+        <a href="<?= url('communication', $isSender ? 'sent' : 'inbox') ?>" class="text-sm text-gray-500 dark:text-dark-muted hover:text-gray-700 dark:text-gray-300">
             &larr; <?= $isSender ? 'Sent' : 'Inbox' ?>
         </a>
         <?php if (!$isSender): ?>
@@ -41,24 +41,24 @@ ob_start();
         <?php endif; ?>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border p-6">
-        <h1 class="text-xl font-bold text-gray-900"><?= e($message['subject']) ?></h1>
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-sm border p-6">
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text"><?= e($message['subject']) ?></h1>
 
-        <div class="flex items-center gap-4 mt-3 text-sm text-gray-500">
+        <div class="flex items-center gap-4 mt-3 text-sm text-gray-500 dark:text-dark-muted">
             <div>
-                <span class="text-gray-400">From:</span>
-                <span class="font-medium text-gray-700"><?= e($message['sender_name']) ?></span>
+                <span class="text-gray-400 dark:text-gray-500">From:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300"><?= e($message['sender_name']) ?></span>
             </div>
             <div>
-                <span class="text-gray-400">To:</span>
-                <span class="font-medium text-gray-700"><?= e($message['receiver_name']) ?></span>
+                <span class="text-gray-400 dark:text-gray-500">To:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300"><?= e($message['receiver_name']) ?></span>
             </div>
             <div><?= format_datetime($message['created_at']) ?></div>
         </div>
 
         <hr class="my-4">
 
-        <div class="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">
+        <div class="prose max-w-none text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
 <?= e($message['body']) ?>
         </div>
     </div>

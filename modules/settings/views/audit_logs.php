@@ -64,14 +64,14 @@ ob_start();
 ?>
 <div class="space-y-6">
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900">Audit Logs</h1>
-        <span class="text-sm text-gray-500"><?= number_format($total) ?> records</span>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-dark-text">Audit Logs</h1>
+        <span class="text-sm text-gray-500 dark:text-dark-muted"><?= number_format($total) ?> records</span>
     </div>
 
     <!-- Filters -->
-    <form class="bg-white rounded-xl shadow-sm border p-4">
+    <form class="bg-white dark:bg-dark-card rounded-xl shadow-sm border p-4">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-            <select name="user" class="rounded-lg border-gray-300 text-sm">
+            <select name="user" class="rounded-lg border-gray-300 dark:border-dark-border text-sm">
                 <option value="">All Users</option>
                 <?php foreach ($users as $u): ?>
                     <option value="<?= $u['user_id'] ?>" <?= $filterUser == $u['user_id'] ? 'selected' : '' ?>>
@@ -79,7 +79,7 @@ ob_start();
                     </option>
                 <?php endforeach; ?>
             </select>
-            <select name="act" class="rounded-lg border-gray-300 text-sm">
+            <select name="act" class="rounded-lg border-gray-300 dark:border-dark-border text-sm">
                 <option value="">All Actions</option>
                 <?php foreach ($actions as $a): ?>
                     <option value="<?= e($a['action']) ?>" <?= $filterAction === $a['action'] ? 'selected' : '' ?>>
@@ -87,7 +87,7 @@ ob_start();
                     </option>
                 <?php endforeach; ?>
             </select>
-            <select name="tbl" class="rounded-lg border-gray-300 text-sm">
+            <select name="tbl" class="rounded-lg border-gray-300 dark:border-dark-border text-sm">
                 <option value="">All Tables</option>
                 <?php foreach ($tables as $t): ?>
                     <option value="<?= e($t['table_name']) ?>" <?= $filterTable === $t['table_name'] ? 'selected' : '' ?>>
@@ -96,10 +96,10 @@ ob_start();
                 <?php endforeach; ?>
             </select>
             <input type="date" name="from" value="<?= e($filterFrom) ?>"
-                   class="rounded-lg border-gray-300 text-sm" placeholder="From">
+                   class="rounded-lg border-gray-300 dark:border-dark-border text-sm" placeholder="From">
             <div class="flex gap-2">
                 <input type="date" name="to" value="<?= e($filterTo) ?>"
-                       class="rounded-lg border-gray-300 text-sm flex-1" placeholder="To">
+                       class="rounded-lg border-gray-300 dark:border-dark-border text-sm flex-1" placeholder="To">
                 <button type="submit"
                         class="px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900">
                     Filter
@@ -109,10 +109,10 @@ ob_start();
     </form>
 
     <!-- Table -->
-    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-sm border overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 text-gray-700">
+                <thead class="bg-gray-50 dark:bg-dark-bg text-gray-700 dark:text-gray-300">
                     <tr>
                         <th class="px-4 py-3 text-left font-medium">Time</th>
                         <th class="px-4 py-3 text-left font-medium">User</th>
@@ -125,14 +125,14 @@ ob_start();
                 </thead>
                 <tbody class="divide-y">
                     <?php if (empty($logs)): ?>
-                        <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">No audit logs found.</td></tr>
+                        <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-dark-muted">No audit logs found.</td></tr>
                     <?php else: ?>
                         <?php foreach ($logs as $log): ?>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">
+                            <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                                <td class="px-4 py-3 text-gray-500 dark:text-dark-muted whitespace-nowrap text-xs">
                                     <?= format_datetime($log['created_at']) ?>
                                 </td>
-                                <td class="px-4 py-3 font-medium text-gray-900">
+                                <td class="px-4 py-3 font-medium text-gray-900 dark:text-dark-text">
                                     <?= e($log['user_name'] ?? 'System') ?>
                                 </td>
                                 <td class="px-4 py-3">
@@ -142,20 +142,20 @@ ob_start();
                                         'update' => 'bg-blue-100 text-blue-700',
                                         'delete' => 'bg-red-100 text-red-700',
                                         'login'  => 'bg-purple-100 text-purple-700',
-                                        'logout' => 'bg-gray-100 text-gray-700',
+                                        'logout' => 'bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300',
                                     ];
-                                    $cls = $badges[$log['action']] ?? 'bg-gray-100 text-gray-700';
+                                    $cls = $badges[$log['action']] ?? 'bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300';
                                     ?>
                                     <span class="px-2 py-0.5 rounded-full text-xs font-medium <?= $cls ?>">
                                         <?= e(ucfirst($log['action'])) ?>
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 text-gray-600"><?= e($log['module'] ?? '-') ?></td>
-                                <td class="px-4 py-3 text-gray-600"><?= $log['entity_id'] ? e($log['entity_type'] ?? '') . ' #' . $log['entity_id'] : '-' ?></td>
-                                <td class="px-4 py-3 text-gray-600 max-w-xs truncate" title="<?= e($log['description'] ?? '') ?>">
+                                <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($log['module'] ?? '-') ?></td>
+                                <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= $log['entity_id'] ? e($log['entity_type'] ?? '') . ' #' . $log['entity_id'] : '-' ?></td>
+                                <td class="px-4 py-3 text-gray-600 dark:text-dark-muted max-w-xs truncate" title="<?= e($log['description'] ?? '') ?>">
                                     <?= e($log['description'] ?? '-') ?>
                                 </td>
-                                <td class="px-4 py-3 text-gray-500 text-xs"><?= e($log['ip_address'] ?? '-') ?></td>
+                                <td class="px-4 py-3 text-gray-500 dark:text-dark-muted text-xs"><?= e($log['ip_address'] ?? '-') ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

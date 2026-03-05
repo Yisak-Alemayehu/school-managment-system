@@ -49,10 +49,10 @@ ob_start();
 <div class="space-y-4">
     <div class="flex items-center justify-between flex-wrap gap-2">
         <div class="flex items-center gap-3">
-            <a href="<?= url('finance', 'fee-due') ?>" class="text-gray-500 hover:text-gray-700">
+            <a href="<?= url('finance', 'fee-due') ?>" class="text-gray-500 dark:text-dark-muted hover:text-gray-700 dark:text-gray-300">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </a>
-            <h1 class="text-xl font-bold text-gray-900"><?= e($fee['description']) ?></h1>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text"><?= e($fee['description']) ?></h1>
             <span class="px-2 py-1 rounded-full text-xs font-medium <?= $fee['is_active'] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' ?>">
                 <?= $fee['is_active'] ? 'Active' : 'Inactive' ?>
             </span>
@@ -66,51 +66,51 @@ ob_start();
     </div>
 
     <!-- Fee Information -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-700 uppercase mb-3">Fee Information</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-3">Fee Information</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-            <div><span class="text-gray-500">Amount:</span> <strong><?= format_money($fee['amount']) ?> <?= e($fee['currency']) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Amount:</span> <strong><?= format_money($fee['amount']) ?> <?= e($fee['currency']) ?></strong></div>
             <?php if ($fee['foreign_amount']): ?>
-            <div><span class="text-gray-500">ETB Equivalent:</span> <strong><?= format_money($fee['foreign_amount']) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">ETB Equivalent:</span> <strong><?= format_money($fee['foreign_amount']) ?></strong></div>
             <?php endif; ?>
-            <div><span class="text-gray-500">Type:</span> <strong><?= $fee['fee_type'] ? 'Recurrent' : 'One-Time' ?></strong></div>
-            <div><span class="text-gray-500">Effective Date:</span> <strong><?= format_date($fee['effective_date']) ?></strong></div>
-            <div><span class="text-gray-500">End Date:</span> <strong><?= format_date($fee['end_date']) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Type:</span> <strong><?= $fee['fee_type'] ? 'Recurrent' : 'One-Time' ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Effective Date:</span> <strong><?= format_date($fee['effective_date']) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">End Date:</span> <strong><?= format_date($fee['end_date']) ?></strong></div>
             <?php if ($fee['fee_type']): ?>
-            <div><span class="text-gray-500">Applies Every:</span> <strong><?= (int) $fee['apply_every'] ?> <?= e($fee['frequency']) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Applies Every:</span> <strong><?= (int) $fee['apply_every'] ?> <?= e($fee['frequency']) ?></strong></div>
             <?php endif; ?>
-            <div><span class="text-gray-500">Classes:</span> <strong><?= !empty($feeClasses) ? e(implode(', ', array_column($feeClasses, 'name'))) : 'All' ?></strong></div>
-            <div><span class="text-gray-500">Created By:</span> <strong><?= e($fee['created_by_name'] ?? '—') ?></strong></div>
-            <div><span class="text-gray-500">Created:</span> <strong><?= format_datetime($fee['created_at']) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Classes:</span> <strong><?= !empty($feeClasses) ? e(implode(', ', array_column($feeClasses, 'name'))) : 'All' ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Created By:</span> <strong><?= e($fee['created_by_name'] ?? '—') ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Created:</span> <strong><?= format_datetime($fee['created_at']) ?></strong></div>
         </div>
     </div>
 
     <!-- Penalty Info -->
     <?php if ($fee['has_penalty']): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-sm font-semibold text-gray-700 uppercase mb-3">Penalty Configuration</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase mb-3">Penalty Configuration</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-            <div><span class="text-gray-500">Penalty Type:</span> <strong><?= ucfirst(str_replace('_', ' ', $fee['penalty_type'] ?? '—')) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Penalty Type:</span> <strong><?= ucfirst(str_replace('_', ' ', $fee['penalty_type'] ?? '—')) ?></strong></div>
             <?php if (in_array($fee['penalty_type'], ['fixed_amount', 'fixed_percentage'])): ?>
-            <div><span class="text-gray-500">Penalty Value:</span> <strong><?= $fee['penalty_value'] ?><?= $fee['penalty_type'] === 'fixed_percentage' ? '%' : '' ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Penalty Value:</span> <strong><?= $fee['penalty_value'] ?><?= $fee['penalty_type'] === 'fixed_percentage' ? '%' : '' ?></strong></div>
             <?php endif; ?>
-            <div><span class="text-gray-500">Unpaid After:</span> <strong><?= (int) $fee['penalty_unpaid_after'] ?> <?= e($fee['penalty_unpaid_unit'] ?? '') ?></strong></div>
-            <div><span class="text-gray-500">Frequency:</span> <strong><?= ucfirst(str_replace('_', ' ', $fee['penalty_frequency'] ?? '—')) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Unpaid After:</span> <strong><?= (int) $fee['penalty_unpaid_after'] ?> <?= e($fee['penalty_unpaid_unit'] ?? '') ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Frequency:</span> <strong><?= ucfirst(str_replace('_', ' ', $fee['penalty_frequency'] ?? '—')) ?></strong></div>
             <?php if ($fee['penalty_frequency'] === 'recurrent'): ?>
-            <div><span class="text-gray-500">Reapply Every:</span> <strong><?= (int) $fee['penalty_reapply_every'] ?> <?= e($fee['penalty_reapply_unit'] ?? '') ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Reapply Every:</span> <strong><?= (int) $fee['penalty_reapply_every'] ?> <?= e($fee['penalty_reapply_unit'] ?? '') ?></strong></div>
             <?php endif; ?>
-            <div><span class="text-gray-500">Penalty Expiry:</span> <strong><?= $fee['penalty_expiry_date'] ? format_date($fee['penalty_expiry_date']) : 'None' ?></strong></div>
-            <div><span class="text-gray-500">Max Amount:</span> <strong><?= format_money($fee['max_penalty_amount']) ?></strong></div>
-            <div><span class="text-gray-500">Max Count:</span> <strong><?= $fee['max_penalty_count'] ?: 'Unlimited' ?></strong></div>
-            <div><span class="text-gray-500">Credit Hour:</span> <strong><?= $fee['is_credit_hour'] ? 'Yes' : 'No' ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Penalty Expiry:</span> <strong><?= $fee['penalty_expiry_date'] ? format_date($fee['penalty_expiry_date']) : 'None' ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Max Amount:</span> <strong><?= format_money($fee['max_penalty_amount']) ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Max Count:</span> <strong><?= $fee['max_penalty_count'] ?: 'Unlimited' ?></strong></div>
+            <div><span class="text-gray-500 dark:text-dark-muted">Credit Hour:</span> <strong><?= $fee['is_credit_hour'] ? 'Yes' : 'No' ?></strong></div>
         </div>
 
         <?php if (!empty($varyingPenalties)): ?>
         <div class="mt-4">
-            <h3 class="text-sm font-medium text-gray-700 mb-2">Varying Values</h3>
+            <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Varying Values</h3>
             <div class="flex flex-wrap gap-2">
                 <?php foreach ($varyingPenalties as $i => $vp): ?>
-                <span class="px-3 py-1 bg-gray-100 rounded-lg text-sm"><?= ($i + 1) ?>. <?= $vp['value'] ?></span>
+                <span class="px-3 py-1 bg-gray-100 dark:bg-dark-card2 rounded-lg text-sm"><?= ($i + 1) ?>. <?= $vp['value'] ?></span>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -119,33 +119,33 @@ ob_start();
     <?php endif; ?>
 
     <!-- Assigned Students -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-700 uppercase">Assigned Students (<?= count($assignedStudents) ?>)</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-dark-border">
+            <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase">Assigned Students (<?= count($assignedStudents) ?>)</h2>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 responsive-table">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
+                <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Code</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Balance</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Code</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Amount</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Balance</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($assignedStudents)): ?>
-                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No students assigned.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No students assigned.</td></tr>
                     <?php else: ?>
                     <?php foreach ($assignedStudents as $as): ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg transition-colors">
                         <td class="px-4 py-3 text-sm" data-label="Student">
                             <a href="<?= url('finance', 'student-detail', $as['student_id']) ?>" class="text-primary-600 hover:underline font-medium"><?= e($as['full_name']) ?></a>
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Code"><?= e($as['admission_no']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Class"><?= e($as['class_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Code"><?= e($as['admission_no']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Class"><?= e($as['class_name'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Amount"><?= format_money($as['amount']) ?></td>
                         <td class="px-4 py-3 text-sm font-semibold <?= $as['balance'] > 0 ? 'text-red-600' : 'text-green-600' ?>" data-label="Balance">
                             <?= format_money($as['balance']) ?>
@@ -164,28 +164,28 @@ ob_start();
     </div>
 
     <!-- Recent Transactions -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-700 uppercase">Recent Transactions</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-dark-border">
+            <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase">Recent Transactions</h2>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 responsive-table">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
+                <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Type</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Description</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Type</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Amount</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Description</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($recentTx)): ?>
-                    <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No transactions yet.</td></tr>
+                    <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No transactions yet.</td></tr>
                     <?php else: ?>
                     <?php foreach ($recentTx as $tx): ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Date"><?= format_datetime($tx['created_at']) ?></td>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg transition-colors">
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Date"><?= format_datetime($tx['created_at']) ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Student">
                             <a href="<?= url('finance', 'student-detail', $tx['student_id']) ?>" class="text-primary-600 hover:underline"><?= e($tx['full_name']) ?></a>
                         </td>
@@ -196,14 +196,14 @@ ob_start();
                                         case 'payment': echo 'bg-green-100 text-green-700'; break;
                                         case 'penalty': echo 'bg-red-100 text-red-700'; break;
                                         case 'adjustment': echo 'bg-yellow-100 text-yellow-700'; break;
-                                        default: echo 'bg-gray-100 text-gray-700';
+                                        default: echo 'bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300';
                                     }
                                 ?>">
                                 <?= ucfirst(str_replace('_', ' ', $tx['type'])) ?>
                             </span>
                         </td>
                         <td class="px-4 py-3 text-sm font-semibold" data-label="Amount"><?= format_money($tx['amount']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Desc"><?= e(truncate($tx['description'] ?? '', 60)) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Desc"><?= e(truncate($tx['description'] ?? '', 60)) ?></td>
                     </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>

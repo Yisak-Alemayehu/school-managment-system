@@ -25,25 +25,25 @@ ob_start();
 ?>
 
 <div class="max-w-5xl mx-auto">
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Exams</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Exams</h1>
 
     <!-- Form -->
     <?php if (auth_has_permission('exam.manage')): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4"><?= $editing ? 'Edit Exam' : 'Create Exam' ?></h2>
-        <form method="POST" action="<?= url('exams', 'exam-save') ?>" class="grid grid-cols-1 sm:grid-cols-5 gap-4">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4"><?= $editing ? 'Edit Exam' : 'Create Exam' ?></h2>
+        <form method="POST" action="<?= url('exams', 'exam-save') ?>" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <?= csrf_field() ?>
             <?php if ($editing): ?><input type="hidden" name="id" value="<?= $editing['id'] ?>"><?php endif; ?>
             <input type="hidden" name="session_id" value="<?= $sessionId ?>">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Exam Name</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exam Name</label>
                 <input type="text" name="name" value="<?= e($editing['name'] ?? '') ?>" required placeholder="e.g. Mid-Term Exam"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Term</label>
-                <select name="term_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Term</label>
+                <select name="term_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select</option>
                     <?php foreach ($terms as $t): ?>
                         <option value="<?= $t['id'] ?>" <?= ($editing['term_id'] ?? '') == $t['id'] ? 'selected' : '' ?>><?= e($t['name']) ?></option>
@@ -51,21 +51,21 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
                 <input type="date" name="start_date" value="<?= e($editing['start_date'] ?? '') ?>" required
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
                 <input type="date" name="end_date" value="<?= e($editing['end_date'] ?? '') ?>" required
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit" class="px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                     <?= $editing ? 'Update' : 'Create' ?>
                 </button>
                 <?php if ($editing): ?>
-                    <a href="<?= url('exams', 'exams') ?>" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
+                    <a href="<?= url('exams', 'exams') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                 <?php endif; ?>
             </div>
         </form>
@@ -75,14 +75,14 @@ ob_start();
     <!-- List -->
     <div class="space-y-3">
         <?php if (empty($exams)): ?>
-            <div class="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">No exams created yet.</div>
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-8 text-center text-gray-500 dark:text-dark-muted">No exams created yet.</div>
         <?php endif; ?>
         <?php foreach ($exams as $ex): ?>
-            <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-sm transition">
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 hover:shadow-sm transition">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-900"><?= e($ex['name']) ?></h3>
-                        <div class="text-xs text-gray-500 mt-1">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-dark-text"><?= e($ex['name']) ?></h3>
+                        <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">
                             <?= e($ex['term_name'] ?? 'N/A') ?> &middot; <?= format_date($ex['start_date']) ?> — <?= format_date($ex['end_date']) ?>
                         </div>
                     </div>
@@ -91,10 +91,10 @@ ob_start();
                             <?= $ex['status'] === 'completed' ? 'bg-green-100 text-green-800' : ($ex['status'] === 'ongoing' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800') ?>">
                             <?= ucfirst($ex['status']) ?>
                         </span>
-                        <span class="text-xs text-gray-400"><?= $ex['schedule_count'] ?> schedules</span>
-                        <a href="<?= url('exams', 'exam-schedule') ?>&exam_id=<?= $ex['id'] ?>" class="px-3 py-1 border border-gray-300 rounded-lg text-xs hover:bg-gray-50">Schedule</a>
+                        <span class="text-xs text-gray-400 dark:text-gray-500"><?= $ex['schedule_count'] ?> schedules</span>
+                        <a href="<?= url('exams', 'exam-schedule') ?>&exam_id=<?= $ex['id'] ?>" class="px-3 py-1 border border-gray-300 dark:border-dark-border rounded-lg text-xs hover:bg-gray-50 dark:bg-dark-bg">Schedule</a>
                         <?php if (auth_has_permission('exam.manage')): ?>
-                            <a href="<?= url('exams', 'exams') ?>&edit=<?= $ex['id'] ?>" class="p-1 text-gray-400 hover:text-yellow-600 rounded">
+                            <a href="<?= url('exams', 'exams') ?>&edit=<?= $ex['id'] ?>" class="p-1 text-gray-400 dark:text-gray-500 hover:text-yellow-600 rounded">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </a>
                         <?php endif; ?>

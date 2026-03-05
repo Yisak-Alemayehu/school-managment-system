@@ -148,7 +148,7 @@ ob_start();
 ?>
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900">Database Backup</h1>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-dark-text">Database Backup</h1>
         <form method="POST">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="backup">
@@ -166,9 +166,9 @@ ob_start();
         otherwise falls back to a PHP-based export.
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 text-gray-700">
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-sm border overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-dark-bg text-gray-700 dark:text-gray-300">
                 <tr>
                     <th class="px-4 py-3 text-left font-medium">Filename</th>
                     <th class="px-4 py-3 text-left font-medium">Size</th>
@@ -178,13 +178,13 @@ ob_start();
             </thead>
             <tbody class="divide-y">
                 <?php if (empty($backups)): ?>
-                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">No backups found. Create one to get started.</td></tr>
+                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-dark-muted">No backups found. Create one to get started.</td></tr>
                 <?php else: ?>
                     <?php foreach ($backups as $b): ?>
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 font-medium text-gray-900"><?= e($b['name']) ?></td>
-                            <td class="px-4 py-3 text-gray-600"><?= format_file_size($b['size']) ?></td>
-                            <td class="px-4 py-3 text-gray-600"><?= date('M j, Y g:i A', $b['date']) ?></td>
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                            <td class="px-4 py-3 font-medium text-gray-900 dark:text-dark-text"><?= e($b['name']) ?></td>
+                            <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= format_file_size($b['size']) ?></td>
+                            <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= date('M j, Y g:i A', $b['date']) ?></td>
                             <td class="px-4 py-3 text-right">
                                 <a href="<?= url('settings', 'backup') ?>&download=<?= urlencode($b['name']) ?>"
                                    class="text-primary-700 hover:underline text-sm mr-3">Download</a>
@@ -200,7 +200,7 @@ ob_start();
                 <?php endif; ?>
             </tbody>
         </table>
-    </div>
+    </div></div>
 </div>
 <?php
 $content = ob_get_clean();

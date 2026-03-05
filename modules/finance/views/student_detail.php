@@ -66,7 +66,7 @@ ob_start();
 
 <div class="space-y-6">
     <!-- Back link -->
-    <a href="<?= url('finance', 'students') ?>" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600">
+    <a href="<?= url('finance', 'students') ?>" class="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-dark-muted hover:text-primary-600">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         Back to Student List
     </a>
@@ -91,8 +91,8 @@ ob_start();
     </div>
 
     <!-- Student Information -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Student Information</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Student Information</h2>
         <div class="flex flex-col md:flex-row gap-6">
             <div class="flex-shrink-0">
                 <?php if ($student['photo']): ?>
@@ -105,44 +105,44 @@ ob_start();
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3 flex-1">
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-semibold">Student Name</p>
-                    <p class="text-sm font-medium text-gray-900"><?= e($student['full_name']) ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Student Name</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($student['full_name']) ?></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-semibold">Student Code</p>
-                    <p class="text-sm font-medium text-gray-900"><?= e($student['admission_no']) ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Student Code</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($student['admission_no']) ?></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-semibold">Class</p>
-                    <p class="text-sm font-medium text-gray-900"><?= e($student['class_name'] ?? '—') ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Class</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($student['class_name'] ?? '—') ?></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-semibold">Date of Birth</p>
-                    <p class="text-sm font-medium text-gray-900"><?= format_date($student['date_of_birth']) ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Date of Birth</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= format_date($student['date_of_birth']) ?></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-semibold">Gender</p>
-                    <p class="text-sm font-medium text-gray-900"><?= ucfirst(e($student['gender'])) ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Gender</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= ucfirst(e($student['gender'])) ?></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-semibold">Email</p>
-                    <p class="text-sm font-medium text-gray-900"><?= e($student['email'] ?? '—') ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Email</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($student['email'] ?? '—') ?></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-semibold">Nationality</p>
-                    <p class="text-sm font-medium text-gray-900"><?= e($student['nationality'] ?? '—') ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Nationality</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($student['nationality'] ?? '—') ?></p>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-semibold">Parent's Contact Phone</p>
-                    <p class="text-sm font-medium text-gray-900"><?= e($guardian['phone'] ?? $student['phone'] ?? '—') ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Parent's Contact Phone</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($guardian['phone'] ?? $student['phone'] ?? '—') ?></p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Payment Summary -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Payment Summary</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Payment Summary</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <p class="text-xs text-blue-600 uppercase font-semibold">Total Active Fees</p>
@@ -157,33 +157,33 @@ ob_start();
 
     <!-- Guardian Information -->
     <?php if ($guardian): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Guardian Information</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Guardian Information</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-3">
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Name</p>
-                <p class="text-sm font-medium text-gray-900"><?= e($guardian['full_name']) ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Name</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($guardian['full_name']) ?></p>
             </div>
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Relationship</p>
-                <p class="text-sm font-medium text-gray-900"><?= ucfirst(e($guardian['relation'])) ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Relationship</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= ucfirst(e($guardian['relation'])) ?></p>
             </div>
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Phone Contact</p>
-                <p class="text-sm font-medium text-gray-900"><?= e($guardian['phone']) ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Phone Contact</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($guardian['phone']) ?></p>
             </div>
             <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Email</p>
-                <p class="text-sm font-medium text-gray-900"><?= e($guardian['email'] ?? '—') ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Email</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($guardian['email'] ?? '—') ?></p>
             </div>
         </div>
     </div>
     <?php endif; ?>
 
     <!-- Payment History / Transactions Section -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <h2 class="text-lg font-bold text-gray-900">Transactions</h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text">Transactions</h2>
             <div class="flex flex-wrap gap-2">
                 <a href="<?= url('finance', 'export-pdf') ?>&student_id=<?= $id ?>" target="_blank"
                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-700 text-xs rounded-lg hover:bg-red-100 font-medium border border-red-200">
@@ -199,7 +199,7 @@ ob_start();
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex flex-wrap gap-1 mb-4 border-b border-gray-200">
+        <div class="flex flex-wrap gap-1 mb-4 border-b border-gray-200 dark:border-dark-border">
             <?php
             $tabs = [
                 'history' => 'Full Payment History',
@@ -209,7 +209,7 @@ ob_start();
             ];
             foreach ($tabs as $key => $label): ?>
             <a href="<?= url('finance', 'student-detail', $id) ?>&tab=<?= $key ?>"
-               class="px-4 py-2 text-sm font-medium border-b-2 transition-colors <?= $tab === $key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700' ?>">
+               class="px-4 py-2 text-sm font-medium border-b-2 transition-colors <?= $tab === $key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 dark:text-dark-muted hover:text-gray-700 dark:text-gray-300' ?>">
                 <?= $label ?>
             </a>
             <?php endforeach; ?>
@@ -218,29 +218,29 @@ ob_start();
         <!-- Content for Active Fees tab -->
         <?php if ($tab === 'active'): ?>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 responsive-table">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
+                <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Description</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Balance</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Currency</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Assigned</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Description</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Amount</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Balance</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Currency</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Assigned</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($transactions)): ?>
-                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">No active fees.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No active fees.</td></tr>
                     <?php else: foreach ($transactions as $tx): ?>
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                         <td class="px-4 py-3 text-sm" data-label="Description"><?= e($tx['description']) ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Amount"><?= format_money($tx['amount']) ?></td>
                         <td class="px-4 py-3 text-sm font-semibold <?= $tx['balance'] > 0 ? 'text-red-600' : 'text-green-600' ?>" data-label="Balance"><?= format_money($tx['balance']) ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Currency"><?= e($tx['currency']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-500" data-label="Assigned"><?= format_datetime($tx['assigned_at']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted" data-label="Assigned"><?= format_datetime($tx['assigned_at']) ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Status">
-                            <span class="px-2 py-0.5 text-xs font-semibold rounded-full <?= $tx['is_active'] ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' ?>">
+                            <span class="px-2 py-0.5 text-xs font-semibold rounded-full <?= $tx['is_active'] ? 'bg-green-100 text-green-700' : 'bg-gray-100 dark:bg-dark-card2 text-gray-500 dark:text-dark-muted' ?>">
                                 <?= $tx['is_active'] ? 'Active' : 'Inactive' ?>
                             </span>
                         </td>
@@ -253,21 +253,21 @@ ob_start();
         <?php else: ?>
         <!-- Content for transaction tabs (history, payments, all) -->
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 responsive-table">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
+                <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Type</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Description</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Balance After</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Channel</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Reference</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Type</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Description</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Amount</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Balance After</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Channel</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Reference</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($transactions)): ?>
-                    <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No transactions found.</td></tr>
+                    <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No transactions found.</td></tr>
                     <?php else: foreach ($transactions as $tx):
                         $typeBadge = match($tx['type']) {
                             'payment'      => 'bg-green-100 text-green-700',
@@ -276,19 +276,19 @@ ob_start();
                             'fee_removed'  => 'bg-red-100 text-red-700',
                             'penalty'      => 'bg-orange-100 text-orange-700',
                             'refund'       => 'bg-purple-100 text-purple-700',
-                            default        => 'bg-gray-100 text-gray-700',
+                            default        => 'bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300',
                         };
                     ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm text-gray-500" data-label="Date"><?= format_datetime($tx['created_at']) ?></td>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted" data-label="Date"><?= format_datetime($tx['created_at']) ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Type">
                             <span class="px-2 py-0.5 text-xs font-semibold rounded-full <?= $typeBadge ?>"><?= ucwords(str_replace('_', ' ', $tx['type'])) ?></span>
                         </td>
                         <td class="px-4 py-3 text-sm" data-label="Description"><?= e($tx['description'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-sm font-semibold <?= $tx['amount'] >= 0 ? 'text-green-600' : 'text-red-600' ?>" data-label="Amount"><?= format_money($tx['amount']) ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Balance After"><?= $tx['balance_after'] !== null ? format_money($tx['balance_after']) : '—' ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-500" data-label="Channel"><?= e($tx['channel'] ?? '—') ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-500" data-label="Reference"><?= e($tx['reference'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted" data-label="Channel"><?= e($tx['channel'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted" data-label="Reference"><?= e($tx['reference'] ?? '—') ?></td>
                     </tr>
                     <?php endforeach; endif; ?>
                 </tbody>
@@ -304,15 +304,15 @@ ob_start();
 
 <!-- Assign Fee Modal -->
 <div id="assignFeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
-        <h3 class="text-lg font-bold text-gray-900 mb-4">Assign Fee</h3>
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Assign Fee</h3>
         <form method="POST" action="<?= url('finance', 'assign-fee') ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="student_id" value="<?= $id ?>">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Fee *</label>
-                    <select name="fee_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Fee *</label>
+                    <select name="fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         <option value="">— Select Fee —</option>
                         <?php foreach ($allFees as $f): ?>
                         <option value="<?= $f['id'] ?>"><?= e($f['description']) ?> (<?= format_money($f['amount']) ?>)</option>
@@ -321,7 +321,7 @@ ob_start();
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">
-                <button type="button" onclick="this.closest('#assignFeeModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
+                <button type="button" onclick="this.closest('#assignFeeModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Assign</button>
             </div>
         </form>
@@ -330,15 +330,15 @@ ob_start();
 
 <!-- Remove Fee Modal -->
 <div id="removeFeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
-        <h3 class="text-lg font-bold text-gray-900 mb-4">Remove Fee</h3>
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Remove Fee</h3>
         <form method="POST" action="<?= url('finance', 'remove-fee') ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="student_id" value="<?= $id ?>">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Active Fee to Remove *</label>
-                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Active Fee to Remove *</label>
+                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         <option value="">— Select Fee —</option>
                         <?php
                         $activeFeeList = db_fetch_all(
@@ -352,12 +352,12 @@ ob_start();
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Reason</label>
-                    <input type="text" name="reason" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Optional reason">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason</label>
+                    <input type="text" name="reason" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="Optional reason">
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">
-                <button type="button" onclick="this.closest('#removeFeeModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
+                <button type="button" onclick="this.closest('#removeFeeModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 font-medium">Remove</button>
             </div>
         </form>
@@ -366,15 +366,15 @@ ob_start();
 
 <!-- Adjust Balance Modal -->
 <div id="adjustModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
-        <h3 class="text-lg font-bold text-gray-900 mb-4">Adjust Balance</h3>
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Adjust Balance</h3>
         <form method="POST" action="<?= url('finance', 'adjust-balance') ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="student_id" value="<?= $id ?>">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Select Fee *</label>
-                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Fee *</label>
+                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         <option value="">— Select Fee —</option>
                         <?php foreach ($activeFeeList as $af): ?>
                         <option value="<?= $af['id'] ?>"><?= e($af['description']) ?> — Balance: <?= format_money($af['balance']) ?></option>
@@ -382,16 +382,16 @@ ob_start();
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Adjustment Amount *</label>
-                    <input type="number" name="amount" step="0.01" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Positive to credit, negative to debit">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adjustment Amount *</label>
+                    <input type="number" name="amount" step="0.01" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="Positive to credit, negative to debit">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Reason *</label>
-                    <input type="text" name="reason" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Reason for adjustment">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason *</label>
+                    <input type="text" name="reason" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="Reason for adjustment">
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">
-                <button type="button" onclick="this.closest('#adjustModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
+                <button type="button" onclick="this.closest('#adjustModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm hover:bg-yellow-700 font-medium">Adjust</button>
             </div>
         </form>

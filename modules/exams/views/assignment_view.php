@@ -31,15 +31,15 @@ ob_start();
 
 <div class="max-w-4xl mx-auto">
     <div class="flex items-center gap-3 mb-6">
-        <a href="<?= url('exams', 'assignments') ?>" class="p-2 hover:bg-gray-100 rounded-lg">
-            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <a href="<?= url('exams', 'assignments') ?>" class="p-2 hover:bg-gray-100 dark:hover:bg-dark-card2 rounded-lg">
+            <svg class="w-5 h-5 text-gray-500 dark:text-dark-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </a>
         <div class="flex-1">
-            <h1 class="text-xl font-bold text-gray-900"><?= e($assignment['title']) ?></h1>
-            <p class="text-sm text-gray-500"><?= e($assignment['class_name']) ?> &middot; <?= e($assignment['subject_name']) ?></p>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text"><?= e($assignment['title']) ?></h1>
+            <p class="text-sm text-gray-500 dark:text-dark-muted"><?= e($assignment['class_name']) ?> &middot; <?= e($assignment['subject_name']) ?></p>
         </div>
         <?php if (auth_has_permission('assignment.manage')): ?>
-            <a href="<?= url('exams', 'assignment-create') ?>&id=<?= $id ?>" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Edit</a>
+            <a href="<?= url('exams', 'assignment-create') ?>&id=<?= $id ?>" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Edit</a>
             <form method="POST" action="<?= url('exams', 'assignment-delete') ?>" class="inline" onsubmit="return confirm('Delete this assignment?')">
                 <?= csrf_field() ?>
                 <input type="hidden" name="id" value="<?= $id ?>">
@@ -49,24 +49,24 @@ ob_start();
     </div>
 
     <!-- Details -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
             <div>
-                <span class="text-xs text-gray-500">Due Date</span>
-                <p class="text-sm font-medium text-gray-900"><?= format_date($assignment['due_date']) ?></p>
+                <span class="text-xs text-gray-500 dark:text-dark-muted">Due Date</span>
+                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= format_date($assignment['due_date']) ?></p>
             </div>
             <div>
-                <span class="text-xs text-gray-500">Total Marks</span>
-                <p class="text-sm font-medium text-gray-900"><?= $assignment['total_marks'] ?></p>
+                <span class="text-xs text-gray-500 dark:text-dark-muted">Total Marks</span>
+                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= $assignment['total_marks'] ?></p>
             </div>
             <div>
-                <span class="text-xs text-gray-500">Teacher</span>
-                <p class="text-sm font-medium text-gray-900"><?= e($assignment['teacher_name']) ?></p>
+                <span class="text-xs text-gray-500 dark:text-dark-muted">Teacher</span>
+                <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($assignment['teacher_name']) ?></p>
             </div>
             <div>
-                <span class="text-xs text-gray-500">Status</span>
+                <span class="text-xs text-gray-500 dark:text-dark-muted">Status</span>
                 <p class="text-sm">
-                    <span class="px-2 py-0.5 rounded-full text-xs font-medium <?= $assignment['status'] === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600' ?>">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium <?= $assignment['status'] === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 dark:bg-dark-card2 text-gray-600 dark:text-dark-muted' ?>">
                         <?= ucfirst($assignment['status']) ?>
                     </span>
                 </p>
@@ -74,8 +74,8 @@ ob_start();
         </div>
         <?php if ($assignment['description']): ?>
             <div class="border-t pt-4">
-                <span class="text-xs text-gray-500">Description</span>
-                <p class="text-sm text-gray-700 mt-1 whitespace-pre-line"><?= e($assignment['description']) ?></p>
+                <span class="text-xs text-gray-500 dark:text-dark-muted">Description</span>
+                <p class="text-sm text-gray-700 dark:text-gray-300 mt-1 whitespace-pre-line"><?= e($assignment['description']) ?></p>
             </div>
         <?php endif; ?>
         <?php if ($assignment['file_path']): ?>
@@ -89,26 +89,26 @@ ob_start();
     </div>
 
     <!-- Submissions -->
-    <h2 class="text-lg font-semibold text-gray-900 mb-3">Submissions (<?= count($submissions) ?>)</h2>
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full">
-            <thead class="bg-gray-50 border-b">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-dark-text mb-3">Submissions (<?= count($submissions) ?>)</h2>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full">
+            <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Marks</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Student</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Submitted</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Marks</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Status</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php if (empty($submissions)): ?>
-                    <tr><td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500">No submissions yet.</td></tr>
+                    <tr><td colspan="4" class="px-4 py-6 text-center text-sm text-gray-500 dark:text-dark-muted">No submissions yet.</td></tr>
                 <?php endif; ?>
                 <?php foreach ($submissions as $sub): ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900"><?= e($sub['first_name'] . ' ' . $sub['last_name']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= format_datetime($sub['submitted_at']) ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-600"><?= $sub['marks'] !== null ? $sub['marks'] . '/' . $assignment['total_marks'] : '<span class="text-gray-400">—</span>' ?></td>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($sub['first_name'] . ' ' . $sub['last_name']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= format_datetime($sub['submitted_at']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= $sub['marks'] !== null ? $sub['marks'] . '/' . $assignment['total_marks'] : '<span class="text-gray-400 dark:text-gray-500">—</span>' ?></td>
                         <td class="px-4 py-3">
                             <span class="px-2 py-0.5 rounded-full text-xs font-medium
                                 <?= $sub['status'] === 'graded' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' ?>">
@@ -119,7 +119,7 @@ ob_start();
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
+    </div></div>
 </div>
 
 <?php

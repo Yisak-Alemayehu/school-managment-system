@@ -29,7 +29,7 @@ ob_start();
 
 <div class="max-w-4xl mx-auto">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-bold text-gray-900">Assign Roll Numbers</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Assign Roll Numbers</h1>
     </div>
 
     <?php if ($msg = get_flash('success')): ?>
@@ -40,12 +40,12 @@ ob_start();
     <?php endif; ?>
 
     <!-- Filter -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6">
         <form method="GET" action="<?= url('students', 'roll-numbers') ?>" class="flex flex-wrap gap-4 items-end">
             <div class="flex-1 min-w-40">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                 <select name="class_id" onchange="this.form.submit()"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Class…</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -53,9 +53,9 @@ ob_start();
                 </select>
             </div>
             <div class="flex-1 min-w-40">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section <span class="text-red-500">*</span></label>
                 <select name="section_id" onchange="this.form.submit()"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Section…</option>
                     <?php foreach ($sections as $sec): ?>
                         <option value="<?= $sec['id'] ?>" <?= $sectionId == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
@@ -66,42 +66,44 @@ ob_start();
     </div>
 
     <?php if ($sectionId && empty($students)): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <p class="text-gray-400 text-sm">No active students found in this section.</p>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-12 text-center">
+        <p class="text-gray-400 dark:text-gray-500 text-sm">No active students found in this section.</p>
     </div>
     <?php elseif (!empty($students)): ?>
     <form method="POST" action="<?= url('students', 'roll-numbers') ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="section_id" value="<?= $sectionId ?>">
-        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-4">
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden mb-4">
+          <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 border-b border-gray-200">
+                <thead class="bg-gray-50 dark:bg-dark-bg border-b border-gray-200 dark:border-dark-border">
                     <tr>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">#</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Student Name</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Admission No.</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-700">Roll Number</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">#</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Student Name</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Admission No.</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300">Roll Number</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php foreach ($students as $i => $st): ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-gray-500"><?= $i + 1 ?></td>
-                        <td class="px-4 py-3 font-medium text-gray-900"><?= e($st['full_name']) ?></td>
-                        <td class="px-4 py-3 text-gray-600"><?= e($st['admission_no']) ?></td>
+                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                        <td class="px-4 py-3 text-gray-500 dark:text-dark-muted"><?= $i + 1 ?></td>
+                        <td class="px-4 py-3 font-medium text-gray-900 dark:text-dark-text"><?= e($st['full_name']) ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['admission_no']) ?></td>
                         <td class="px-4 py-3">
                             <input type="number" name="roll[<?= $st['id'] ?>]"
                                    value="<?= e($st['roll_no']) ?>" min="1"
-                                   class="w-24 px-2 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500">
+                                   class="w-24 px-2 py-1 border border-gray-300 dark:border-dark-border rounded-md text-sm focus:ring-2 focus:ring-primary-500">
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
+          </div>
         </div>
         <div class="flex justify-end gap-3">
             <button type="button" onclick="autoFill()"
-                    class="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                    class="px-4 py-2 text-sm border border-gray-300 dark:border-dark-border rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                 Auto-fill (1, 2, 3…)
             </button>
             <button type="submit"
@@ -111,11 +113,11 @@ ob_start();
         </div>
     </form>
     <?php elseif (!$classId): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-12 text-center">
         <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
-        <p class="text-gray-400 text-sm">Select a class and section to assign roll numbers.</p>
+        <p class="text-gray-400 dark:text-gray-500 text-sm">Select a class and section to assign roll numbers.</p>
     </div>
     <?php endif; ?>
 </div>

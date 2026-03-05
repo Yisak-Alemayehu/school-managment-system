@@ -16,11 +16,11 @@ $mobileNav = [
 ];
 ?>
 
-<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-20 no-print safe-area-bottom">
+<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-card border-t border-gray-200 dark:border-dark-border z-20 no-print safe-area-bottom">
     <div class="flex items-center justify-around h-14">
         <?php foreach ($mobileNav as $item):
             $active = route_is($item['module']);
-            $activeClass = $active ? 'text-primary-600' : 'text-gray-500';
+            $activeClass = $active ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-dark-muted';
             $onclick = isset($item['onclick']) ? 'onclick="' . $item['onclick'] . '"' : '';
         ?>
         <a href="<?= $item['url'] === '#' ? '#' : url($item['url']) ?>" <?= $onclick ?> class="relative flex flex-col items-center justify-center gap-0.5 w-full h-full <?= $activeClass ?>">

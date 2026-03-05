@@ -146,8 +146,9 @@ function pagination_html(array $pagination, string $baseUrl = ''): string {
     $baseUrl = $baseUrl ?: strtok($_SERVER['REQUEST_URI'], '?');
 
     $params = $_GET;
+    $btn = 'px-3 py-1.5 rounded-lg text-sm bg-white dark:bg-dark-card border border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-card2';
     $html = '<nav class="flex items-center justify-between px-2 py-3" aria-label="Pagination">';
-    $html .= '<div class="hidden sm:block text-sm text-gray-600">';
+    $html .= '<div class="hidden sm:block text-sm text-gray-600 dark:text-dark-muted">';
     $html .= "Showing {$pagination['from']} to {$pagination['to']} of {$pagination['total']} results";
     $html .= '</div>';
     $html .= '<div class="flex gap-1">';
@@ -155,7 +156,7 @@ function pagination_html(array $pagination, string $baseUrl = ''): string {
     // Previous
     if ($current > 1) {
         $params['page'] = $current - 1;
-        $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="px-3 py-1.5 rounded-lg text-sm bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">&laquo; Prev</a>';
+        $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="' . $btn . '">&laquo; Prev</a>';
     }
 
     // Page numbers
@@ -164,26 +165,26 @@ function pagination_html(array $pagination, string $baseUrl = ''): string {
 
     if ($start > 1) {
         $params['page'] = 1;
-        $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="px-3 py-1.5 rounded-lg text-sm bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">1</a>';
-        if ($start > 2) $html .= '<span class="px-2 py-1.5 text-gray-400">...</span>';
+        $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="' . $btn . '">1</a>';
+        if ($start > 2) $html .= '<span class="px-2 py-1.5 text-gray-400 dark:text-gray-500">...</span>';
     }
 
     for ($i = $start; $i <= $end; $i++) {
         $params['page'] = $i;
-        $active = $i === $current ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50';
+        $active = $i === $current ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-dark-card border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-card2';
         $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="px-3 py-1.5 rounded-lg text-sm border ' . $active . '">' . $i . '</a>';
     }
 
     if ($end < $last) {
-        if ($end < $last - 1) $html .= '<span class="px-2 py-1.5 text-gray-400">...</span>';
+        if ($end < $last - 1) $html .= '<span class="px-2 py-1.5 text-gray-400 dark:text-gray-500">...</span>';
         $params['page'] = $last;
-        $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="px-3 py-1.5 rounded-lg text-sm bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">' . $last . '</a>';
+        $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="' . $btn . '">' . $last . '</a>';
     }
 
     // Next
     if ($current < $last) {
         $params['page'] = $current + 1;
-        $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="px-3 py-1.5 rounded-lg text-sm bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">Next &raquo;</a>';
+        $html .= '<a href="' . $baseUrl . '?' . http_build_query($params) . '" class="' . $btn . '">Next &raquo;</a>';
     }
 
     $html .= '</div></nav>';

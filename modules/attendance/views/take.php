@@ -50,18 +50,18 @@ ob_start();
 ?>
 
 <div class="max-w-5xl mx-auto">
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Take Attendance</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Take Attendance</h1>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6">
         <form method="GET" action="" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <input type="hidden" name="module" value="attendance">
             <input type="hidden" name="action" value="index">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                 <select name="class_id" id="attClassSel" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
                         onchange="ajaxLoadSections(this.value,'attSecSel',<?= (int)$filterSection ?>, 'All Sections')">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
@@ -70,8 +70,8 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" id="attSecSel" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
+                <select name="section_id" id="attSecSel" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
                         <?= !$filterClass ? 'disabled' : '' ?>>
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $s): ?>
@@ -82,13 +82,13 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
                 <input type="date" name="date" value="<?= e($filterDate) ?>" max="<?= date('Y-m-d') ?>"
                        onchange="this.form.submit()"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
             </div>
             <div class="flex items-end">
-                <button type="submit" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg text-sm transition">Load</button>
+                <button type="submit" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-medium rounded-lg text-sm transition">Load</button>
             </div>
         </form>
     </div>
@@ -96,7 +96,7 @@ ob_start();
     <?php if ($filterClass && !empty($students)): ?>
     <!-- Quick Actions -->
     <div class="flex items-center gap-2 mb-4">
-        <span class="text-sm text-gray-500"><?= count($students) ?> students</span>
+        <span class="text-sm text-gray-500 dark:text-dark-muted"><?= count($students) ?> students</span>
         <div class="ml-auto flex gap-2">
             <button onclick="markAll('present')" class="px-3 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-medium hover:bg-green-200">All Present</button>
             <button onclick="markAll('absent')" class="px-3 py-1 bg-red-100 text-red-800 rounded-lg text-xs font-medium hover:bg-red-200">All Absent</button>
@@ -110,29 +110,30 @@ ob_start();
         <input type="hidden" name="date" value="<?= e($filterDate) ?>">
         <input type="hidden" name="session_id" value="<?= $sessionId ?>">
 
-        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
+          <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-gray-50 border-b">
+                <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
-                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">#</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Student</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Remarks</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php foreach ($students as $i => $st): ?>
                         <?php $ex = $existing[$st['id']] ?? null; ?>
-                        <tr class="hover:bg-gray-50" id="row-<?= $st['id'] ?>">
-                            <td class="px-4 py-3 text-sm text-gray-500"><?= $i + 1 ?></td>
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg" id="row-<?= $st['id'] ?>">
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= $i + 1 ?></td>
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-bold">
                                         <?= strtoupper(substr($st['first_name'], 0, 1)) ?>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900"><?= e($st['first_name'] . ' ' . $st['last_name']) ?></div>
-                                        <div class="text-xs text-gray-500"><?= e($st['admission_no']) ?></div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($st['first_name'] . ' ' . $st['last_name']) ?></div>
+                                        <div class="text-xs text-gray-500 dark:text-dark-muted"><?= e($st['admission_no']) ?></div>
                                     </div>
                                 </div>
                             </td>
@@ -149,7 +150,7 @@ ob_start();
                                             <input type="radio" name="students[<?= $st['id'] ?>][status]" value="<?= $val ?>" <?= $checked ? 'checked' : '' ?> class="sr-only peer">
                                             <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold border-2 
                                                 peer-checked:bg-<?= $colors[$val] ?>-500 peer-checked:text-white peer-checked:border-<?= $colors[$val] ?>-500
-                                                border-gray-200 text-gray-400 hover:border-<?= $colors[$val] ?>-300 transition">
+                                                border-gray-200 dark:border-dark-border text-gray-400 dark:text-gray-500 hover:border-<?= $colors[$val] ?>-300 transition">
                                                 <?= $label ?>
                                             </span>
                                         </label>
@@ -158,12 +159,13 @@ ob_start();
                             </td>
                             <td class="px-4 py-3">
                                 <input type="text" name="students[<?= $st['id'] ?>][remarks]" value="<?= e($ex['remarks'] ?? '') ?>"
-                                       placeholder="Optional" class="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-primary-500">
+                                       placeholder="Optional" class="w-full px-2 py-1 border border-gray-200 dark:border-dark-border rounded text-xs focus:ring-1 focus:ring-primary-500">
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
+          </div>
         </div>
 
         <div class="mt-4 flex justify-end">
@@ -174,7 +176,7 @@ ob_start();
     </form>
 
     <?php elseif ($filterClass): ?>
-        <div class="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">No students found for the selected class/section.</div>
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-8 text-center text-gray-500 dark:text-dark-muted">No students found for the selected class/section.</div>
     <?php endif; ?>
 </div>
 

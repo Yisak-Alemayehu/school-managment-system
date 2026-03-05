@@ -41,7 +41,7 @@ ob_start();
 
 <div class="max-w-5xl mx-auto">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-bold text-gray-900">Assignments</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Assignments</h1>
         <?php if (auth_has_permission('assignment.manage')): ?>
             <a href="<?= url('exams', 'assignment-create') ?>" class="px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                 + New Assignment
@@ -50,7 +50,7 @@ ob_start();
     </div>
 
     <div class="flex items-center gap-3 mb-4">
-        <select onchange="window.location='<?= url('exams', 'assignments') ?>&class_id='+this.value" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
+        <select onchange="window.location='<?= url('exams', 'assignments') ?>&class_id='+this.value" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
             <option value="0">All Classes</option>
             <?php foreach ($classes as $c): ?>
                 <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -60,17 +60,17 @@ ob_start();
 
     <div class="space-y-3">
         <?php if (empty($assignments)): ?>
-            <div class="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">No assignments found.</div>
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-8 text-center text-gray-500 dark:text-dark-muted">No assignments found.</div>
         <?php endif; ?>
         <?php foreach ($assignments as $a): ?>
             <?php $overdue = $a['due_date'] < date('Y-m-d') && $a['status'] === 'published'; ?>
-            <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-sm transition">
+            <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 hover:shadow-sm transition">
                 <div class="flex items-start justify-between gap-4">
                     <div class="flex-1">
-                        <a href="<?= url('exams', 'assignment-view') ?>&id=<?= $a['id'] ?>" class="text-sm font-semibold text-gray-900 hover:text-primary-600">
+                        <a href="<?= url('exams', 'assignment-view') ?>&id=<?= $a['id'] ?>" class="text-sm font-semibold text-gray-900 dark:text-dark-text hover:text-primary-600">
                             <?= e($a['title']) ?>
                         </a>
-                        <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-gray-500">
+                        <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-gray-500 dark:text-dark-muted">
                             <span><?= e($a['class_name']) ?></span>
                             <span>&middot;</span>
                             <span><?= e($a['subject_name']) ?></span>
@@ -79,10 +79,10 @@ ob_start();
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <div class="text-xs text-gray-500">Due: <?= format_date($a['due_date']) ?></div>
+                        <div class="text-xs text-gray-500 dark:text-dark-muted">Due: <?= format_date($a['due_date']) ?></div>
                         <div class="flex items-center gap-1 mt-1">
                             <?php if ($a['status'] === 'draft'): ?>
-                                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Draft</span>
+                                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-dark-card2 text-gray-600 dark:text-dark-muted">Draft</span>
                             <?php elseif ($overdue): ?>
                                 <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Overdue</span>
                             <?php else: ?>

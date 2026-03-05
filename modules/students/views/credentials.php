@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Students — Generate Username & Password
  * Generate login credentials by class or for an individual student.
@@ -39,7 +39,7 @@ ob_start();
 ?>
 
 <div class="max-w-3xl mx-auto space-y-6">
-    <h1 class="text-xl font-bold text-gray-900">Generate Username &amp; Password</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Generate Username &amp; Password</h1>
 
     <?php if ($msg = get_flash('success')): ?>
         <div class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm"><?= e($msg) ?></div>
@@ -49,8 +49,8 @@ ob_start();
     <?php endif; ?>
 
     <!-- Mode Tabs -->
-    <div class="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-        <div class="flex gap-4 border-b border-gray-200 pb-4">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 space-y-5">
+        <div class="flex gap-4 border-b border-gray-200 dark:border-dark-border pb-4">
             <button type="button" onclick="switchMode('class')"
                     id="tab-class"
                     class="tab-btn px-4 py-1.5 text-sm rounded-md font-medium bg-primary-600 text-white">
@@ -58,7 +58,7 @@ ob_start();
             </button>
             <button type="button" onclick="switchMode('single')"
                     id="tab-single"
-                    class="tab-btn px-4 py-1.5 text-sm rounded-md font-medium text-gray-600 hover:bg-gray-100">
+                    class="tab-btn px-4 py-1.5 text-sm rounded-md font-medium text-gray-600 dark:text-dark-muted hover:bg-gray-100 dark:hover:bg-dark-card2">
                 Single Student
             </button>
         </div>
@@ -68,7 +68,7 @@ ob_start();
             <form method="GET" action="<?= url('students', 'credentials') ?>" class="flex flex-wrap gap-3 mb-4">
                 <input type="hidden" name="_mode" value="class">
                 <select name="class_id" onchange="this.form.submit()"
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Class…</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -76,13 +76,13 @@ ob_start();
                 </select>
                 <?php if (!empty($sections)): ?>
                 <select name="section_id"
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $sec): ?>
                         <option value="<?= $sec['id'] ?>" <?= $sectionId == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <button type="submit" class="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-50">Load</button>
+                <button type="submit" class="px-4 py-2 border border-gray-300 dark:border-dark-border text-sm rounded-lg hover:bg-gray-50 dark:bg-dark-bg">Load</button>
                 <?php endif; ?>
             </form>
 
@@ -91,48 +91,48 @@ ob_start();
                 <?= csrf_field() ?>
                 <input type="hidden" name="mode" value="class">
                 <input type="hidden" name="section_id" value="<?= $sectionId ?>">
-                <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden mb-4">
+                <div class="bg-gray-50 dark:bg-dark-bg rounded-lg border border-gray-200 dark:border-dark-border overflow-hidden overflow-x-auto mb-4">
                     <table class="w-full text-sm">
-                        <thead class="bg-gray-100 border-b border-gray-200">
+                        <thead class="bg-gray-100 dark:bg-dark-card2 border-b border-gray-200 dark:border-dark-border">
                             <tr>
-                                <th class="px-4 py-2 text-left font-medium text-gray-700">
+                                <th class="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">
                                     <input type="checkbox" id="checkAll" onchange="document.querySelectorAll('input[name=\'ids[]\']').forEach(c=>c.checked=this.checked)">
                                 </th>
-                                <th class="px-4 py-2 text-left font-medium text-gray-700">Name</th>
-                                <th class="px-4 py-2 text-left font-medium text-gray-700">Adm. No.</th>
-                                <th class="px-4 py-2 text-left font-medium text-gray-700">Current Username</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Name</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Adm. No.</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Current Username</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                             <?php foreach ($students as $st): ?>
-                            <tr class="hover:bg-white">
+                            <tr class="hover:bg-white dark:bg-dark-card">
                                 <td class="px-4 py-2"><input type="checkbox" name="ids[]" value="<?= $st['id'] ?>" checked></td>
-                                <td class="px-4 py-2 font-medium text-gray-900"><?= e($st['full_name']) ?></td>
-                                <td class="px-4 py-2 text-gray-600"><?= e($st['admission_no']) ?></td>
-                                <td class="px-4 py-2 text-gray-500 font-mono text-xs"><?= $st['username'] ? e($st['username']) : '<span class="text-yellow-600">Not set</span>' ?></td>
+                                <td class="px-4 py-2 font-medium text-gray-900 dark:text-dark-text"><?= e($st['full_name']) ?></td>
+                                <td class="px-4 py-2 text-gray-600 dark:text-dark-muted"><?= e($st['admission_no']) ?></td>
+                                <td class="px-4 py-2 text-gray-500 dark:text-dark-muted font-mono text-xs"><?= $st['username'] ? e($st['username']) : '<span class="text-yellow-600">Not set</span>' ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
+                </div></div>
                 <div class="flex flex-wrap items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Username format:
-                        <select name="username_format" class="ml-2 px-2 py-1 border border-gray-300 rounded-md text-sm">
+                        <select name="username_format" class="ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border rounded-md text-sm">
                             <option value="adm_no">Admission No. (e.g. STU-001)</option>
                             <option value="firstlast">firstname.lastname</option>
                             <option value="firstname_roll">firstname_rollno</option>
                         </select>
                     </label>
-                    <label class="text-sm font-medium text-gray-700">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Password:
-                        <select name="password_mode" class="ml-2 px-2 py-1 border border-gray-300 rounded-md text-sm">
+                        <select name="password_mode" class="ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border rounded-md text-sm">
                             <option value="adm_no">Admission No.</option>
                             <option value="dob">Date of Birth (DDMMYYYY)</option>
                             <option value="random">Random 8-char</option>
                         </select>
                     </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
+                    <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-dark-muted">
                         <input type="checkbox" name="overwrite" value="1">
                         Overwrite existing credentials
                     </label>
@@ -144,7 +144,7 @@ ob_start();
                 </div>
             </form>
             <?php elseif ($classId && !$sectionId && empty($sections)): ?>
-                <p class="text-sm text-gray-400">No sections found for this class.</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500">No sections found for this class.</p>
             <?php endif; ?>
         </div>
 
@@ -153,7 +153,7 @@ ob_start();
             <form method="GET" action="<?= url('students', 'credentials') ?>" class="flex gap-3 mb-4">
                 <input type="hidden" name="_mode" value="single">
                 <input type="number" name="student_id" value="<?= e($singleId ?: '') ?>" placeholder="Student DB ID…"
-                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                 <button type="submit" class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700">Find</button>
             </form>
 
@@ -162,21 +162,21 @@ ob_start();
                 <?= csrf_field() ?>
                 <input type="hidden" name="mode" value="single">
                 <input type="hidden" name="ids[]" value="<?= $st['id'] ?>">
-                <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-4 space-y-3">
-                    <p class="font-medium text-gray-900"><?= e($st['full_name']) ?> &mdash; <span class="text-gray-500 text-sm"><?= e($st['admission_no']) ?></span></p>
+                <div class="bg-gray-50 dark:bg-dark-bg rounded-lg border border-gray-200 dark:border-dark-border p-4 mb-4 space-y-3">
+                    <p class="font-medium text-gray-900 dark:text-dark-text"><?= e($st['full_name']) ?> &mdash; <span class="text-gray-500 dark:text-dark-muted text-sm"><?= e($st['admission_no']) ?></span></p>
                     <?php if ($st['username']): ?>
-                    <p class="text-sm text-gray-500">Current username: <code class="bg-gray-200 px-1 rounded"><?= e($st['username']) ?></code></p>
+                    <p class="text-sm text-gray-500 dark:text-dark-muted">Current username: <code class="bg-gray-200 px-1 rounded"><?= e($st['username']) ?></code></p>
                     <?php endif; ?>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
                             <input type="text" name="manual_username" placeholder="Leave blank to auto-generate"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
                             <input type="text" name="manual_password" placeholder="Leave blank to auto-generate"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
                         </div>
                     </div>
                 </div>
@@ -195,8 +195,8 @@ ob_start();
 function switchMode(mode) {
     document.getElementById('mode-class').classList.toggle('hidden', mode !== 'class');
     document.getElementById('mode-single').classList.toggle('hidden', mode !== 'single');
-    document.getElementById('tab-class').className  = 'tab-btn px-4 py-1.5 text-sm rounded-md font-medium ' + (mode === 'class'  ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-100');
-    document.getElementById('tab-single').className = 'tab-btn px-4 py-1.5 text-sm rounded-md font-medium ' + (mode === 'single' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-100');
+    document.getElementById('tab-class').className  = 'tab-btn px-4 py-1.5 text-sm rounded-md font-medium ' + (mode === 'class'  ? 'bg-primary-600 text-white' : 'text-gray-600 dark:text-dark-muted hover:bg-gray-100 dark:hover:bg-dark-card2');
+    document.getElementById('tab-single').className = 'tab-btn px-4 py-1.5 text-sm rounded-md font-medium ' + (mode === 'single' ? 'bg-primary-600 text-white' : 'text-gray-600 dark:text-dark-muted hover:bg-gray-100 dark:hover:bg-dark-card2');
 }
 // Restore active tab from URL hint
 var qs = new URLSearchParams(location.search);

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Attendance — View Attendance (read-only daily records)
  */
@@ -81,10 +81,10 @@ ob_start();
 
 <div class="max-w-5xl mx-auto">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-bold text-gray-900">View Attendance</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">View Attendance</h1>
         <?php if ($loaded && !empty($records)): ?>
-        <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
-            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">
+            <svg class="w-4 h-4 text-gray-500 dark:text-dark-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
             </svg>
             Print
@@ -93,14 +93,14 @@ ob_start();
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6">
         <form method="GET" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <input type="hidden" name="module" value="attendance">
             <input type="hidden" name="action" value="view">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
-                <select name="class_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
+                <select name="class_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -109,8 +109,8 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
+                <select name="section_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $s): ?>
                         <?php if ($s['class_id'] == $filterClass): ?>
@@ -121,10 +121,10 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
                 <input type="date" name="date" value="<?= e($filterDate) ?>" max="<?= date('Y-m-d') ?>"
                        onchange="this.form.submit()"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
             </div>
 
             <div class="flex items-end">
@@ -137,28 +137,28 @@ ob_start();
 
     <?php if (!$loaded): ?>
     <!-- Empty state -->
-    <div class="bg-white rounded-xl border border-gray-200 p-16 text-center">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-16 text-center">
+        <div class="w-16 h-16 bg-gray-100 dark:bg-dark-card2 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
         </div>
-        <h3 class="text-base font-medium text-gray-700 mb-1">Select a class to view attendance</h3>
-        <p class="text-sm text-gray-400">Choose a class and date above to see the attendance record.</p>
+        <h3 class="text-base font-medium text-gray-700 dark:text-gray-300 mb-1">Select a class to view attendance</h3>
+        <p class="text-sm text-gray-400 dark:text-gray-500">Choose a class and date above to see the attendance record.</p>
     </div>
 
     <?php elseif (empty($records)): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <p class="text-gray-500">No students found for the selected class.</p>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-12 text-center">
+        <p class="text-gray-500 dark:text-dark-muted">No students found for the selected class.</p>
     </div>
 
     <?php else: ?>
     <!-- Summary Cards -->
     <?php if ($summary['total'] > 0): ?>
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6 no-print">
-        <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
-            <div class="text-2xl font-bold text-gray-900"><?= count($records) ?></div>
-            <div class="text-xs text-gray-500 mt-1">Total Students</div>
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 text-center">
+            <div class="text-2xl font-bold text-gray-900 dark:text-dark-text"><?= count($records) ?></div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted mt-1">Total Students</div>
         </div>
         <div class="bg-green-50 rounded-xl border border-green-200 p-4 text-center">
             <div class="text-2xl font-bold text-green-700"><?= $summary['present'] ?></div>
@@ -193,7 +193,7 @@ ob_start();
     <!-- Print Header -->
     <div class="hidden print:block mb-4">
         <h2 class="text-lg font-bold">Attendance Record — <?= date('D, d M Y', strtotime($filterDate)) ?></h2>
-        <p class="text-sm text-gray-600">
+        <p class="text-sm text-gray-600 dark:text-dark-muted">
             Class: <?= e(current(array_filter($classes, fn($c) => $c['id'] == $filterClass))['name'] ?? '') ?>
             <?php if ($filterSection): ?>
                 — Section: <?= e(current(array_filter($sections, fn($s) => $s['id'] == $filterSection))['name'] ?? '') ?>
@@ -202,17 +202,17 @@ ob_start();
     </div>
 
     <!-- Attendance Table -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden" id="attendanceTable">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden overflow-x-auto" id="attendanceTable">
         <!-- Table Header Bar -->
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-gray-50">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg">
             <div class="flex items-center gap-3">
-                <span class="text-sm font-medium text-gray-700">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
                     <?= date('D, d M Y', strtotime($filterDate)) ?>
                 </span>
                 <?php if ($summary['total'] > 0): ?>
                     <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Marked</span>
                 <?php else: ?>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Not Marked</span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-dark-card2 text-gray-600 dark:text-dark-muted">Not Marked</span>
                 <?php endif; ?>
             </div>
             <?php if ($summary['total'] > 0): ?>
@@ -224,30 +224,30 @@ ob_start();
         </div>
 
         <!-- Search bar (hidden on print) -->
-        <div class="px-4 py-2 border-b border-gray-100 no-print">
+        <div class="px-4 py-2 border-b border-gray-100 dark:border-dark-border no-print">
             <input type="text" id="searchInput" placeholder="Search student..." onkeyup="filterTable()"
-                   class="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-400">
+                   class="w-full px-3 py-1.5 border border-gray-200 dark:border-dark-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-400">
         </div>
 
         <table class="w-full" id="viewTable">
-            <thead class="bg-gray-50 border-b border-gray-200">
+            <thead class="bg-gray-50 dark:bg-dark-bg border-b border-gray-200 dark:border-dark-border">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide w-10">#</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Student</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Adm No</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Section</th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wide">Status</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Remarks</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wide w-10">#</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wide">Student</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wide">Adm No</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wide">Section</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wide">Status</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase tracking-wide">Remarks</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100" id="viewTableBody">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border" id="viewTableBody">
                 <?php foreach ($records as $i => $r): ?>
                 <?php
                     $st = $r['att_status'];
                     $cfg = $st ? ($statusConfig[$st] ?? null) : null;
                 ?>
-                <tr class="hover:bg-gray-50 transition view-row">
-                    <td class="px-4 py-3 text-sm text-gray-500"><?= $i + 1 ?></td>
+                <tr class="hover:bg-gray-50 dark:bg-dark-bg transition view-row">
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= $i + 1 ?></td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-3">
                             <?php if (!empty($r['photo'])): ?>
@@ -257,13 +257,13 @@ ob_start();
                                     <span class="text-xs font-bold text-primary-700"><?= strtoupper(substr($r['first_name'], 0, 1)) ?></span>
                                 </div>
                             <?php endif; ?>
-                            <span class="text-sm font-medium text-gray-900 student-name">
+                            <span class="text-sm font-medium text-gray-900 dark:text-dark-text student-name">
                                 <?= e($r['first_name'] . ' ' . $r['last_name']) ?>
                             </span>
                         </div>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-500"><?= e($r['admission_no']) ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-500"><?= e($r['section_name'] ?? '—') ?></td>
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['admission_no']) ?></td>
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['section_name'] ?? '—') ?></td>
                     <td class="px-4 py-3 text-center">
                         <?php if ($cfg): ?>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium <?= $cfg['bg'] ?> <?= $cfg['text'] ?>">
@@ -271,10 +271,10 @@ ob_start();
                                 <?= $cfg['label'] ?>
                             </span>
                         <?php else: ?>
-                            <span class="text-xs text-gray-400 italic">—</span>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 italic">—</span>
                         <?php endif; ?>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-500"><?= e($r['remarks'] ?: '—') ?></td>
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['remarks'] ?: '—') ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -282,7 +282,7 @@ ob_start();
 
         <!-- Stats Bar -->
         <?php if ($summary['total'] > 0): ?>
-        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 flex flex-wrap gap-4 text-xs text-gray-600">
+        <div class="px-4 py-3 bg-gray-50 dark:bg-dark-bg border-t border-gray-200 dark:border-dark-border flex flex-wrap gap-4 text-xs text-gray-600 dark:text-dark-muted">
             <span>Total: <strong><?= count($records) ?></strong></span>
             <span class="text-green-700">Present: <strong><?= $summary['present'] ?></strong></span>
             <span class="text-red-700">Absent: <strong><?= $summary['absent'] ?></strong></span>
@@ -332,14 +332,14 @@ function filterByStatus(status) {
     // update chip active state
     document.querySelectorAll('.chip-btn').forEach(btn => {
         btn.classList.remove('active', 'bg-gray-800', 'text-white', 'border-gray-800');
-        btn.classList.add('border-gray-200', 'bg-gray-50', 'text-gray-700');
+        btn.classList.add('border-gray-200 dark:border-dark-border', 'bg-gray-50 dark:bg-dark-bg', 'text-gray-700 dark:text-gray-300');
     });
     const activeChip = status
         ? document.querySelector(`button[onclick="filterByStatus('${status}')"]`)
         : document.querySelector('.chip-all');
     if (activeChip) {
         activeChip.classList.add('bg-gray-800', 'text-white', 'border-gray-800');
-        activeChip.classList.remove('bg-gray-50', 'text-gray-700', 'border-gray-200',
+        activeChip.classList.remove('bg-gray-50 dark:bg-dark-bg', 'text-gray-700 dark:text-gray-300', 'border-gray-200 dark:border-dark-border',
             'bg-green-50','text-green-800','border-green-200',
             'bg-red-50','text-red-800','border-red-200',
             'bg-yellow-50','text-yellow-800','border-yellow-200',

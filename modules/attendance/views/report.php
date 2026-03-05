@@ -118,7 +118,7 @@ ob_start();
 
     <!-- Screen title + Print button -->
     <div class="flex items-center justify-between mb-6 no-print">
-        <h1 class="text-xl font-bold text-gray-900">Attendance Report</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Attendance Report</h1>
         <?php if (!empty($report)): ?>
         <button onclick="window.print()"
                 class="flex items-center gap-2 px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900 transition">
@@ -132,15 +132,15 @@ ob_start();
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6 no-print">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6 no-print">
         <form method="GET" class="flex flex-wrap items-end gap-4">
             <input type="hidden" name="module" value="attendance">
             <input type="hidden" name="action" value="report">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                 <select name="class_id" id="repClassSel" required
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
                         onchange="ajaxLoadSections(this.value,'repSecSel',<?= (int)$filterSection ?>,'All Sections')">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
@@ -150,9 +150,9 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
                 <select name="section_id" id="repSecSel"
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
                         <?= !$filterClass ? 'disabled' : '' ?>>
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $s): ?>
@@ -164,15 +164,15 @@ ob_start();
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">From</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From</label>
                 <input type="date" name="date_from" value="<?= e($filterFrom) ?>" max="<?= date('Y-m-d') ?>"
-                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">To</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To</label>
                 <input type="date" name="date_to" value="<?= e($filterTo) ?>" max="<?= date('Y-m-d') ?>"
-                       class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
             </div>
 
             <button type="submit" class="px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900 transition">
@@ -183,20 +183,20 @@ ob_start();
 
     <?php if (!$filterClass): ?>
     <!-- Initial empty state -->
-    <div class="bg-white rounded-xl border border-gray-200 p-16 text-center">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-16 text-center">
+        <div class="w-16 h-16 bg-gray-100 dark:bg-dark-card2 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/>
             </svg>
         </div>
-        <h3 class="text-base font-medium text-gray-700 mb-1">Generate an Attendance Report</h3>
-        <p class="text-sm text-gray-400">Select a class and date range above, then click <strong>Generate Report</strong>.</p>
+        <h3 class="text-base font-medium text-gray-700 dark:text-gray-300 mb-1">Generate an Attendance Report</h3>
+        <p class="text-sm text-gray-400 dark:text-gray-500">Select a class and date range above, then click <strong>Generate Report</strong>.</p>
     </div>
 
     <?php elseif (empty($report)): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <p class="text-gray-500">No students found for the selected class.</p>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-12 text-center">
+        <p class="text-gray-500 dark:text-dark-muted">No students found for the selected class.</p>
     </div>
 
     <?php else: ?>
@@ -204,13 +204,13 @@ ob_start();
     <!-- Print-only header -->
     <div class="print-header mb-4">
         <h2 class="text-base font-bold">Urjiberi School — Attendance Report</h2>
-        <p class="text-xs text-gray-600 mt-0.5">
+        <p class="text-xs text-gray-600 dark:text-dark-muted mt-0.5">
             Class: <strong><?= e($className) ?></strong>
             &nbsp;|&nbsp; Section: <strong><?= e($sectionName) ?></strong>
             &nbsp;|&nbsp; Period: <strong><?= date('d M Y', strtotime($filterFrom)) ?> – <?= date('d M Y', strtotime($filterTo)) ?></strong>
             &nbsp;|&nbsp; Printed: <?= date('d M Y, H:i') ?>
         </p>
-        <hr class="my-2 border-gray-300">
+        <hr class="my-2 border-gray-300 dark:border-dark-border">
     </div>
 
     <!-- Summary strip (screen only) -->
@@ -223,13 +223,13 @@ ob_start();
     $overallPct = $totMarked > 0 ? round(($totPresent + $totLate) / $totMarked * 100, 1) : 0;
     ?>
     <div class="grid grid-cols-2 sm:grid-cols-6 gap-3 mb-5 no-print">
-        <div class="bg-white rounded-xl border p-3 text-center">
-            <div class="text-lg font-bold text-gray-800"><?= count($report) ?></div>
-            <div class="text-xs text-gray-500">Students</div>
+        <div class="bg-white dark:bg-dark-card rounded-xl border p-3 text-center">
+            <div class="text-lg font-bold text-gray-800 dark:text-dark-text"><?= count($report) ?></div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted">Students</div>
         </div>
-        <div class="bg-white rounded-xl border p-3 text-center">
-            <div class="text-lg font-bold text-gray-800"><?= count($dates) ?></div>
-            <div class="text-xs text-gray-500">Days</div>
+        <div class="bg-white dark:bg-dark-card rounded-xl border p-3 text-center">
+            <div class="text-lg font-bold text-gray-800 dark:text-dark-text"><?= count($dates) ?></div>
+            <div class="text-xs text-gray-500 dark:text-dark-muted">Days</div>
         </div>
         <div class="bg-green-50 rounded-xl border border-green-200 p-3 text-center">
             <div class="text-lg font-bold text-green-700"><?= $totPresent ?></div>
@@ -250,7 +250,7 @@ ob_start();
     </div>
 
     <!-- Report Table -->
-    <div id="reportTable" class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+    <div id="reportTable" class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-x-auto">
         <table class="w-full text-xs border-collapse">
             <thead>
                 <!-- Month grouping header -->
@@ -261,40 +261,40 @@ ob_start();
                     $monthGroups[$mk] = ($monthGroups[$mk] ?? 0) + 1;
                 }
                 ?>
-                <tr class="bg-gray-100 border-b border-gray-300">
-                    <th class="px-2 py-1.5 text-left text-gray-600 border-r border-gray-200 w-6" rowspan="2">#</th>
-                    <th class="px-3 py-1.5 text-left text-gray-600 border-r border-gray-200 min-w-[130px]" rowspan="2">Student</th>
+                <tr class="bg-gray-100 dark:bg-dark-card2 border-b border-gray-300 dark:border-dark-border">
+                    <th class="px-2 py-1.5 text-left text-gray-600 dark:text-dark-muted border-r border-gray-200 dark:border-dark-border w-6" rowspan="2">#</th>
+                    <th class="px-3 py-1.5 text-left text-gray-600 dark:text-dark-muted border-r border-gray-200 dark:border-dark-border min-w-[130px]" rowspan="2">Student</th>
                     <?php foreach ($monthGroups as $mk => $span): ?>
-                        <th colspan="<?= $span ?>" class="px-1 py-1.5 text-center text-gray-700 font-semibold border-r border-gray-300">
+                        <th colspan="<?= $span ?>" class="px-1 py-1.5 text-center text-gray-700 dark:text-gray-300 font-semibold border-r border-gray-300 dark:border-dark-border">
                             <?= date('F Y', strtotime($mk . '-01')) ?>
                         </th>
                     <?php endforeach; ?>
-                    <th colspan="4" class="px-1 py-1.5 text-center text-gray-700 font-semibold bg-gray-200">Summary</th>
+                    <th colspan="4" class="px-1 py-1.5 text-center text-gray-700 dark:text-gray-300 font-semibold bg-gray-200">Summary</th>
                 </tr>
-                <tr class="bg-gray-50 border-b border-gray-200">
+                <tr class="bg-gray-50 dark:bg-dark-bg border-b border-gray-200 dark:border-dark-border">
                     <?php foreach ($dates as $dt): ?>
                         <?php $isSun = date('N', strtotime($dt)) == 7; ?>
-                        <th class="px-0.5 py-1 text-center w-7 border-r border-gray-100 <?= $isSun ? 'bg-red-50 text-red-500' : 'text-gray-500' ?>">
+                        <th class="px-0.5 py-1 text-center w-7 border-r border-gray-100 dark:border-dark-border <?= $isSun ? 'bg-red-50 text-red-500' : 'text-gray-500 dark:text-dark-muted' ?>">
                             <div class="font-medium"><?= date('j', strtotime($dt)) ?></div>
-                            <div class="text-gray-400 font-normal" style="font-size:9px"><?= date('D', strtotime($dt)) ?></div>
+                            <div class="text-gray-400 dark:text-gray-500 font-normal" style="font-size:9px"><?= date('D', strtotime($dt)) ?></div>
                         </th>
                     <?php endforeach; ?>
-                    <th class="px-2 py-1 text-center text-green-700 bg-green-50 border-r border-gray-200 w-8">P</th>
-                    <th class="px-2 py-1 text-center text-red-700 bg-red-50 border-r border-gray-200 w-8">A</th>
-                    <th class="px-2 py-1 text-center text-yellow-700 bg-yellow-50 border-r border-gray-200 w-8">L</th>
-                    <th class="px-2 py-1 text-center text-gray-700 w-12">%</th>
+                    <th class="px-2 py-1 text-center text-green-700 bg-green-50 border-r border-gray-200 dark:border-dark-border w-8">P</th>
+                    <th class="px-2 py-1 text-center text-red-700 bg-red-50 border-r border-gray-200 dark:border-dark-border w-8">A</th>
+                    <th class="px-2 py-1 text-center text-yellow-700 bg-yellow-50 border-r border-gray-200 dark:border-dark-border w-8">L</th>
+                    <th class="px-2 py-1 text-center text-gray-700 dark:text-gray-300 w-12">%</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php foreach ($report as $i => $r): ?>
-                <tr class="hover:bg-gray-50 <?= $i % 2 !== 0 ? 'bg-gray-50/50' : '' ?>">
-                    <td class="px-2 py-1.5 text-gray-400 border-r border-gray-100"><?= $i + 1 ?></td>
-                    <td class="px-3 py-1.5 font-medium text-gray-900 border-r border-gray-100">
+                <tr class="hover:bg-gray-50 dark:bg-dark-bg <?= $i % 2 !== 0 ? 'bg-gray-50 dark:bg-dark-bg/50' : '' ?>">
+                    <td class="px-2 py-1.5 text-gray-400 dark:text-gray-500 border-r border-gray-100 dark:border-dark-border"><?= $i + 1 ?></td>
+                    <td class="px-3 py-1.5 font-medium text-gray-900 dark:text-dark-text border-r border-gray-100 dark:border-dark-border">
                         <a href="<?= url('attendance', 'student') ?>&student_id=<?= $r['student']['id'] ?>"
                            class="hover:text-primary-600">
                             <?= e($r['student']['first_name'] . ' ' . $r['student']['last_name']) ?>
                         </a>
-                        <div class="text-gray-400 font-normal" style="font-size:9px"><?= e($r['student']['admission_no']) ?></div>
+                        <div class="text-gray-400 dark:text-gray-500 font-normal" style="font-size:9px"><?= e($r['student']['admission_no']) ?></div>
                     </td>
                     <?php foreach ($dates as $dt): ?>
                         <?php
@@ -308,11 +308,11 @@ ob_start();
                             default   => '<span class="text-gray-300">·</span>',
                         };
                         ?>
-                        <td class="px-0.5 py-1.5 text-center border-r border-gray-100 <?= $isSun ? 'bg-red-50/50' : '' ?>"><?= $cell ?></td>
+                        <td class="px-0.5 py-1.5 text-center border-r border-gray-100 dark:border-dark-border <?= $isSun ? 'bg-red-50/50' : '' ?>"><?= $cell ?></td>
                     <?php endforeach; ?>
-                    <td class="px-2 py-1.5 text-center font-bold text-green-700 bg-green-50 border-r border-gray-100"><?= $r['present'] ?></td>
-                    <td class="px-2 py-1.5 text-center font-bold text-red-700 bg-red-50 border-r border-gray-100"><?= $r['absent'] ?></td>
-                    <td class="px-2 py-1.5 text-center font-bold text-yellow-700 bg-yellow-50 border-r border-gray-100"><?= $r['late'] ?></td>
+                    <td class="px-2 py-1.5 text-center font-bold text-green-700 bg-green-50 border-r border-gray-100 dark:border-dark-border"><?= $r['present'] ?></td>
+                    <td class="px-2 py-1.5 text-center font-bold text-red-700 bg-red-50 border-r border-gray-100 dark:border-dark-border"><?= $r['absent'] ?></td>
+                    <td class="px-2 py-1.5 text-center font-bold text-yellow-700 bg-yellow-50 border-r border-gray-100 dark:border-dark-border"><?= $r['late'] ?></td>
                     <td class="px-2 py-1.5 text-center font-bold <?= $r['pct'] >= 75 ? 'text-green-700' : 'text-red-700' ?>">
                         <?= $r['pct'] ?>%
                     </td>
@@ -323,14 +323,14 @@ ob_start();
     </div>
 
     <!-- Legend -->
-    <div class="print-legend flex flex-wrap gap-5 mt-3 text-xs text-gray-600">
+    <div class="print-legend flex flex-wrap gap-5 mt-3 text-xs text-gray-600 dark:text-dark-muted">
         <span><strong class="text-green-700">P</strong> = Present</span>
         <span><strong class="text-red-700">A</strong> = Absent</span>
         <span><strong class="text-yellow-700">L</strong> = Late</span>
         <span><strong class="text-blue-700">E</strong> = Excused</span>
         <span>· = Not marked</span>
     </div>
-    <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray-500 no-print">
+    <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray-500 dark:text-dark-muted no-print">
         <span><span class="inline-block w-3 h-3 rounded mr-1 bg-green-500"></span>P = Present</span>
         <span><span class="inline-block w-3 h-3 rounded mr-1 bg-red-500"></span>A = Absent</span>
         <span><span class="inline-block w-3 h-3 rounded mr-1 bg-yellow-500"></span>L = Late</span>

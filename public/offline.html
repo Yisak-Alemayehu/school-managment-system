@@ -54,7 +54,20 @@
             text-decoration: none;
         }
         .retry-btn:hover { background: #1e3a8a; }
+
+        /* Dark mode */
+        .dark body { background: #0f172a; color: #e2e8f0; }
+        .dark .offline-card { background: #1e293b; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .dark .offline-icon { background: #78350f; }
+        .dark .offline-icon svg { color: #fbbf24; }
+        .dark h1 { color: #e2e8f0; }
+        .dark p { color: #94a3b8; }
+        .dark .retry-btn { background: #2563eb; }
+        .dark .retry-btn:hover { background: #1d4ed8; }
     </style>
+    <script>
+    (function(){var t=(document.cookie.match(/(?:^|;\s*)theme=(\w+)/)||[])[1];if(t==='dark')document.documentElement.classList.add('dark');})();
+    </script>
 </head>
 <body>
     <div class="offline-card">

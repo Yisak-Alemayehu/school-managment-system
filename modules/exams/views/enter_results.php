@@ -105,7 +105,7 @@ ob_start();
 ?>
 
 <div class="max-w-4xl mx-auto">
-    <h1 class="text-xl font-bold text-gray-900 mb-6">Enter Students' Results</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Enter Students' Results</h1>
 
     <?php partial('flash'); ?>
 
@@ -117,8 +117,8 @@ ob_start();
             $done     = $step > $num;
             $current  = $step === $num;
             $pending  = $step < $num;
-            $dotCls   = $done ? 'bg-green-600 text-white' : ($current ? 'bg-primary-800 text-white' : 'bg-gray-200 text-gray-500');
-            $lblCls   = $done ? 'text-green-600 font-semibold' : ($current ? 'text-primary-800 font-bold' : 'text-gray-400');
+            $dotCls   = $done ? 'bg-green-600 text-white' : ($current ? 'bg-primary-800 text-white' : 'bg-gray-200 text-gray-500 dark:text-dark-muted');
+            $lblCls   = $done ? 'text-green-600 font-semibold' : ($current ? 'text-primary-800 font-bold' : 'text-gray-400 dark:text-gray-500');
             ?>
             <?php if ($i > 0): ?><div class="flex-1 h-0.5 <?= $done ? 'bg-green-400' : 'bg-gray-200' ?> min-w-4"></div><?php endif; ?>
             <div class="flex flex-col items-center gap-1 flex-shrink-0">
@@ -132,7 +132,7 @@ ob_start();
         <?php endforeach; ?>
     </div>
 
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
 
     <?php if ($step <= 5): ?>
     <!-- Steps 1-5: selection form -->
@@ -142,7 +142,7 @@ ob_start();
 
         <!-- Step 1: Term -->
         <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Step 1 — Select Term</label>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Step 1 — Select Term</label>
             <div class="flex flex-wrap gap-2">
                 <?php foreach ($allTerms as $t): ?>
                     <label class="cursor-pointer">
@@ -151,7 +151,7 @@ ob_start();
                                onchange="this.form.submit()" class="sr-only peer">
                         <span class="px-4 py-2 rounded-lg border text-sm font-medium transition
                                      peer-checked:bg-primary-800 peer-checked:text-white peer-checked:border-primary-800
-                                     border-gray-300 text-gray-700 hover:bg-gray-50">
+                                     border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                             <?= e($t['name']) ?>
                         </span>
                     </label>
@@ -165,7 +165,7 @@ ob_start();
         <?php if ($selTerm): ?>
         <!-- Step 2: Class -->
         <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Step 2 — Select Class</label>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Step 2 — Select Class</label>
             <div class="flex flex-wrap gap-2">
                 <?php foreach ($allClasses as $c): ?>
                     <label class="cursor-pointer">
@@ -174,7 +174,7 @@ ob_start();
                                onchange="this.form.submit()" class="sr-only peer">
                         <span class="px-4 py-2 rounded-lg border text-sm font-medium transition
                                      peer-checked:bg-primary-800 peer-checked:text-white peer-checked:border-primary-800
-                                     border-gray-300 text-gray-700 hover:bg-gray-50">
+                                     border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                             <?= e($c['name']) ?>
                         </span>
                     </label>
@@ -188,7 +188,7 @@ ob_start();
         <!-- Step 3: Section -->
         <?php $classSections = array_filter($allSections, fn($s) => $s['class_id'] == $selClass); ?>
         <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Step 3 — Select Section</label>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Step 3 — Select Section</label>
             <div class="flex flex-wrap gap-2">
                 <label class="cursor-pointer">
                     <input type="radio" name="section_id" value="0"
@@ -196,7 +196,7 @@ ob_start();
                            onchange="this.form.submit()" class="sr-only peer">
                     <span class="px-4 py-2 rounded-lg border text-sm font-medium transition
                                  peer-checked:bg-primary-800 peer-checked:text-white peer-checked:border-primary-800
-                                 border-gray-300 text-gray-700 hover:bg-gray-50">
+                                 border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                         All Sections
                     </span>
                 </label>
@@ -207,7 +207,7 @@ ob_start();
                                onchange="this.form.submit()" class="sr-only peer">
                         <span class="px-4 py-2 rounded-lg border text-sm font-medium transition
                                      peer-checked:bg-primary-800 peer-checked:text-white peer-checked:border-primary-800
-                                     border-gray-300 text-gray-700 hover:bg-gray-50">
+                                     border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                             <?= e($s['name']) ?>
                         </span>
                     </label>
@@ -221,7 +221,7 @@ ob_start();
         <?php if ($selClass && $selSection !== null && $step >= 4): ?>
         <!-- Step 4: Subject -->
         <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Step 4 — Select Subject</label>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Step 4 — Select Subject</label>
             <?php if (empty($subjects)): ?>
                 <p class="text-sm text-amber-600">No subjects assigned to this class. Go to Academics → Class Subjects first.</p>
             <?php else: ?>
@@ -233,7 +233,7 @@ ob_start();
                                onchange="this.form.submit()" class="sr-only peer">
                         <span class="px-4 py-2 rounded-lg border text-sm font-medium transition
                                      peer-checked:bg-primary-800 peer-checked:text-white peer-checked:border-primary-800
-                                     border-gray-300 text-gray-700 hover:bg-gray-50">
+                                     border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                             <?= e($s['name']) ?>
                         </span>
                     </label>
@@ -249,7 +249,7 @@ ob_start();
         <?php if ($selSubject && $step >= 5): ?>
         <!-- Step 5: Assessment -->
         <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Step 5 — Select Assessment</label>
+            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Step 5 — Select Assessment</label>
             <?php if (empty($assessments)): ?>
                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-700">
                     No assessments found for this class/subject/term combination.
@@ -265,7 +265,7 @@ ob_start();
                                onchange="this.form.submit()" class="sr-only peer">
                         <span class="px-4 py-2 rounded-lg border text-sm font-medium transition
                                      peer-checked:bg-primary-800 peer-checked:text-white peer-checked:border-primary-800
-                                     border-gray-300 text-gray-700 hover:bg-gray-50">
+                                     border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                             <?= e($a['name']) ?> <span class="text-xs opacity-70">(/ <?= (int)$a['total_marks'] ?>)</span>
                         </span>
                     </label>
@@ -284,8 +284,8 @@ ob_start();
     <!-- Step 6: Enter marks -->
     <div class="flex items-center justify-between mb-4">
         <div>
-            <h2 class="text-base font-bold text-gray-900"><?= e($assessment['name']) ?></h2>
-            <p class="text-sm text-gray-500">
+            <h2 class="text-base font-bold text-gray-900 dark:text-dark-text"><?= e($assessment['name']) ?></h2>
+            <p class="text-sm text-gray-500 dark:text-dark-muted">
                 <?= e($assessment['class_name']) ?> &nbsp;·&nbsp;
                 <?= e($assessment['subject_name']) ?> &nbsp;·&nbsp;
                 <?= e($assessment['term_name'] ?? 'No Term') ?>
@@ -303,10 +303,10 @@ ob_start();
             Mark All Absent
         </button>
         <button type="button" onclick="setAllAbsent(false)"
-                class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-xs font-medium">
+                class="px-3 py-1.5 border border-gray-300 dark:border-dark-border text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:bg-dark-bg text-xs font-medium">
             Clear All Absent
         </button>
-        <span class="text-gray-400 ml-auto text-xs"><?= count($students) ?> students</span>
+        <span class="text-gray-400 dark:text-gray-500 ml-auto text-xs"><?= count($students) ?> students</span>
     </div>
 
     <form method="POST" action="<?= url('exams', 'results-save') ?>">
@@ -317,48 +317,48 @@ ob_start();
         <input type="hidden" name="term_id"       value="<?= $selTerm ?>">
         <input type="hidden" name="subject_id"    value="<?= $selSubject ?>">
 
-        <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-dark-border">
         <table class="w-full text-sm">
-            <thead class="bg-gray-50 text-xs font-medium text-gray-500 uppercase border-b">
+            <thead class="bg-gray-50 dark:bg-dark-bg text-xs font-medium text-gray-500 dark:text-dark-muted uppercase border-b">
                 <tr>
                     <th class="px-3 py-2 text-left w-8">#</th>
                     <th class="px-3 py-2 text-left">Student</th>
                     <th class="px-3 py-2 text-left w-20">Adm No</th>
-                    <th class="px-3 py-2 text-center w-28">Marks <span class="text-gray-400 normal-case">(0–<?= (int)$assessment['total_marks'] ?>)</span></th>
+                    <th class="px-3 py-2 text-center w-28">Marks <span class="text-gray-400 dark:text-gray-500 normal-case">(0–<?= (int)$assessment['total_marks'] ?>)</span></th>
                     <th class="px-3 py-2 text-center w-20">Absent</th>
                     <th class="px-3 py-2 text-left">Remarks</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100" id="resultTbody">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border" id="resultTbody">
                 <?php foreach ($students as $i => $st): ?>
                 <?php $existing = $marksMap[$st['id']] ?? null; ?>
-                <tr class="hover:bg-gray-50">
-                    <td class="px-3 py-2 text-gray-400"><?= $i + 1 ?></td>
-                    <td class="px-3 py-2 font-medium text-gray-900">
+                <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                    <td class="px-3 py-2 text-gray-400 dark:text-gray-500"><?= $i + 1 ?></td>
+                    <td class="px-3 py-2 font-medium text-gray-900 dark:text-dark-text">
                         <?= e($st['first_name'] . ' ' . $st['last_name']) ?>
                         <?php if ($st['roll_no']): ?>
-                            <span class="text-xs text-gray-400 ml-1">#<?= e($st['roll_no']) ?></span>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 ml-1">#<?= e($st['roll_no']) ?></span>
                         <?php endif; ?>
                     </td>
-                    <td class="px-3 py-2 text-gray-500 text-xs"><?= e($st['admission_no']) ?></td>
+                    <td class="px-3 py-2 text-gray-500 dark:text-dark-muted text-xs"><?= e($st['admission_no']) ?></td>
                     <td class="px-3 py-2">
                         <input type="number" name="results[<?= $st['id'] ?>][marks]"
                                min="0" max="<?= (int)$assessment['total_marks'] ?>" step="0.5"
                                value="<?= $existing && !$existing['is_absent'] ? e($existing['marks_obtained']) : '' ?>"
-                               class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm text-center focus:ring-2 focus:ring-primary-400 focus:border-primary-400 marks-input"
+                               class="w-full px-2 py-1.5 border border-gray-300 dark:border-dark-border rounded text-sm text-center focus:ring-2 focus:ring-primary-400 focus:border-primary-400 marks-input"
                                data-max="<?= (int)$assessment['total_marks'] ?>">
                     </td>
                     <td class="px-3 py-2 text-center">
                         <input type="checkbox" name="results[<?= $st['id'] ?>][is_absent]" value="1"
                                <?= ($existing && $existing['is_absent']) ? 'checked' : '' ?>
-                               class="absent-check w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                               class="absent-check w-4 h-4 text-red-600 rounded border-gray-300 dark:border-dark-border focus:ring-red-500"
                                onchange="toggleAbsent(this)">
                     </td>
                     <td class="px-3 py-2">
                         <input type="text" name="results[<?= $st['id'] ?>][remarks]"
                                value="<?= e($existing['remarks'] ?? '') ?>"
                                placeholder="Optional"
-                               class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-400 focus:border-primary-400">
+                               class="w-full px-2 py-1.5 border border-gray-300 dark:border-dark-border rounded text-sm focus:ring-2 focus:ring-primary-400 focus:border-primary-400">
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -368,7 +368,7 @@ ob_start();
 
         <div class="flex justify-end gap-3 mt-5">
             <a href="<?= url('exams','enter-results') ?>&term_id=<?= $selTerm ?>&class_id=<?= $selClass ?>&section_id=<?= $selSection ?>&subject_id=<?= $selSubject ?>"
-               class="px-5 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">
+               class="px-5 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                 Back
             </a>
             <button type="submit"
@@ -379,10 +379,10 @@ ob_start();
     </form>
 
     <?php elseif ($step === 6 && empty($students)): ?>
-    <div class="text-center py-12 text-gray-400">No students found for the selected class/section.</div>
+    <div class="text-center py-12 text-gray-400 dark:text-gray-500">No students found for the selected class/section.</div>
 
     <?php else: ?>
-    <div class="text-center py-12 text-gray-400 text-sm">Complete the steps above to enter results.</div>
+    <div class="text-center py-12 text-gray-400 dark:text-gray-500 text-sm">Complete the steps above to enter results.</div>
     <?php endif; ?>
 
     </div><!-- /card -->

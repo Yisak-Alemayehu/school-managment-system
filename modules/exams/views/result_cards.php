@@ -265,7 +265,7 @@ ob_start();
 <div class="max-w-3xl mx-auto">
 
     <div class="flex items-center justify-between mb-6 no-print">
-        <h1 class="text-xl font-bold text-gray-900">Report Cards</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Report Cards</h1>
         <?php if (!empty($cards)): ?>
         <button onclick="window.print()"
                 class="flex items-center gap-2 px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900 transition">
@@ -278,14 +278,14 @@ ob_start();
     </div>
 
     <!-- Filters (no-print) -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6 no-print">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-6 no-print">
         <form method="GET" class="flex flex-wrap items-end gap-4">
             <input type="hidden" name="module" value="exams">
             <input type="hidden" name="action" value="result-cards">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Term <span class="text-red-500">*</span></label>
-                <select name="term_id" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Term <span class="text-red-500">*</span></label>
+                <select name="term_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">Select Term</option>
                     <?php foreach ($allTerms as $t): ?>
                         <option value="<?= $t['id'] ?>" <?= $selTerm == $t['id'] ? 'selected' : '' ?>><?= e($t['name']) ?></option>
@@ -293,8 +293,8 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
-                <select name="class_id" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
+                <select name="class_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="">Select Class</option>
                     <?php foreach ($allClasses as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $selClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -302,8 +302,8 @@ ob_start();
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
-                <select name="section_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
+                <select name="section_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
                     <option value="0">All Sections</option>
                     <?php foreach ($allSections as $s): ?>
                         <?php if ($s['class_id'] == $selClass): ?>
@@ -320,12 +320,12 @@ ob_start();
     </div>
 
     <?php if (!$generate): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-16 text-center text-gray-400 text-sm">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-16 text-center text-gray-400 dark:text-gray-500 text-sm">
         Select term, class, and optionally a section, then click <strong>Generate Cards</strong>.
     </div>
 
     <?php elseif (empty($cards)): ?>
-    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400 text-sm">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-12 text-center text-gray-400 dark:text-gray-500 text-sm">
         No students found for the selected class/section.
     </div>
 
@@ -333,42 +333,42 @@ ob_start();
     <!-- Report Cards -->
     <?php foreach ($cards as $idx => $card): ?>
     <?php $st = $card['student']; ?>
-    <div class="report-card bg-white rounded-2xl border-2 border-gray-300 p-8 mb-8 no-break" id="card-<?= $st['id'] ?>">
+    <div class="report-card bg-white dark:bg-dark-card rounded-2xl border-2 border-gray-300 dark:border-dark-border p-8 mb-8 no-break" id="card-<?= $st['id'] ?>">
 
         <!-- School Header -->
-        <div class="text-center mb-6 border-b-2 border-gray-200 pb-4">
+        <div class="text-center mb-6 border-b-2 border-gray-200 dark:border-dark-border pb-4">
             <div class="w-16 h-16 rounded-2xl bg-primary-800 flex items-center justify-center mx-auto mb-2">
                 <span class="text-white text-xl font-bold">U</span>
             </div>
-            <h1 class="text-xl font-bold text-gray-900 uppercase tracking-wide">Urjiberi School</h1>
-            <p class="text-sm text-gray-500 mt-0.5">Student Report Card</p>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text uppercase tracking-wide">Urjiberi School</h1>
+            <p class="text-sm text-gray-500 dark:text-dark-muted mt-0.5">Student Report Card</p>
         </div>
 
         <!-- Student Info -->
         <div class="grid grid-cols-2 gap-x-8 gap-y-1.5 mb-6 text-sm">
             <div class="flex gap-2">
-                <span class="text-gray-500 w-28 flex-shrink-0">Student Name:</span>
-                <span class="font-semibold text-gray-900"><?= e($st['first_name'] . ' ' . $st['last_name']) ?></span>
+                <span class="text-gray-500 dark:text-dark-muted w-28 flex-shrink-0">Student Name:</span>
+                <span class="font-semibold text-gray-900 dark:text-dark-text"><?= e($st['first_name'] . ' ' . $st['last_name']) ?></span>
             </div>
             <div class="flex gap-2">
-                <span class="text-gray-500 w-28 flex-shrink-0">Adm. Number:</span>
-                <span class="font-semibold text-gray-900"><?= e($st['admission_no']) ?></span>
+                <span class="text-gray-500 dark:text-dark-muted w-28 flex-shrink-0">Adm. Number:</span>
+                <span class="font-semibold text-gray-900 dark:text-dark-text"><?= e($st['admission_no']) ?></span>
             </div>
             <div class="flex gap-2">
-                <span class="text-gray-500 w-28 flex-shrink-0">Class:</span>
-                <span class="font-semibold text-gray-900"><?= e($className) ?></span>
+                <span class="text-gray-500 dark:text-dark-muted w-28 flex-shrink-0">Class:</span>
+                <span class="font-semibold text-gray-900 dark:text-dark-text"><?= e($className) ?></span>
             </div>
             <div class="flex gap-2">
-                <span class="text-gray-500 w-28 flex-shrink-0">Section:</span>
-                <span class="font-semibold text-gray-900"><?= e($st['section_name'] ?? $sectionName) ?></span>
+                <span class="text-gray-500 dark:text-dark-muted w-28 flex-shrink-0">Section:</span>
+                <span class="font-semibold text-gray-900 dark:text-dark-text"><?= e($st['section_name'] ?? $sectionName) ?></span>
             </div>
             <div class="flex gap-2">
-                <span class="text-gray-500 w-28 flex-shrink-0">Academic Year:</span>
-                <span class="font-semibold text-gray-900"><?= e($activeSession['name'] ?? '') ?></span>
+                <span class="text-gray-500 dark:text-dark-muted w-28 flex-shrink-0">Academic Year:</span>
+                <span class="font-semibold text-gray-900 dark:text-dark-text"><?= e($activeSession['name'] ?? '') ?></span>
             </div>
             <div class="flex gap-2">
-                <span class="text-gray-500 w-28 flex-shrink-0">Age:</span>
-                <span class="font-semibold text-gray-900"><?= $card['age'] ?></span>
+                <span class="text-gray-500 dark:text-dark-muted w-28 flex-shrink-0">Age:</span>
+                <span class="font-semibold text-gray-900 dark:text-dark-text"><?= $card['age'] ?></span>
             </div>
         </div>
 
@@ -379,7 +379,7 @@ ob_start();
             // Avg column label: "Avg (T1, T2, T3)" using short term names
             $avgColLabel  = 'Avg (' . implode(', ', array_map(fn($t) => $t['name'], $allCardTerms)) . ')';
         ?>
-        <table class="w-full text-sm border border-gray-200 rounded-lg overflow-hidden mb-6">
+        <div class="overflow-x-auto"><table class="w-full text-sm border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden mb-6">
             <thead class="bg-gray-800 text-white">
                 <tr>
                     <th class="px-4 py-2.5 text-left font-medium">Subjects</th>
@@ -397,21 +397,21 @@ ob_start();
                     <th class="px-3 py-2.5 text-center font-medium w-16">Grade</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                 <?php foreach ($subjects as $subj): ?>
                 <?php
                     $cumAvgMark = $card['subj_cum_avg'][$subj['id']] ?? null;
                     $gradeMark  = $hasPrevTerms ? $cumAvgMark : ($card['term_marks'][$selTerm][$subj['id']] ?? null);
                     $grade      = $gradeMark !== null ? academicGrade((float)$gradeMark) : '—';
                 ?>
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-2 text-gray-800"><?= e($subj['name']) ?></td>
+                <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                    <td class="px-4 py-2 text-gray-800 dark:text-dark-text"><?= e($subj['name']) ?></td>
                     <?php foreach ($allCardTerms as $ct): ?>
                     <?php
                         $m   = $card['term_marks'][$ct['id']][$subj['id']] ?? null;
                         $cls = $m !== null
-                            ? ((float)$m >= 50 ? 'text-gray-900' : 'text-red-600 font-bold')
-                            : 'text-gray-400';
+                            ? ((float)$m >= 50 ? 'text-gray-900 dark:text-dark-text' : 'text-red-600 font-bold')
+                            : 'text-gray-400 dark:text-gray-500';
                     ?>
                     <td class="px-3 py-2 text-center <?= $cls ?>
                                <?= $ct['id'] == $selTerm ? 'bg-blue-50/40' : '' ?>">
@@ -421,8 +421,8 @@ ob_start();
                     <?php if ($hasPrevTerms): ?>
                     <?php
                         $avgCls = $cumAvgMark !== null
-                            ? ((float)$cumAvgMark >= 50 ? 'text-gray-700 font-semibold' : 'text-red-600 font-bold')
-                            : 'text-gray-400';
+                            ? ((float)$cumAvgMark >= 50 ? 'text-gray-700 dark:text-gray-300 font-semibold' : 'text-red-600 font-bold')
+                            : 'text-gray-400 dark:text-gray-500';
                     ?>
                     <td class="px-3 py-2 text-center <?= $avgCls ?> bg-amber-50/40">
                         <?= $cumAvgMark !== null ? number_format($cumAvgMark, 1) : '—' ?>
@@ -441,18 +441,18 @@ ob_start();
                                 <?= $grade ?>
                             </span>
                         <?php else: ?>
-                            <span class="text-gray-400 text-xs">—</span>
+                            <span class="text-gray-400 dark:text-gray-500 text-xs">—</span>
                         <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
-            <tfoot class="bg-gray-50 border-t-2 border-gray-300 text-sm">
+            <tfoot class="bg-gray-50 dark:bg-dark-bg border-t-2 border-gray-300 dark:border-dark-border text-sm">
                 <!-- Total row -->
                 <tr class="font-semibold">
-                    <td class="px-4 py-2 text-gray-700">Total</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">Total</td>
                     <?php foreach ($allCardTerms as $ct): ?>
-                    <td class="px-3 py-2 text-center text-gray-900 <?= $ct['id'] == $selTerm ? 'bg-blue-50/40' : '' ?>">
+                    <td class="px-3 py-2 text-center text-gray-900 dark:text-dark-text <?= $ct['id'] == $selTerm ? 'bg-blue-50/40' : '' ?>">
                         <?= ($card['term_totals'][$ct['id']] ?? 0) > 0
                             ? number_format($card['term_totals'][$ct['id']], 0)
                             : '—' ?>
@@ -467,17 +467,17 @@ ob_start();
                 </tr>
                 <!-- Average row -->
                 <tr>
-                    <td class="px-4 py-2 text-gray-700">Average</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">Average</td>
                     <?php foreach ($allCardTerms as $ct): ?>
                     <?php $tAvg = $card['term_avgs'][$ct['id']] ?? null; ?>
                     <td class="px-3 py-2 text-center font-bold <?= $ct['id'] == $selTerm ? 'bg-blue-50/40' : '' ?>
-                               <?= $tAvg !== null ? ($tAvg >= 50 ? 'text-green-700' : 'text-red-700') : 'text-gray-400' ?>">
+                               <?= $tAvg !== null ? ($tAvg >= 50 ? 'text-green-700' : 'text-red-700') : 'text-gray-400 dark:text-gray-500' ?>">
                         <?= $tAvg !== null ? number_format($tAvg, 1) . '%' : '—' ?>
                     </td>
                     <?php endforeach; ?>
                     <?php if ($hasPrevTerms): ?>
                     <td class="px-3 py-2 text-center font-bold bg-amber-50/40
-                               <?= $card['cum_avg'] !== null ? ($card['cum_avg'] >= 50 ? 'text-amber-700' : 'text-red-700') : 'text-gray-400' ?>">
+                               <?= $card['cum_avg'] !== null ? ($card['cum_avg'] >= 50 ? 'text-amber-700' : 'text-red-700') : 'text-gray-400 dark:text-gray-500' ?>">
                         <?= $card['cum_avg'] !== null ? number_format($card['cum_avg'], 1) . '%' : '—' ?>
                     </td>
                     <?php endif; ?>
@@ -485,37 +485,37 @@ ob_start();
                 </tr>
                 <!-- Conduct -->
                 <tr>
-                    <td class="px-4 py-2 text-gray-700">Conduct</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">Conduct</td>
                     <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center font-bold text-primary-800">
                         <?php if ($card['conduct']): ?>
                         <span title="<?= e($card['conductLabel']) ?>"><?= e($card['conduct']) ?></span>
-                        <span class="text-xs font-normal text-gray-500 ml-1"><?= e($card['conductLabel']) ?></span>
+                        <span class="text-xs font-normal text-gray-500 dark:text-dark-muted ml-1"><?= e($card['conductLabel']) ?></span>
                         <?php else: ?>
-                        <span class="text-gray-400 text-xs font-normal">Not Entered</span>
+                        <span class="text-gray-400 dark:text-gray-500 text-xs font-normal">Not Entered</span>
                         <?php endif; ?>
                     </td>
                     <td></td>
                 </tr>
                 <!-- Rank -->
                 <tr>
-                    <td class="px-4 py-2 text-gray-700">Rank</td>
-                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center font-bold text-gray-900">
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">Rank</td>
+                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center font-bold text-gray-900 dark:text-dark-text">
                         <?= $card['rank'] ?>
                     </td>
                     <td></td>
                 </tr>
                 <!-- Absent days -->
                 <tr>
-                    <td class="px-4 py-2 text-gray-700">Absent Days</td>
-                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center text-gray-700">
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">Absent Days</td>
+                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center text-gray-700 dark:text-gray-300">
                         <?= $card['ab_days'] ?>
                     </td>
                     <td></td>
                 </tr>
                 <!-- Remark -->
                 <tr>
-                    <td class="px-4 py-2 text-gray-700">Remark</td>
-                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center text-gray-700">
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">Remark</td>
+                    <td colspan="<?= $numTermCols + ($hasPrevTerms ? 1 : 0) ?>" class="px-3 py-2 text-center text-gray-700 dark:text-gray-300">
                         <?= e($card['remark']) ?>
                     </td>
                     <td></td>
@@ -524,8 +524,8 @@ ob_start();
         </table>
 
         <!-- Bottom: signatures + QR -->
-        <div class="flex items-end justify-between mt-8 pt-4 border-t border-gray-200">
-            <div class="flex gap-12 text-sm text-gray-500">
+        <div class="flex items-end justify-between mt-8 pt-4 border-t border-gray-200 dark:border-dark-border">
+            <div class="flex gap-12 text-sm text-gray-500 dark:text-dark-muted">
                 <div class="text-center">
                     <div class="h-10 border-b border-gray-400 w-32 mb-1"></div>
                     <span>Class Teacher</span>
@@ -537,11 +537,11 @@ ob_start();
             </div>
             <!-- QR Code -->
             <div class="text-center">
-                <div class="qrcode-container w-20 h-20 border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center bg-white"
+                <div class="qrcode-container w-20 h-20 border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden flex items-center justify-center bg-white dark:bg-dark-card"
                      id="qr-<?= $st['id'] ?>"
                      data-value="URJIBERI|<?= $st['id'] ?>|<?= $selTerm ?>|<?= urlencode($st['admission_no']) ?>|<?= $card['total'] ?>|<?= $card['avg'] ?>">
                 </div>
-                <p class="text-xs text-gray-400 mt-1">Scan to verify</p>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Scan to verify</p>
             </div>
         </div>
     </div>

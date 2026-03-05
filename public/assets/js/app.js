@@ -3,31 +3,17 @@
  * Minimal vanilla JS for UI interactions
  */
 
-// ── Sidebar Toggle ───────────────────────────────────────────
-function toggleSidebar() {
-    var sidebar = document.getElementById('sidebar');
-    var overlay = document.getElementById('sidebar-overlay');
-    if (!sidebar) return;
+// toggleTheme, toggleLangMenu, toggleSidebar, toggleProfileMenu
+// are defined inline in layout.php <head> for instant availability
 
-    var isOpen = !sidebar.classList.contains('-translate-x-full');
-    if (isOpen) {
-        sidebar.classList.add('-translate-x-full');
-        if (overlay) overlay.classList.add('hidden');
-        document.body.style.overflow = '';
-    } else {
-        sidebar.classList.remove('-translate-x-full');
-        if (overlay) overlay.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+// Close lang menu on outside click
+document.addEventListener('click', function(e) {
+    var dropdown = document.getElementById('lang-dropdown');
+    var menu = document.getElementById('lang-menu');
+    if (dropdown && menu && !dropdown.contains(e.target)) {
+        menu.classList.add('hidden');
     }
-}
-
-// ── Profile Dropdown ─────────────────────────────────────────
-function toggleProfileMenu() {
-    var menu = document.getElementById('profile-menu');
-    if (menu) {
-        menu.classList.toggle('hidden');
-    }
-}
+});
 
 // Close profile menu on outside click
 document.addEventListener('click', function(e) {
