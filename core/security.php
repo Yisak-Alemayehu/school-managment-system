@@ -86,6 +86,70 @@ function handle_upload(string $fieldName, string $subDir = 'general', array $opt
 }
 
 /**
+ * Compress an uploaded image file in-place.
+ * Resizes to max dimensions and reduces JPEG/WEBP quality.
+ * Returns the new file size, or false on failure.
+ * GIF images are skipped (animation would be lost).
+ */
+function compress_image(string $filePath, int $maxWidth = 1200, int $maxHeight = 1200, int $quality = 75): int|false {
+    if (!file_exists($filePath) || !function_exists('imagecreatefromjpeg')) {
+        return false;
+    }
+
+    $info = @getimagesize($filePath);
+    if (!$info) return false;
+
+    $mime = $info['mime'];
+    $origW = $info[0];
+    $origH = $info[1];
+
+    // Skip GIFs (could be animated) and unsupported types
+    if ($mime === 'image/gif') return false;
+
+    // Load source image
+    switch ($mime) {
+        case 'image/jpeg': $src = @imagecreatefromjpeg($filePath); break;
+        case 'image/png':  $src = @imagecreatefrompng($filePath); break;
+        case 'image/webp': $src = @imagecreatefromwebp($filePath); break;
+        default: return false;
+    }
+    if (!$src) return false;
+
+    // Calculate new dimensions preserving aspect ratio
+    $newW = $origW;
+    $newH = $origH;
+    if ($origW > $maxWidth || $origH > $maxHeight) {
+        $ratio = min($maxWidth / $origW, $maxHeight / $origH);
+        $newW = (int) round($origW * $ratio);
+        $newH = (int) round($origH * $ratio);
+    }
+
+    // Create resized image
+    $dst = imagecreatetruecolor($newW, $newH);
+
+    // Preserve transparency for PNG/WebP
+    if ($mime === 'image/png' || $mime === 'image/webp') {
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+        imagefill($dst, 0, 0, $transparent);
+    }
+
+    imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+    imagedestroy($src);
+
+    // Save compressed image
+    switch ($mime) {
+        case 'image/jpeg': imagejpeg($dst, $filePath, $quality); break;
+        case 'image/png':  imagepng($dst, $filePath, min(9, (int)(9 - ($quality / 100) * 9))); break;
+        case 'image/webp': imagewebp($dst, $filePath, $quality); break;
+    }
+    imagedestroy($dst);
+
+    return filesize($filePath);
+}
+
+/**
  * Delete uploaded file
  */
 function delete_upload(string $relativePath): bool {

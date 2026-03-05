@@ -156,16 +156,55 @@ try {
         'status'      => 'active',
     ]);
 
-    db_commit();
-
+    // 4. Auto-create user account for the student
     $fullName = trim($_POST['first_name']) . ' ' . trim($_POST['last_name']);
+    $studentUsername = strtolower(str_replace([' ', '/'], '_', $admissionNo));
+    $studentPlainPw = $admissionNo;
+    $studentEmail   = trim($_POST['email'] ?? '') ?: ($studentUsername . '@student.local');
+
+    // Ensure unique username/email
+    if (db_exists('users', 'username = ?', [$studentUsername])) {
+        $studentUsername .= '_' . $studentId;
+    }
+    if (db_exists('users', 'email = ?', [$studentEmail])) {
+        $studentEmail = $studentUsername . '@student.local';
+    }
+
+    $studentUserId = db_insert('users', [
+        'username'      => $studentUsername,
+        'email'         => $studentEmail,
+        'password_hash' => password_hash($studentPlainPw, PASSWORD_BCRYPT, ['cost' => 12]),
+        'full_name'     => $fullName,
+        'first_name'    => trim($_POST['first_name']),
+        'last_name'     => trim($_POST['last_name']),
+        'phone'         => trim($_POST['phone']),
+        'gender'        => $_POST['gender'],
+        'date_of_birth' => $_POST['date_of_birth'],
+        'address'       => $fullAddress,
+        'avatar'        => $photoPath,
+        'is_active'     => 1,
+        'status'        => 'active',
+        'force_password_change' => 1,
+    ]);
+
+    // Link user to student record
+    db_update('students', ['user_id' => $studentUserId], 'id = ?', [$studentId]);
+
+    // Assign student role
+    $studentRoleId = db_fetch_value("SELECT id FROM roles WHERE slug = 'student' LIMIT 1");
+    if ($studentRoleId) {
+        db_query("INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)", [$studentUserId, $studentRoleId]);
+    }
+
+    db_commit();
 
     audit_log('student_admitted', 'students', $studentId, null, [
         'admission_no' => $admissionNo,
         'full_name'    => $fullName,
     ]);
 
-    set_flash('success', "Student \"{$fullName}\" admitted successfully. Admission No: {$admissionNo}");
+    $credentialInfo = " Login: <strong>{$studentUsername}</strong> / Password: <strong>{$studentPlainPw}</strong>";
+    set_flash('success', "Student \"{$fullName}\" admitted successfully. Admission No: {$admissionNo}." . $credentialInfo);
     redirect(url('students', 'view', $studentId));
 
 } catch (Exception $e) {

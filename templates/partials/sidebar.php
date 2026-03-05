@@ -14,10 +14,15 @@ $isStudent    = auth_has_role('student');
 $isParent     = auth_has_role('parent');
 
 // Auto-expand flags
-$inAcademics = route_is('academics');
-$inStudents  = route_is('students');
+$inAcademics  = route_is('academics');
+$inStudents   = route_is('students');
+$inFinance    = route_is('finance');
+$inMessaging  = route_is('messaging');
 
 $navItems = [];
+
+// Messaging unread count (used for badge)
+$msgUnread = get_unread_message_count();
 
 // ── Dashboard — everyone ──
 $navItems[] = ['icon' => 'home', 'label' => 'Dashboard', 'url' => '/dashboard', 'module' => 'dashboard'];
@@ -269,8 +274,111 @@ if ($isAdmin) {
         ],
     ];
 }
-// ── Communication — everyone ──
-$navItems[] = ['icon' => 'chat-alt', 'label' => 'Messages', 'url' => '/communication', 'module' => 'communication'];
+// ══════════════════════════════════════════════════════════════
+// FINANCE — Admin & Accountant
+// ══════════════════════════════════════════════════════════════
+if ($isAdmin || auth_has_role('accountant')) {
+    $navItems[] = [
+        'icon'   => 'currency-dollar',
+        'label'  => 'Finance',
+        'module' => 'finance',
+        'tree'   => true,
+        'groups' => [
+            'Manage Students' => [
+                ['action' => 'students',        'label' => 'Student List'],
+            ],
+            'Grouping' => [
+                ['action' => 'groups',          'label' => 'Groups'],
+            ],
+            'Payments' => [
+                ['action' => 'payments',        'label' => 'School Payment History'],
+                ['action' => 'supplementary-payments', 'label' => 'Supplementary Payments'],
+            ],
+            'Fee / Tuition' => [
+                ['action' => 'fee-due',         'label' => 'Fee Due'],
+                ['action' => 'supplementary-fees', 'label' => 'Supplementary Fees'],
+            ],
+            'Report Center' => [
+                ['action' => 'report-students',  'label' => 'Students Report'],
+                ['action' => 'report-penalty',   'label' => 'Penalty Report'],
+                ['action' => 'report-supplementary', 'label' => 'Supplementary Transactions'],
+            ],
+        ],
+    ];
+}
+
+// ══════════════════════════════════════════════════════════════
+// MESSAGING — Role-specific visibility
+// ══════════════════════════════════════════════════════════════
+if ($isAdmin) {
+    // 🔴🔵 Super Admin / School Admin: Bulk + Solo messaging
+    $navItems[] = [
+        'icon'   => 'chat-alt',
+        'label'  => 'Messaging',
+        'module' => 'messaging',
+        'tree'   => true,
+        'groups' => [
+            'Messages' => [
+                ['action' => 'inbox',          'label' => 'Inbox'],
+                ['action' => 'compose',        'label' => 'New Message'],
+                ['action' => 'sent',           'label' => 'Sent Messages'],
+            ],
+            'Broadcast' => [
+                ['action' => 'bulk',           'label' => 'Bulk Message'],
+                ['action' => 'bulk-history',   'label' => 'Bulk History'],
+            ],
+        ],
+    ];
+} elseif ($isTeacher) {
+    // 🟢 Teacher: Solo messaging only
+    $navItems[] = [
+        'icon'   => 'chat-alt',
+        'label'  => 'Messaging',
+        'module' => 'messaging',
+        'tree'   => true,
+        'groups' => [
+            'Messages' => [
+                ['action' => 'inbox',          'label' => 'Inbox'],
+                ['action' => 'compose',        'label' => 'New Message'],
+                ['action' => 'sent',           'label' => 'Sent Messages'],
+            ],
+        ],
+    ];
+} elseif ($isStudent) {
+    // 🟡 Student: Solo + Group messaging
+    $navItems[] = [
+        'icon'   => 'chat-alt',
+        'label'  => 'Messaging',
+        'module' => 'messaging',
+        'tree'   => true,
+        'groups' => [
+            'Messages' => [
+                ['action' => 'inbox',          'label' => 'Inbox'],
+                ['action' => 'compose',        'label' => 'New Message'],
+                ['action' => 'sent',           'label' => 'Sent Messages'],
+            ],
+            'Groups' => [
+                ['action' => 'groups',         'label' => 'My Groups'],
+                ['action' => 'group-create',   'label' => 'Create Group'],
+            ],
+        ],
+    ];
+} elseif ($isParent) {
+    // 🟠 Parent: Solo messaging only
+    $navItems[] = [
+        'icon'   => 'chat-alt',
+        'label'  => 'Messaging',
+        'module' => 'messaging',
+        'tree'   => true,
+        'groups' => [
+            'Messages' => [
+                ['action' => 'inbox',          'label' => 'Inbox'],
+                ['action' => 'compose',        'label' => 'New Message'],
+                ['action' => 'sent',           'label' => 'Sent Messages'],
+            ],
+        ],
+    ];
+}
 
 // ── Users — admin only ──
 if ($isAdmin) {
@@ -321,8 +429,11 @@ if ($isAdmin) {
                     class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors <?= $parentCls ?>">
                 <?= sidebar_icon($item['icon']) ?>
                 <span><?= e($item['label']) ?></span>
+                <?php if ($mod === 'messaging' && $msgUnread > 0): ?>
+                <span id="msg-tree-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full"><?= $msgUnread > 99 ? '99+' : $msgUnread ?></span>
+                <?php endif; ?>
                 <svg id="<?= $arrowId ?>"
-                     class="ml-auto w-4 h-4 flex-shrink-0 transition-transform duration-200 <?= $parentActive ? 'rotate-180' : '' ?>"
+                     class="<?= ($mod === 'messaging' && $msgUnread > 0) ? '' : 'ml-auto ' ?>w-4 h-4 flex-shrink-0 transition-transform duration-200 <?= $parentActive ? 'rotate-180' : '' ?>"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
@@ -345,6 +456,9 @@ if ($isAdmin) {
                        class="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-medium transition-colors <?= $childCls ?>">
                         <span class="w-1 h-1 rounded-full bg-current flex-shrink-0 opacity-60"></span>
                         <?= e($child['label']) ?>
+                        <?php if ($mod === 'messaging' && $child['action'] === 'inbox' && $msgUnread > 0): ?>
+                        <span id="msg-inbox-badge" class="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full"><?= $msgUnread > 99 ? '99+' : $msgUnread ?></span>
+                        <?php endif; ?>
                     </a>
                     <?php endforeach; ?>
                     <?php endforeach; ?>

@@ -4,6 +4,7 @@
  */
 $user = auth_user();
 $unreadNotifs = get_unread_notification_count();
+$unreadMsgs = get_unread_message_count();
 ?>
 <header class="sticky top-0 z-20 bg-white border-b border-gray-200 no-print">
     <div class="flex items-center justify-between h-14 px-4 md:px-6">
@@ -17,6 +18,15 @@ $unreadNotifs = get_unread_notification_count();
 
         <!-- Right: notifications + profile -->
         <div class="flex items-center gap-2 md:gap-3">
+            <!-- Messages -->
+            <a href="<?= url('messaging', 'inbox') ?>" class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100" title="Messages" id="header-msg-link">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <?php if ($unreadMsgs > 0): ?>
+                <span id="header-msg-badge" class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4.5 h-4.5 flex items-center justify-center rounded-full"><?= $unreadMsgs > 9 ? '9+' : $unreadMsgs ?></span>
+                <?php else: ?>
+                <span id="header-msg-badge" class="hidden absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4.5 h-4.5 flex items-center justify-center rounded-full"></span>
+                <?php endif; ?>
+            </a>
             <!-- Notifications -->
             <a href="<?= url('/communication/notifications') ?>" class="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100" title="Notifications">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>

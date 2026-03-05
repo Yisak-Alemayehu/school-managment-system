@@ -258,6 +258,19 @@ function get_unread_notification_count(?int $userId = null): int {
     return db_count('notifications', 'user_id = ? AND is_read = 0', [$userId]);
 }
 
+function get_unread_message_count(?int $userId = null): int {
+    $userId = $userId ?? auth_user_id();
+    if (!$userId) return 0;
+    return (int) db_fetch_value(
+        "SELECT COUNT(DISTINCT ms.message_id)
+           FROM msg_message_status ms
+           JOIN msg_messages m ON m.id = ms.message_id
+           JOIN msg_conversation_participants cp ON cp.conversation_id = m.conversation_id AND cp.user_id = ms.user_id
+          WHERE ms.user_id = ? AND ms.status != 'read' AND cp.left_at IS NULL",
+        [$userId]
+    );
+}
+
 // ── Misc ─────────────────────────────────────────────────────
 
 function dd(...$vars): never {

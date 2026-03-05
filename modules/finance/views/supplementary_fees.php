@@ -1,0 +1,151 @@
+<?php
+/**
+ * Finance — Supplementary Fees List + Add New Supplementary Fee
+ */
+
+$search = input('search');
+$page   = max(1, input_int('page') ?: 1);
+$perPage = 25;
+
+$where  = ["1=1"];
+$params = [];
+if ($search) {
+    $where[]  = "sf.description LIKE ?";
+    $params[] = "%$search%";
+}
+
+$whereClause = implode(' AND ', $where);
+$offset      = ($page - 1) * $perPage;
+
+$total = (int) db_fetch_value("SELECT COUNT(*) FROM fin_supplementary_fees sf WHERE $whereClause", $params);
+$sfees = db_fetch_all(
+    "SELECT sf.*,
+            (SELECT COUNT(*) FROM fin_supplementary_transactions st WHERE st.supplementary_fee_id = sf.id) AS tx_count,
+            (SELECT COALESCE(SUM(st.amount), 0) FROM fin_supplementary_transactions st WHERE st.supplementary_fee_id = sf.id) AS total_collected,
+            u.full_name AS created_by_name
+       FROM fin_supplementary_fees sf
+       LEFT JOIN users u ON sf.created_by = u.id
+      WHERE $whereClause
+      ORDER BY sf.created_at DESC
+      LIMIT $perPage OFFSET $offset",
+    $params
+);
+
+$lastPage   = max(1, (int) ceil($total / $perPage));
+$pagination = [
+    'total' => $total, 'per_page' => $perPage, 'current_page' => $page,
+    'last_page' => $lastPage, 'from' => $total > 0 ? $offset + 1 : 0,
+    'to' => min($offset + $perPage, $total),
+];
+
+ob_start();
+?>
+
+<div class="space-y-4">
+    <div class="flex items-center justify-between flex-wrap gap-2">
+        <h1 class="text-xl font-bold text-gray-900">Supplementary Fees</h1>
+        <button onclick="document.getElementById('addSupFeeModal').classList.remove('hidden')"
+                class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">
+            + Add Supplementary Fee
+        </button>
+    </div>
+
+    <!-- Search -->
+    <form method="GET" action="<?= url('finance', 'supplementary-fees') ?>" class="bg-white rounded-xl border border-gray-200 p-4">
+        <div class="flex gap-3">
+            <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search supplementary fees…"
+                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Search</button>
+            <a href="<?= url('finance', 'supplementary-fees') ?>" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>
+        </div>
+    </form>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 responsive-table">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Description</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Currency</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Transactions</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Total Collected</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Created</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <?php if (empty($sfees)): ?>
+                    <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">No supplementary fees defined.</td></tr>
+                    <?php else: ?>
+                    <?php foreach ($sfees as $sf): ?>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-3 text-sm font-medium" data-label="Description"><?= e($sf['description']) ?></td>
+                        <td class="px-4 py-3 text-sm" data-label="Amount"><?= format_money($sf['amount']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Currency"><?= e($sf['currency']) ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Transactions"><?= (int) $sf['tx_count'] ?></td>
+                        <td class="px-4 py-3 text-sm font-semibold text-gray-900" data-label="Collected"><?= format_money($sf['total_collected']) ?></td>
+                        <td class="px-4 py-3 text-sm" data-label="Status">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium <?= $sf['is_active'] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' ?>">
+                                <?= $sf['is_active'] ? 'Active' : 'Inactive' ?>
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-600" data-label="Created"><?= format_date($sf['created_at']) ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+        <?= pagination_html($pagination, url('finance/supplementary-fees')) ?>
+    </div>
+</div>
+
+<!-- Add Supplementary Fee Modal -->
+<div id="addSupFeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-xl">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Add Supplementary Fee</h2>
+        <form method="POST" action="<?= url('finance', 'supplementary-fee-save') ?>">
+            <?= csrf_field() ?>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                    <input type="text" name="description" required maxlength="255"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                           placeholder="e.g. Lab Fee, Uniform Fee">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Amount *</label>
+                    <input type="number" name="amount" step="0.01" min="0" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                           placeholder="0.00">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                    <select name="currency" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        <option value="ETB">ETB (Birr)</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="flex items-center gap-2 text-sm">
+                        <input type="checkbox" name="is_active" value="1" checked
+                               class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        Active
+                    </label>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Add</button>
+                <button type="button" onclick="document.getElementById('addSupFeeModal').classList.add('hidden')"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 font-medium">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php
+$content = ob_get_clean();
+$page_title = $pageTitle;
+include TEMPLATES_PATH . '/layout.php';

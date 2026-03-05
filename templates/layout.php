@@ -179,6 +179,49 @@
     })();
     </script>
 
+    <?php if (auth_check()): ?>
+    <!-- Messaging unread badge polling -->
+    <script>
+    (function () {
+        var POLL_URL = '<?= url('messaging', 'api-unread-count') ?>';
+        function updateMsgBadges() {
+            fetch(POLL_URL).then(function(r){ return r.ok ? r.json() : null; })
+            .then(function(data) {
+                if (!data) return;
+                var n = parseInt(data.unread_count, 10) || 0;
+                var label = n > 99 ? '99+' : (n > 9 ? '9+' : String(n));
+                var shortLabel = n > 9 ? '9+' : String(n);
+                // Header badge
+                var hb = document.getElementById('header-msg-badge');
+                if (hb) { hb.textContent = shortLabel; hb.classList.toggle('hidden', n === 0); }
+                // Sidebar tree badge
+                var tb = document.getElementById('msg-tree-badge');
+                if (tb) { tb.textContent = label; tb.classList.toggle('hidden', n === 0); }
+                else if (n > 0) {
+                    // Create badge if it doesn't exist yet
+                    var btn = document.querySelector('#messaging-submenu')?.closest('div')?.querySelector('button');
+                    if (btn) {
+                        var arrow = btn.querySelector('svg');
+                        var badge = document.createElement('span');
+                        badge.id = 'msg-tree-badge';
+                        badge.className = 'ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full';
+                        badge.textContent = label;
+                        if (arrow) { arrow.classList.remove('ml-auto'); btn.insertBefore(badge, arrow); }
+                    }
+                }
+                // Sidebar inbox badge
+                var ib = document.getElementById('msg-inbox-badge');
+                if (ib) { ib.textContent = label; ib.classList.toggle('hidden', n === 0); }
+                // Mobile badge
+                var mb = document.getElementById('mobile-msg-badge');
+                if (mb) { mb.textContent = shortLabel; mb.classList.toggle('hidden', n === 0); }
+            }).catch(function(){});
+        }
+        setInterval(updateMsgBadges, 30000);
+    })();
+    </script>
+    <?php endif; ?>
+
     <!-- PWA registration -->
     <?= pwa_register_script() ?>
 </body>
