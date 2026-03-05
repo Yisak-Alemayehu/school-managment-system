@@ -10,7 +10,6 @@ $roles = $user['roles'];
 $isSuperAdmin = auth_is_super_admin();
 $isAdmin      = $isSuperAdmin || auth_has_role('admin');
 $isTeacher    = auth_has_role('teacher');
-$isAccountant = auth_has_role('accountant');
 $isStudent    = auth_has_role('student');
 $isParent     = auth_has_role('parent');
 
@@ -162,7 +161,6 @@ if ($isAdmin) {
     ];
 }
 // 🟡 Student: Views own profile via Dashboard (no Students menu)
-// 🟣 Accountant: NO access to student details (except fee-related)
 
 // ══════════════════════════════════════════════════════════════
 // ATTENDANCE — Role-specific visibility
@@ -212,8 +210,6 @@ if ($isAdmin) {
         ],
     ];
 }
-// 🟣 Accountant: NO access to attendance
-
 // ══════════════════════════════════════════════════════════════
 // RESULTS / EXAMS — Role-specific visibility
 // ══════════════════════════════════════════════════════════════
@@ -273,64 +269,6 @@ if ($isAdmin) {
         ],
     ];
 }
-// 🟣 Accountant: NO access to assessments
-
-// ══════════════════════════════════════════════════════════════
-// FINANCE — Role-specific visibility
-// ══════════════════════════════════════════════════════════════
-if ($isAdmin || $isAccountant) {
-    // 🔴🔵 Admin: Full access | 🟣 Accountant: Fee Management + Reports
-    $financeItem = [
-        'icon'   => 'currency-dollar',
-        'label'  => 'Finance',
-        'module' => 'finance',
-        'tree'   => true,
-        'groups' => [
-            'Fee Management' => [
-                ['action' => 'fm-dashboard',        'label' => 'Fee Dashboard'],
-                ['action' => 'fm-generate-invoice',  'label' => 'Generate Invoice'],
-                ['action' => 'fm-payment',           'label' => 'Record Payment'],
-                ['action' => 'fm-reports',           'label' => 'Fee Reports'],
-            ],
-        ],
-    ];
-
-    // Admin gets full fee management; Accountant gets read-only on create/manage/assign
-    if ($isAdmin) {
-        $financeItem['groups']['Fee Setup'] = [
-            ['action' => 'fm-create-fee',   'label' => 'Create Fee'],
-            ['action' => 'fm-manage-fees',  'label' => 'Manage Fees'],
-            ['action' => 'fm-assign-fees',  'label' => 'Assign Fees'],
-            ['action' => 'fm-groups',       'label' => 'Student Groups'],
-        ];
-    } else {
-        // Accountant: Read-only access to these
-        $financeItem['groups']['Fee Setup (Read-Only)'] = [
-            ['action' => 'fm-create-fee',   'label' => 'Create Fee'],
-            ['action' => 'fm-manage-fees',  'label' => 'Manage Fees'],
-            ['action' => 'fm-assign-fees',  'label' => 'Assign Fees'],
-            ['action' => 'fm-groups',       'label' => 'Student Groups'],
-        ];
-    }
-
-    $navItems[] = $financeItem;
-} elseif ($isStudent || $isParent) {
-    // 🟡 Student: Fee Status | 🟠 Parent: Paid/Due Invoices, Payment History
-    $financeItem = [
-        'icon'   => 'currency-dollar',
-        'label'  => 'Finance',
-        'module' => 'finance',
-        'tree'   => true,
-        'groups' => [
-            'My Fees' => [
-                ['action' => 'pay-online',   'label' => 'Fee Status & Payment'],
-            ],
-        ],
-    ];
-    $navItems[] = $financeItem;
-}
-// 🟢 Teacher: NO access to finance
-
 // ── Communication — everyone ──
 $navItems[] = ['icon' => 'chat-alt', 'label' => 'Messages', 'url' => '/communication', 'module' => 'communication'];
 
@@ -339,8 +277,8 @@ if ($isAdmin) {
     $navItems[] = ['icon' => 'user-group', 'label' => 'Users', 'url' => '/users', 'module' => 'users'];
 }
 
-// ── Reports — admin/accountant ──
-if ($isAdmin || $isAccountant) {
+// ── Reports — admin only ──
+if ($isAdmin) {
     $navItems[] = ['icon' => 'chart-bar', 'label' => 'Reports', 'url' => '/reports', 'module' => 'reports'];
 }
 

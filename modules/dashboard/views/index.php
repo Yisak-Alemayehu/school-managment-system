@@ -9,7 +9,6 @@ $isAdmin      = auth_has_role('admin') || $isSuperAdmin;
 $isTeacher    = auth_has_role('teacher');
 $isStudent    = auth_has_role('student');
 $isParent     = auth_has_role('parent');
-$isAccountant = auth_has_role('accountant');
 
 // ── Gather Stats ─────────────────────────────────────────
 $stats = [];
@@ -19,20 +18,6 @@ if ($isAdmin) {
     $stats['total_teachers']  = db_fetch_value("SELECT COUNT(*) FROM users u JOIN user_roles ur ON u.id = ur.user_id JOIN roles r ON ur.role_id = r.id WHERE r.slug = 'teacher' AND u.is_active = 1 AND u.deleted_at IS NULL") ?: 0;
     $stats['total_classes']   = db_fetch_value("SELECT COUNT(*) FROM classes WHERE is_active = 1") ?: 0;
     $stats['total_sections']  = db_fetch_value("SELECT COUNT(*) FROM sections WHERE is_active = 1") ?: 0;
-
-    // Finance stats
-    $activeSession = get_active_session();
-    if ($activeSession) {
-        $stats['total_invoiced'] = db_fetch_value(
-            "SELECT COALESCE(SUM(total_amount), 0) FROM invoices WHERE session_id = ?",
-            [$activeSession['id']]
-        ) ?: 0;
-        $stats['total_collected'] = db_fetch_value(
-            "SELECT COALESCE(SUM(p.amount), 0) FROM payments p JOIN invoices i ON p.invoice_id = i.id WHERE p.status = 'completed' AND i.session_id = ?",
-            [$activeSession['id']]
-        ) ?: 0;
-        $stats['total_pending'] = $stats['total_invoiced'] - $stats['total_collected'];
-    }
 
     // Today's attendance
     $today = date('Y-m-d');
@@ -49,7 +34,6 @@ if ($isAdmin) {
 // ── Super Admin Extended Stats ────────────────────────────
 $superAdminStats   = [];
 $recentStudents    = [];
-$recentPayments    = [];
 $attendanceByClass = [];
 
 if ($isSuperAdmin) {
@@ -80,20 +64,10 @@ if ($isSuperAdmin) {
     $superAdminStats['total_marked_today'] = $totalEnrolled;
 
     // Exams & results
-    $activeSession = $activeSession ?? get_active_session();
+    $activeSession = get_active_session();
     if ($activeSession) {
         $superAdminStats['total_exams'] = db_fetch_value(
             "SELECT COUNT(*) FROM exams WHERE session_id = ?", [$activeSession['id']]
-        ) ?: 0;
-        $superAdminStats['paid_invoices'] = db_fetch_value(
-            "SELECT COUNT(*) FROM invoices WHERE session_id = ? AND status = 'paid'", [$activeSession['id']]
-        ) ?: 0;
-        $superAdminStats['unpaid_invoices'] = db_fetch_value(
-            "SELECT COUNT(*) FROM invoices WHERE session_id = ? AND status IN ('unpaid','partial')", [$activeSession['id']]
-        ) ?: 0;
-        $superAdminStats['payment_this_month'] = db_fetch_value(
-            "SELECT COALESCE(SUM(p.amount),0) FROM payments p JOIN invoices i ON p.invoice_id = i.id WHERE p.status = 'completed' AND i.session_id = ? AND p.created_at >= ?",
-            [$activeSession['id'], $monthStart]
         ) ?: 0;
     }
 
@@ -107,17 +81,6 @@ if ($isSuperAdmin) {
          LEFT JOIN classes c      ON sec.class_id  = c.id
          WHERE s.status = 'active' AND s.deleted_at IS NULL
          ORDER BY s.created_at DESC LIMIT 6"
-    );
-
-    // Recent 6 payments
-    $recentPayments = db_fetch_all(
-        "SELECT p.id, p.amount, p.payment_date, p.method, p.status,
-                s.full_name AS student_name, s.admission_no
-         FROM payments p
-         JOIN invoices i  ON p.invoice_id = i.id
-         JOIN students s  ON i.student_id  = s.id
-         WHERE p.status = 'completed'
-         ORDER BY p.created_at DESC LIMIT 6"
     );
 
     // Top 5 classes by attendance today
@@ -238,23 +201,7 @@ ob_start();
     </div>
 </div>
 
-<!-- Finance Row -->
-<?php if (isset($stats['total_invoiced'])): ?>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-        <p class="text-xs sm:text-sm text-gray-500">Total Invoiced</p>
-        <p class="text-lg font-bold text-gray-900 mt-1"><?= format_money($stats['total_invoiced']) ?></p>
-    </div>
-    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-        <p class="text-xs sm:text-sm text-gray-500">Total Collected</p>
-        <p class="text-lg font-bold text-green-600 mt-1"><?= format_money($stats['total_collected']) ?></p>
-    </div>
-    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
-        <p class="text-xs sm:text-sm text-gray-500">Outstanding</p>
-        <p class="text-lg font-bold text-red-600 mt-1"><?= format_money($stats['total_pending']) ?></p>
-    </div>
-</div>
-<?php endif; ?>
+
 
 <?php if ($isSuperAdmin): ?>
 <!-- ══════════════════════════════════════════════════════
@@ -316,45 +263,8 @@ ob_start();
     </div>
 </div>
 
-<!-- Row: Finance extra + Attendance rate + Exams -->
+<!-- Row: Exams -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-    <!-- Revenue This Month -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
-        <div class="w-11 h-11 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-        </div>
-        <div>
-            <p class="text-xs text-gray-500">Revenue This Month</p>
-            <p class="text-xl font-bold text-emerald-700"><?= format_money($superAdminStats['payment_this_month'] ?? 0) ?></p>
-        </div>
-    </div>
-    <!-- Paid Invoices -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
-        <div class="w-11 h-11 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-        </div>
-        <div>
-            <p class="text-xs text-gray-500">Paid Invoices</p>
-            <p class="text-2xl font-bold text-green-700"><?= number_format($superAdminStats['paid_invoices'] ?? 0) ?></p>
-        </div>
-    </div>
-    <!-- Unpaid / Partial -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
-        <div class="w-11 h-11 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-        </div>
-        <div>
-            <p class="text-xs text-gray-500">Unpaid / Partial</p>
-            <p class="text-2xl font-bold text-red-700"><?= number_format($superAdminStats['unpaid_invoices'] ?? 0) ?></p>
-            <a href="<?= url('finance') ?>" class="text-xs text-primary-600 hover:underline">View &rarr;</a>
-        </div>
-    </div>
     <!-- Total Exams -->
     <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 flex items-center gap-4">
         <div class="w-11 h-11 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -430,8 +340,8 @@ ob_start();
     </div>
 </div>
 
-<!-- Row: Recent Students + Recent Payments -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+<!-- Row: Recent Students -->
+<div class="grid grid-cols-1 gap-6 mb-6">
     <!-- Recent Admissions -->
     <div class="bg-white rounded-xl border border-gray-200 p-5">
         <div class="flex items-center justify-between mb-4">
@@ -473,52 +383,6 @@ ob_start();
         <?php endif; ?>
     </div>
 
-    <!-- Recent Payments -->
-    <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-semibold text-gray-900">Recent Payments</h3>
-            <a href="<?= url('finance') ?>" class="text-xs text-primary-600 hover:underline">View all &rarr;</a>
-        </div>
-        <?php if (empty($recentPayments)): ?>
-            <p class="text-sm text-gray-400">No payments recorded yet.</p>
-        <?php else: ?>
-        <div class="overflow-x-auto -mx-1">
-            <table class="w-full text-xs">
-                <thead>
-                    <tr class="text-left text-gray-500 border-b">
-                        <th class="pb-2 pl-1 font-medium">Student</th>
-                        <th class="pb-2 font-medium">Amount</th>
-                        <th class="pb-2 font-medium">Method</th>
-                        <th class="pb-2 font-medium">Date</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50">
-                    <?php foreach ($recentPayments as $rp): ?>
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="py-2 pl-1">
-                            <p class="font-medium text-gray-800 truncate max-w-[110px]"><?= e($rp['student_name']) ?></p>
-                            <p class="text-gray-400"><?= e($rp['admission_no']) ?></p>
-                        </td>
-                        <td class="py-2 font-semibold text-green-700"><?= format_money($rp['amount']) ?></td>
-                        <td class="py-2">
-                            <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
-                                <?= match(strtolower($rp['method'] ?? '')) {
-                                    'cash'     => 'bg-gray-100 text-gray-700',
-                                    'chapa'    => 'bg-blue-100 text-blue-700',
-                                    'telebirr' => 'bg-teal-100 text-teal-700',
-                                    default    => 'bg-purple-100 text-purple-700'
-                                } ?>">
-                                <?= e(ucfirst($rp['method'] ?? 'N/A')) ?>
-                            </span>
-                        </td>
-                        <td class="py-2 text-gray-400"><?= date('d M', strtotime($rp['payment_date'] ?? $rp['created_at'] ?? 'now')) ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-        <?php endif; ?>
-    </div>
 </div>
 <?php endif; /* end $isSuperAdmin */ ?>
 
@@ -535,12 +399,6 @@ ob_start();
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
         <span class="text-xs font-medium text-gray-700">Attendance</span>
-    </a>
-    <a href="<?= url('finance', 'create-invoice') ?>" class="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition text-center">
-        <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
-        </svg>
-        <span class="text-xs font-medium text-gray-700">New Invoice</span>
     </a>
     <a href="<?= url('communication', 'create') ?>" class="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition text-center">
         <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -587,12 +445,6 @@ ob_start();
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
         <span class="text-sm font-medium text-gray-700">My Results</span>
-    </a>
-    <a href="<?= url('finance', 'my-fees') ?>" class="flex flex-col items-center gap-3 p-6 bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition">
-        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700">My Fees</span>
     </a>
     <a href="<?= url('attendance', 'my-attendance') ?>" class="flex flex-col items-center gap-3 p-6 bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition">
         <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

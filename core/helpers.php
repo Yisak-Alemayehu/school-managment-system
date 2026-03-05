@@ -136,20 +136,6 @@ function generate_code(string $prefix = '', int $length = 8): string {
     return $prefix . $number;
 }
 
-function generate_invoice_no(): string {
-    $prefix = db_fetch_value("SELECT setting_value FROM settings WHERE setting_group = 'finance' AND setting_key = 'invoice_prefix'") ?: 'INV-';
-    $year = date('Y');
-    $count = db_count('invoices', "invoice_no LIKE ?", [$prefix . $year . '%']) + 1;
-    return $prefix . $year . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
-}
-
-function generate_receipt_no(): string {
-    $prefix = db_fetch_value("SELECT setting_value FROM settings WHERE setting_group = 'finance' AND setting_key = 'receipt_prefix'") ?: 'RCP-';
-    $year = date('Y');
-    $count = db_count('payments', "receipt_no LIKE ?", [$prefix . $year . '%']) + 1;
-    return $prefix . $year . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
-}
-
 // ── Pagination Helper ────────────────────────────────────────
 
 function pagination_html(array $pagination, string $baseUrl = ''): string {

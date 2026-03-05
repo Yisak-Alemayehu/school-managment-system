@@ -31,15 +31,6 @@ $guardians = db_fetch_all(
     [$id]
 );
 
-// Fee summary
-$feeData = db_fetch_one(
-    "SELECT COALESCE(SUM(total_amount), 0) as total_invoiced,
-            COALESCE(SUM(paid_amount), 0) as total_paid,
-            COALESCE(SUM(total_amount - paid_amount), 0) as balance
-     FROM invoices WHERE student_id = ? AND status != 'cancelled'",
-    [$id]
-);
-
 // Attendance summary
 $attendanceSummary = db_fetch_one(
     "SELECT 
@@ -119,7 +110,7 @@ ob_start();
         </div>
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
                 <p class="text-2xl font-bold text-green-600"><?= $attendanceSummary['present'] ?? 0 ?></p>
                 <p class="text-xs text-gray-500">Days Present</p>
@@ -127,14 +118,6 @@ ob_start();
             <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
                 <p class="text-2xl font-bold text-red-600"><?= $attendanceSummary['absent'] ?? 0 ?></p>
                 <p class="text-xs text-gray-500">Days Absent</p>
-            </div>
-            <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                <p class="text-2xl font-bold text-gray-900"><?= format_money($feeData['total_paid'] ?? 0) ?></p>
-                <p class="text-xs text-gray-500">Fees Paid</p>
-            </div>
-            <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                <p class="text-2xl font-bold <?= ($feeData['balance'] ?? 0) > 0 ? 'text-red-600' : 'text-green-600' ?>"><?= format_money($feeData['balance'] ?? 0) ?></p>
-                <p class="text-xs text-gray-500">Fee Balance</p>
             </div>
         </div>
 

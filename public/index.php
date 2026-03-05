@@ -16,7 +16,6 @@ env_load(APP_ROOT . '/.env');
 // Load configuration
 require APP_ROOT . '/config/app.php';
 require APP_ROOT . '/config/database.php';
-require APP_ROOT . '/config/payment.php';
 
 // Load core libraries
 require APP_ROOT . '/core/db.php';

@@ -223,31 +223,6 @@ function rbac_parent_has_child(int $studentId): bool {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ACCOUNTANT — Finance Scoping
-// ═══════════════════════════════════════════════════════════════
-
-/**
- * Check if the current user can access finance module.
- */
-function rbac_can_access_finance(): bool {
-    return auth_is_super_admin()
-        || auth_has_role('admin')
-        || auth_has_role('accountant')
-        || auth_has_permission('finance.view')
-        || auth_has_permission('fee_management.view_dashboard');
-}
-
-/**
- * Check if the current user can manage finance (create/update/delete).
- */
-function rbac_can_manage_finance(): bool {
-    return auth_is_super_admin()
-        || auth_has_role('admin')
-        || auth_has_role('accountant')
-        || auth_has_permission('finance.create');
-}
-
-// ═══════════════════════════════════════════════════════════════
 // PERMISSION-AWARE QUERY HELPERS
 // ═══════════════════════════════════════════════════════════════
 
@@ -258,7 +233,7 @@ function rbac_can_manage_finance(): bool {
  * @param string $column The column name (e.g., 'class_id', 'a.class_id')
  */
 function rbac_class_filter(string $column = 'class_id'): array {
-    if (auth_is_super_admin() || auth_has_role('admin') || auth_has_role('accountant')) {
+    if (auth_is_super_admin() || auth_has_role('admin')) {
         return ['sql' => '', 'params' => []];
     }
 
@@ -296,7 +271,7 @@ function rbac_class_filter(string $column = 'class_id'): array {
  * @param string $column The column name (e.g., 'student_id', 's.id')
  */
 function rbac_student_filter(string $column = 'student_id'): array {
-    if (auth_is_super_admin() || auth_has_role('admin') || auth_has_role('teacher') || auth_has_role('accountant')) {
+    if (auth_is_super_admin() || auth_has_role('admin') || auth_has_role('teacher')) {
         return ['sql' => '', 'params' => []];
     }
 

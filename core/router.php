@@ -48,7 +48,6 @@ function router_dispatch(): void {
     // Public routes (no auth required)
     $publicRoutes = [
         'auth/login', 'auth/forgot-password', 'auth/reset-password',
-        'payments/webhook', 'payments/return', 'payments/timeout',
         'offline',
     ];
 
