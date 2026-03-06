@@ -1,6 +1,6 @@
-ï»¿<?php
+<?php
 /**
- * Students â€” Generate Username & Password
+ * Students — Generate Username & Password
  * Generate login credentials by class or for an individual student.
  */
 
@@ -68,15 +68,15 @@ ob_start();
             <form method="GET" action="<?= url('students', 'credentials') ?>" class="flex flex-wrap gap-3 mb-4">
                 <input type="hidden" name="_mode" value="class">
                 <select name="class_id" onchange="this.form.submit()"
-                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
-                    <option value="">Select Classâ€¦</option>
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    <option value="">Select Class…</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
                 <?php if (!empty($sections)): ?>
                 <select name="section_id"
-                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $sec): ?>
                         <option value="<?= $sec['id'] ?>" <?= $sectionId == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
@@ -118,7 +118,7 @@ ob_start();
                 <div class="flex flex-wrap items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Username format:
-                        <select name="username_format" class="ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border rounded-md text-sm">
+                        <select name="username_format" class="ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text rounded-md text-sm">
                             <option value="adm_no">Admission No. (e.g. STU-001)</option>
                             <option value="firstlast">firstname.lastname</option>
                             <option value="firstname_roll">firstname_rollno</option>
@@ -126,7 +126,7 @@ ob_start();
                     </label>
                     <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Password:
-                        <select name="password_mode" class="ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border rounded-md text-sm">
+                        <select name="password_mode" class="ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text rounded-md text-sm">
                             <option value="adm_no">Admission No.</option>
                             <option value="dob">Date of Birth (DDMMYYYY)</option>
                             <option value="random">Random 8-char</option>
@@ -152,8 +152,8 @@ ob_start();
         <div id="mode-single" class="hidden">
             <form method="GET" action="<?= url('students', 'credentials') ?>" class="flex gap-3 mb-4">
                 <input type="hidden" name="_mode" value="single">
-                <input type="number" name="student_id" value="<?= e($singleId ?: '') ?>" placeholder="Student DB IDâ€¦"
-                       class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <input type="number" name="student_id" value="<?= e($singleId ?: '') ?>" placeholder="Student DB ID…"
+                       class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 <button type="submit" class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700">Find</button>
             </form>
 
@@ -171,12 +171,12 @@ ob_start();
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
                             <input type="text" name="manual_username" placeholder="Leave blank to auto-generate"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
                             <input type="text" name="manual_password" placeholder="Leave blank to auto-generate"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         </div>
                     </div>
                 </div>

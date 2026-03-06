@@ -31,13 +31,13 @@ ob_start();
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title *</label>
             <input type="text" name="title" value="<?= e($assignment['title'] ?? old('title')) ?>" required
-                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class *</label>
-                <select name="class_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="class_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">Select</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= ($assignment['class_id'] ?? old('class_id')) == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -46,7 +46,7 @@ ob_start();
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject *</label>
-                <select name="subject_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="subject_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">Select</option>
                     <?php foreach ($subjects as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= ($assignment['subject_id'] ?? old('subject_id')) == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
@@ -57,23 +57,23 @@ ob_start();
 
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-            <textarea name="description" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"><?= e($assignment['description'] ?? old('description')) ?></textarea>
+            <textarea name="description" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"><?= e($assignment['description'] ?? old('description')) ?></textarea>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Due Date *</label>
                 <input type="date" name="due_date" value="<?= e($assignment['due_date'] ?? old('due_date')) ?>" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total Marks *</label>
                 <input type="number" name="total_marks" value="<?= e($assignment['total_marks'] ?? old('total_marks') ?? 100) ?>" min="1" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                <select name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="draft" <?= ($assignment['status'] ?? '') === 'draft' ? 'selected' : '' ?>>Draft</option>
                     <option value="published" <?= ($assignment['status'] ?? '') === 'published' ? 'selected' : '' ?>>Published</option>
                 </select>
@@ -92,7 +92,7 @@ ob_start();
             <button type="submit" class="px-6 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                 <?= $assignment ? 'Update' : 'Create' ?> Assignment
             </button>
-            <a href="<?= url('exams', 'assignments') ?>" class="px-6 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg flex items-center">Cancel</a>
+            <a href="<?= url('exams', 'assignments') ?>" class="px-6 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg flex items-center">Cancel</a>
         </div>
     </form>
 </div>

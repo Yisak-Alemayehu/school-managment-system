@@ -82,7 +82,22 @@ INSERT INTO `permissions` (`id`, `module`, `action`, `description`) VALUES
 (60, 'exam',           'view',            'View a single exam'),
 (61, 'marks',          'view',            'View marks detail'),
 (62, 'report_card',    'view',            'View a single report card'),
-;
+-- Manage-level permissions (used by routes)
+(63, 'attendance',     'manage',          'Take and edit attendance'),
+(64, 'academics',      'manage',          'Manage academic configuration'),
+(65, 'timetable',      'manage',          'Create/edit/delete timetable entries'),
+(66, 'exam',           'manage',          'Create/edit/delete exams and assessments'),
+(67, 'marks',          'manage',          'Enter and edit student marks'),
+(68, 'assignment',     'manage',          'Create/edit/delete assignments'),
+(69, 'report_card',    'manage',          'Generate and manage report cards'),
+(70, 'students',       'promote',         'Promote students to next class'),
+(71, 'settings',       'update',          'Update system settings'),
+(72, 'audit_logs',     'view',            'View audit logs'),
+(73, 'communication',  'create',          'Create announcements and messages'),
+(74, 'communication',  'delete',          'Delete announcements'),
+(75, 'finance',        'view',            'View finance data'),
+(76, 'finance',        'manage',          'Manage fees and payments'),
+(77, 'finance',        'reports',         'View financial reports');
 -- ============================================================
 -- SECTION 3: ROLE â†’ PERMISSION MAPPING
 -- ============================================================
@@ -98,22 +113,28 @@ SELECT 2, `id` FROM `permissions` WHERE `id` NOT IN (44, 46);
 INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (3,1),(3,7),(3,11),(3,12),(3,16),(3,19),(3,20),(3,21),(3,22),(3,23),
 (3,24),(3,25),(3,26),(3,28),(3,29),(3,30),(3,38),(3,39),(3,40),
-(3,47),(3,49),(3,50),(3,51),(3,52),(3,54),(3,58),(3,59),(3,60),(3,61),(3,62);
+(3,47),(3,49),(3,50),(3,51),(3,52),(3,54),(3,58),(3,59),(3,60),(3,61),(3,62),
+(3,63),(3,65),(3,66),(3,67),(3,68),(3,69),(3,73);
 
 -- Student (role 4)
 INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (4,1),(4,7),(4,11),(4,19),(4,23),(4,24),(4,28),(4,30),
-(4,40),(4,50),(4,51),(4,52),(4,54),(4,58),(4,59),(4,60),(4,61),(4,62),;
+(4,40),(4,50),(4,51),(4,52),(4,54),(4,58),(4,59),(4,60),(4,61),(4,62);
 
 -- Parent (role 5)
 INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (5,1),(5,7),(5,11),(5,12),(5,16),(5,19),(5,23),(5,24),(5,28),(5,30),
-(5,39),(5,40),(5,50),(5,51),(5,52),(5,59),(5,60),(5,61),(5,62),;
+(5,39),(5,40),(5,50),(5,51),(5,52),(5,59),(5,60),(5,61),(5,62),(5,75);
 
 -- Registrar (role 7)
 INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (7,1),(7,7),(7,8),(7,9),(7,11),(7,12),(7,13),(7,14),(7,15),(7,16),
-(7,17),(7,18),(7,19),(7,22),(7,23),(7,38),(7,39),(7,40),(7,47),(7,50),(7,51),(7,52);
+(7,17),(7,18),(7,19),(7,22),(7,23),(7,38),(7,39),(7,40),(7,47),(7,50),(7,51),(7,52),(7,70),(7,73);
+
+-- Accountant (role 6)
+INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
+(6,1),(6,7),(6,11),(6,12),(6,16),(6,19),(6,23),(6,39),(6,40),
+(6,50),(6,51),(6,52),(6,75),(6,76),(6,77);
 
 -- ============================================================
 -- SECTION 4: MEDIUMS, STREAMS, SHIFTS

@@ -1,6 +1,6 @@
-﻿<?php
+<?php
 /**
- * Academics — Class Teacher Assignment View (Fixed)
+ * Academics � Class Teacher Assignment View (Fixed)
  * Uses CONCAT(first_name, last_name), is_class_teacher=1, sub-nav.
  */
 
@@ -56,7 +56,7 @@ ob_start();
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Session</label>
             <select onchange="window.location='<?= url('academics', 'class-teachers') ?>&session_id='+this.value"
-                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                 <?php foreach ($sessions as $s): ?>
                     <option value="<?= $s['id'] ?>" <?= $filterSession == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
                 <?php endforeach; ?>
@@ -74,7 +74,7 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                 <select name="class_id" id="ctClass" required onchange="filterCTSections(this.value)"
-                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm min-w-[150px]">
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text min-w-[150px]">
                     <option value="">-- Select --</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
@@ -84,14 +84,14 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section <span class="text-red-500">*</span></label>
-                <select name="section_id" id="ctSection" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm min-w-[120px]">
+                <select name="section_id" id="ctSection" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text min-w-[120px]">
                     <option value="">-- Select Class First --</option>
                 </select>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teacher <span class="text-red-500">*</span></label>
-                <select name="teacher_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm min-w-[200px]">
+                <select name="teacher_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text min-w-[200px]">
                     <option value="">-- Select --</option>
                     <?php foreach ($teachers as $t): ?>
                         <option value="<?= $t['id'] ?>"><?= e($t['full_name']) ?></option>

@@ -14,6 +14,11 @@ if ($scheduleId) {
         JOIN subjects sub ON sub.id = es.subject_id
         WHERE es.id = ?
     ", [$scheduleId]);
+
+    // Teacher can only access marks for their assigned classes
+    if ($schedule && auth_has_role('teacher') && !auth_is_super_admin()) {
+        rbac_require_teacher_class((int)$schedule['class_id']);
+    }
 }
 
 // If no schedule selected, show selector
@@ -25,14 +30,25 @@ $existingMarks = [];
 $filterExam = input_int('exam_id');
 
 if ($filterExam) {
-    $schedules = db_fetch_all("
-        SELECT es.id, c.name AS class_name, sub.name AS subject_name
+    $schedSql = "SELECT es.id, es.class_id, c.name AS class_name, sub.name AS subject_name
         FROM exam_schedules es
         JOIN classes c ON c.id = es.class_id
         JOIN subjects sub ON sub.id = es.subject_id
-        WHERE es.exam_id = ?
-        ORDER BY c.level ASC, sub.name ASC
-    ", [$filterExam]);
+        WHERE es.exam_id = ?";
+    $schedParams = [$filterExam];
+
+    // Restrict to teacher's classes
+    if (auth_has_role('teacher') && !auth_is_super_admin()) {
+        $tClassIds = rbac_teacher_class_ids();
+        if (!empty($tClassIds)) {
+            $ph = implode(',', array_fill(0, count($tClassIds), '?'));
+            $schedSql .= " AND es.class_id IN ({$ph})";
+            $schedParams = array_merge($schedParams, $tClassIds);
+        }
+    }
+
+    $schedSql .= " ORDER BY c.level ASC, sub.name ASC";
+    $schedules = db_fetch_all($schedSql, $schedParams);
 }
 
 if ($schedule) {
@@ -66,7 +82,7 @@ ob_start();
             <input type="hidden" name="action" value="marks">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exam</label>
-                <select name="exam_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="exam_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">Select Exam</option>
                     <?php foreach ($exams as $ex): ?>
                         <option value="<?= $ex['id'] ?>" <?= $filterExam == $ex['id'] ? 'selected' : '' ?>><?= e($ex['name']) ?></option>
@@ -76,7 +92,7 @@ ob_start();
             <?php if (!empty($schedules)): ?>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class / Subject</label>
-                <select name="schedule_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="schedule_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">Select</option>
                     <?php foreach ($schedules as $sc): ?>
                         <option value="<?= $sc['id'] ?>" <?= $scheduleId == $sc['id'] ? 'selected' : '' ?>><?= e($sc['class_name'] . ' — ' . $sc['subject_name']) ?></option>
@@ -130,7 +146,7 @@ ob_start();
                                 <input type="number" name="marks[<?= $st['id'] ?>][score]"
                                        value="<?= $em['marks_obtained'] ?? '' ?>"
                                        min="0" max="<?= $schedule['full_marks'] ?>" step="0.5"
-                                       class="w-24 px-2 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm text-center focus:ring-2 focus:ring-primary-500 marks-input"
+                                       class="w-24 px-2 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text text-center focus:ring-2 focus:ring-primary-500 marks-input"
                                        data-student="<?= $st['id'] ?>">
                             </td>
                             <td class="px-4 py-2.5 text-center">

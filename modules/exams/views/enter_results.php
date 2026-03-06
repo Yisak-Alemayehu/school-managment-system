@@ -13,10 +13,23 @@ $allTerms    = $sessionId
     ? db_fetch_all("SELECT id, name FROM terms WHERE session_id=? ORDER BY sort_order", [$sessionId])
     : [];
 
+// Restrict class list for teachers
+if (auth_has_role('teacher') && !auth_is_super_admin()) {
+    $tClassIds = rbac_teacher_class_ids();
+    if (!empty($tClassIds)) {
+        $allClasses = array_values(array_filter($allClasses, fn($c) => in_array($c['id'], $tClassIds)));
+    }
+}
+
 // Current selections — default term to the active term
 $activeTerm = get_active_term();
 $selTerm    = input_int('term_id') ?: ($activeTerm['id'] ?? 0);
 $selClass   = input_int('class_id');
+
+// Validate teacher access to selected class
+if ($selClass && auth_has_role('teacher') && !auth_is_super_admin()) {
+    rbac_require_teacher_class($selClass);
+}
 $selSection    = input_int('section_id');
 $selSubject    = input_int('subject_id');
 $selAssessment = input_int('assessment_id');
@@ -368,7 +381,7 @@ ob_start();
 
         <div class="flex justify-end gap-3 mt-5">
             <a href="<?= url('exams','enter-results') ?>&term_id=<?= $selTerm ?>&class_id=<?= $selClass ?>&section_id=<?= $selSection ?>&subject_id=<?= $selSubject ?>"
-               class="px-5 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
+               class="px-5 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
                 Back
             </a>
             <button type="submit"

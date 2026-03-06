@@ -22,6 +22,23 @@ if (!$rc) {
     redirect(url('exams', 'report-cards'));
 }
 
+// Access control: students can only view their own, parents only their children's
+if (auth_has_role('student') && (int)$rc['student_id'] !== rbac_student_id()) {
+    http_response_code(403);
+    require TEMPLATES_PATH . '/errors/403.php';
+    exit;
+}
+if (auth_has_role('parent') && !rbac_parent_has_child((int)$rc['student_id'])) {
+    http_response_code(403);
+    require TEMPLATES_PATH . '/errors/403.php';
+    exit;
+}
+if (auth_has_role('teacher') && !rbac_teacher_has_class((int)$rc['class_id'])) {
+    http_response_code(403);
+    require TEMPLATES_PATH . '/errors/403.php';
+    exit;
+}
+
 // Get subject-wise marks
 $marks = db_fetch_all("
     SELECT m.marks_obtained, m.is_absent, m.grade, m.grade_point,
@@ -65,7 +82,7 @@ $schoolName = get_school_name();
     <div class="no-print mb-4 flex gap-3">
         <button onclick="window.print()" class="px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium">Print</button>
         <a href="<?= url('exams', 'report-cards') ?>&exam_id=<?= $rc['exam_id'] ?>&class_id=<?= $rc['class_id'] ?>"
-           class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Back</a>
+           class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Back</a>
     </div>
 
     <!-- Header -->

@@ -13,7 +13,7 @@ if (!defined('APP_ROOT')) {
  */
 function pwa_meta_tags(): string {
     $isDark = ($_COOKIE['theme'] ?? 'light') === 'dark';
-    $themeColor = $isDark ? '#0f172a' : '#1e40af';
+    $themeColor = $isDark ? '#0f172a' : '#074DD9';
     $html = '';
     $html .= '<meta name="theme-color" content="' . $themeColor . '">' . "\n";
     $html .= '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n";

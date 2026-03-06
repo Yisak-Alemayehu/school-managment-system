@@ -31,16 +31,16 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject Name <span class="text-red-500">*</span></label>
                 <input type="text" name="name" value="<?= e($editing['name'] ?? '') ?>" required placeholder="e.g. Mathematics"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code <span class="text-red-500">*</span></label>
                 <input type="text" name="code" value="<?= e($editing['code'] ?? '') ?>" required placeholder="e.g. MATH"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
-                <select name="type" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="type" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="theory" <?= ($editing['type'] ?? '') === 'theory' ? 'selected' : '' ?>>Theory</option>
                     <option value="practical" <?= ($editing['type'] ?? '') === 'practical' ? 'selected' : '' ?>>Practical</option>
                     <option value="both" <?= ($editing['type'] ?? '') === 'both' ? 'selected' : '' ?>>Both</option>
@@ -49,14 +49,14 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                 <input type="text" name="description" value="<?= e($editing['description'] ?? '') ?>" placeholder="Optional"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit" class="px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                     <?= $editing ? 'Update' : 'Add' ?>
                 </button>
                 <?php if ($editing): ?>
-                    <a href="<?= url('academics', 'subjects') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
+                    <a href="<?= url('academics', 'subjects') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                 <?php endif; ?>
             </div>
         </form>
@@ -93,7 +93,7 @@ ob_start();
                             $typeBadge = match($s['type']) {
                                 'theory'    => 'bg-blue-100 text-blue-800',
                                 'practical' => 'bg-purple-100 text-purple-800',
-                                'both'      => 'bg-teal-100 text-teal-800',
+                                'both'      => 'bg-primary-100 text-primary-800',
                                 default     => 'bg-gray-100 dark:bg-dark-card2 text-gray-600 dark:text-dark-muted',
                             };
                             ?>

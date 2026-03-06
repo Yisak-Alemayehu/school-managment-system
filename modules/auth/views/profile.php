@@ -27,7 +27,7 @@ ob_start();
                 <div>
                     <label for="full_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
                     <input type="text" id="full_name" name="full_name" value="<?= e(old('full_name') ?: $userRecord['full_name']) ?>"
-                           required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                           required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <?php if ($err = get_validation_error('full_name')): ?>
                         <p class="mt-1 text-xs text-red-600"><?= e($err) ?></p>
                     <?php endif; ?>
@@ -36,7 +36,7 @@ ob_start();
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                     <input type="email" id="email" name="email" value="<?= e(old('email') ?: $userRecord['email']) ?>"
-                           required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                           required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <?php if ($err = get_validation_error('email')): ?>
                         <p class="mt-1 text-xs text-red-600"><?= e($err) ?></p>
                     <?php endif; ?>
@@ -45,7 +45,7 @@ ob_start();
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
                     <input type="text" id="phone" name="phone" value="<?= e(old('phone') ?: $userRecord['phone']) ?>"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm bg-white dark:bg-dark-card dark:text-dark-text"
                            placeholder="+251...">
                     <?php if ($err = get_validation_error('phone')): ?>
                         <p class="mt-1 text-xs text-red-600"><?= e($err) ?></p>
@@ -62,12 +62,12 @@ ob_start();
             <div>
                 <label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Profile Photo</label>
                 <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/webp"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary-50 file:text-primary-700 file:text-sm file:font-medium">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary-50 file:text-primary-700 file:text-sm file:font-medium">
                 <p class="mt-1 text-xs text-gray-500 dark:text-dark-muted">JPG, PNG, or WebP. Max 2MB.</p>
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
-                <a href="<?= url('dashboard') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
+                <a href="<?= url('dashboard') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                 <button type="submit" class="px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                     Update Profile
                 </button>

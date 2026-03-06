@@ -80,21 +80,21 @@ ob_start();
     <form method="GET" action="<?= url('users') ?>" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <input type="hidden" name="module" value="users">
         <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search name, username, email..."
-               class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-        <select name="role" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+               class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+        <select name="role" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
             <option value="">All Roles</option>
             <?php foreach ($roles as $r): ?>
                 <option value="<?= $r['id'] ?>" <?= $roleFilter == $r['id'] ? 'selected' : '' ?>><?= e($r['name']) ?></option>
             <?php endforeach; ?>
         </select>
-        <select name="status" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+        <select name="status" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
             <option value="">All Status</option>
             <option value="1" <?= $statusFilter === '1' ? 'selected' : '' ?>>Active</option>
             <option value="0" <?= $statusFilter === '0' ? 'selected' : '' ?>>Inactive</option>
         </select>
         <div class="flex gap-2">
             <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900 transition">Filter</button>
-            <a href="<?= url('users') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Clear</a>
+            <a href="<?= url('users') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Clear</a>
         </div>
     </form>
 </div>

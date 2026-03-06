@@ -39,7 +39,7 @@ ob_start();
             <p class="text-sm text-gray-500 dark:text-dark-muted"><?= e($assignment['class_name']) ?> &middot; <?= e($assignment['subject_name']) ?></p>
         </div>
         <?php if (auth_has_permission('assignment.manage')): ?>
-            <a href="<?= url('exams', 'assignment-create') ?>&id=<?= $id ?>" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Edit</a>
+            <a href="<?= url('exams', 'assignment-create') ?>&id=<?= $id ?>" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Edit</a>
             <form method="POST" action="<?= url('exams', 'assignment-delete') ?>" class="inline" onsubmit="return confirm('Delete this assignment?')">
                 <?= csrf_field() ?>
                 <input type="hidden" name="id" value="<?= $id ?>">

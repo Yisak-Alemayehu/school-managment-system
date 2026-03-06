@@ -62,7 +62,7 @@ ob_start();
             <div class="flex-1 min-w-36">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">By Class</label>
                 <select name="class_id" onchange="this.form.submit()"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Class…</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -73,7 +73,7 @@ ob_start();
             <div class="flex-1 min-w-36">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
                 <select name="section_id" onchange="this.form.submit()"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $sec): ?>
                         <option value="<?= $sec['id'] ?>" <?= $sectionId == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
@@ -86,7 +86,7 @@ ob_start();
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Single Student (Admission No.)</label>
                 <div class="flex gap-2">
                     <input type="number" name="student_id" value="<?= e($studentId ?: '') ?>" placeholder="Student ID…"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <button type="submit" class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700">Load</button>
                 </div>
             </div>
@@ -149,7 +149,7 @@ ob_start();
 <style>
 @media print {
     #sidebar, header, nav, form, .no-print { display: none !important; }
-    .id-card { break-inside: avoid; border: 2px solid #1d4ed8 !important; }
+    .id-card { break-inside: avoid; border: 2px solid #074DD9 !important; }
     #idCardGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 }
 </style>

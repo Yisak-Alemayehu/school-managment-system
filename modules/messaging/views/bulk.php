@@ -61,7 +61,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                     <select name="class_id" id="bulk-class" onchange="ajaxLoadSections(this.value, 'bulk-section', 0, 'All Sections')"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">All Classes (everyone)</option>
                         <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
@@ -71,7 +71,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
                     <select name="section_id" id="bulk-section" disabled
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">All Sections</option>
                     </select>
                 </div>
@@ -100,7 +100,7 @@ ob_start();
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
             <input type="text" name="subject" value="<?= old('subject') ?>" required maxlength="255"
-                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 <?= !empty($errors['subject']) ? 'border-red-300' : '' ?>"
+                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 <?= !empty($errors['subject']) ? 'border-red-300' : '' ?>"
                    placeholder="Message subject…">
             <?php if (!empty($errors['subject'])): ?>
             <p class="mt-1 text-xs text-red-600"><?= e($errors['subject']) ?></p>
@@ -111,7 +111,7 @@ ob_start();
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
             <textarea name="body" rows="6" required maxlength="5000"
-                      class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 <?= !empty($errors['body']) ? 'border-red-300' : '' ?>"
+                      class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 <?= !empty($errors['body']) ? 'border-red-300' : '' ?>"
                       placeholder="Type your broadcast message…"><?= old('body') ?></textarea>
             <?php if (!empty($errors['body'])): ?>
             <p class="mt-1 text-xs text-red-600"><?= e($errors['body']) ?></p>

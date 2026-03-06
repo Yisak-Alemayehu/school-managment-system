@@ -50,7 +50,7 @@ ob_start();
     <div class="flex flex-wrap items-end gap-4 mb-6">
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Session</label>
-            <select onchange="updateCSFilter()" id="csSession" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+            <select onchange="updateCSFilter()" id="csSession" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                 <?php foreach ($sessions as $s): ?>
                     <option value="<?= $s['id'] ?>" <?= $filterSession == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
                 <?php endforeach; ?>
@@ -58,7 +58,7 @@ ob_start();
         </div>
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
-            <select onchange="updateCSFilter()" id="csClass" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+            <select onchange="updateCSFilter()" id="csClass" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                 <?php foreach ($classes as $c): ?>
                     <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
                 <?php endforeach; ?>

@@ -46,7 +46,7 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
-                <select name="class_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="class_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">Select</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= ($editing['class_id'] ?? '') == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -55,7 +55,7 @@ ob_start();
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
-                <select name="subject_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="subject_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">Select</option>
                     <?php foreach ($subjects as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= ($editing['subject_id'] ?? '') == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
@@ -65,24 +65,24 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
                 <input type="date" name="exam_date" value="<?= e($editing['exam_date'] ?? '') ?>" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start</label>
                 <input type="time" name="start_time" value="<?= e($editing['start_time'] ?? '') ?>" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Marks</label>
                 <input type="number" name="full_marks" value="<?= e($editing['full_marks'] ?? 100) ?>" min="1" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit" class="px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                     <?= $editing ? 'Update' : 'Add' ?>
                 </button>
                 <?php if ($editing): ?>
-                    <a href="<?= url('exams', 'exam-schedule') ?>&exam_id=<?= $examId ?>" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
+                    <a href="<?= url('exams', 'exam-schedule') ?>&exam_id=<?= $examId ?>" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                 <?php endif; ?>
             </div>
         </form>

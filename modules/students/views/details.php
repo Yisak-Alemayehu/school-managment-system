@@ -64,9 +64,9 @@ ob_start();
     <form method="GET" action="<?= url('students', 'details') ?>" class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4">
         <div class="flex flex-wrap gap-3">
             <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search name, admission no, phone…"
-                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             <select name="class_id" onchange="this.form.submit()"
-                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 <option value="">All Classes</option>
                 <?php foreach ($classes as $c): ?>
                     <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -74,7 +74,7 @@ ob_start();
             </select>
             <?php if (!empty($sections)): ?>
             <select name="section_id"
-                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 <option value="">All Sections</option>
                 <?php foreach ($sections as $sec): ?>
                     <option value="<?= $sec['id'] ?>" <?= $sectionId == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
@@ -82,7 +82,7 @@ ob_start();
             </select>
             <?php endif; ?>
             <select name="status"
-                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 <option value="active"    <?= $statusFilter === 'active'    ? 'selected' : '' ?>>Active</option>
                 <option value="inactive"  <?= $statusFilter === 'inactive'  ? 'selected' : '' ?>>Inactive</option>
                 <option value="graduated" <?= $statusFilter === 'graduated' ? 'selected' : '' ?>>Graduated</option>

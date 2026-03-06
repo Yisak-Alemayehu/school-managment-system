@@ -36,7 +36,7 @@ ob_start();
                 <input type="text" id="recipient-search" autocomplete="off"
                        placeholder="Search by name or username…"
                        value="<?= $recipientUser ? e($recipientUser['full_name']) : old('recipient_name') ?>"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 <?= !empty($errors['recipient_id']) ? 'border-red-300' : '' ?>">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 <?= !empty($errors['recipient_id']) ? 'border-red-300' : '' ?>">
                 <input type="hidden" name="recipient_id" id="recipient-id" value="<?= $recipientUser ? $recipientUser['id'] : old('recipient_id') ?>">
                 <div id="recipient-dropdown" class="hidden absolute z-10 w-full mt-1 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-lg shadow-lg max-h-48 overflow-y-auto"></div>
             </div>
@@ -49,14 +49,14 @@ ob_start();
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-gray-400 dark:text-gray-500">(optional)</span></label>
             <input type="text" name="subject" value="<?= old('subject') ?>" maxlength="255"
-                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
         </div>
 
         <!-- Message Body -->
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
             <textarea name="body" rows="6" required maxlength="5000"
-                      class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 <?= !empty($errors['body']) ? 'border-red-300' : '' ?>"
+                      class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 <?= !empty($errors['body']) ? 'border-red-300' : '' ?>"
                       placeholder="Type your message…"><?= old('body') ?></textarea>
             <?php if (!empty($errors['body'])): ?>
             <p class="mt-1 text-xs text-red-600"><?= e($errors['body']) ?></p>

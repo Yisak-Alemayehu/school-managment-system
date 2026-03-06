@@ -1,12 +1,39 @@
 <?php
 /**
  * Attendance — Individual Student Attendance View
+ * Auto-detects student_id for logged-in student users
  */
 
 $studentId = input_int('student_id');
+
+// Auto-detect for student role
+if (!$studentId && auth_has_role('student')) {
+    $studentId = rbac_student_id();
+}
+
+// Parent: if no student_id, redirect to dashboard
+if (!$studentId && auth_has_role('parent')) {
+    $children = rbac_get_children();
+    if (!empty($children)) {
+        $studentId = (int) $children[0]['id'];
+    }
+}
+
 if (!$studentId) {
     set_flash('error', 'No student specified.');
     redirect(url('attendance', 'report'));
+}
+
+// Validate parent can only view their own children's attendance
+if (auth_has_role('parent') && !rbac_parent_has_child($studentId)) {
+    set_flash('error', 'Access denied.');
+    redirect(url('dashboard'));
+}
+
+// Students can only view their own attendance
+if (auth_has_role('student') && $studentId !== rbac_student_id()) {
+    set_flash('error', 'Access denied.');
+    redirect(url('dashboard'));
 }
 
 $student = db_fetch_one("SELECT * FROM students WHERE id = ?", [$studentId]);

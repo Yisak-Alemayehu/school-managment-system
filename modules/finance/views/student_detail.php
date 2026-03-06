@@ -312,7 +312,7 @@ ob_start();
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Fee *</label>
-                    <select name="fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <select name="fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">— Select Fee —</option>
                         <?php foreach ($allFees as $f): ?>
                         <option value="<?= $f['id'] ?>"><?= e($f['description']) ?> (<?= format_money($f['amount']) ?>)</option>
@@ -338,7 +338,7 @@ ob_start();
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Active Fee to Remove *</label>
-                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">— Select Fee —</option>
                         <?php
                         $activeFeeList = db_fetch_all(
@@ -353,7 +353,7 @@ ob_start();
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason</label>
-                    <input type="text" name="reason" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="Optional reason">
+                    <input type="text" name="reason" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" placeholder="Optional reason">
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">
@@ -374,7 +374,7 @@ ob_start();
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Fee *</label>
-                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">— Select Fee —</option>
                         <?php foreach ($activeFeeList as $af): ?>
                         <option value="<?= $af['id'] ?>"><?= e($af['description']) ?> — Balance: <?= format_money($af['balance']) ?></option>
@@ -383,11 +383,11 @@ ob_start();
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adjustment Amount *</label>
-                    <input type="number" name="amount" step="0.01" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="Positive to credit, negative to debit">
+                    <input type="number" name="amount" step="0.01" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" placeholder="Positive to credit, negative to debit">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason *</label>
-                    <input type="text" name="reason" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="Reason for adjustment">
+                    <input type="text" name="reason" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" placeholder="Reason for adjustment">
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">

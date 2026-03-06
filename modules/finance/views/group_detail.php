@@ -139,14 +139,14 @@ ob_start();
             <input type="hidden" name="tab" value="assign">
             <div class="flex flex-wrap gap-3">
                 <input type="text" name="assign_search" value="<?= e($assignSearch) ?>" placeholder="Search by name…"
-                       class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
-                <select name="assign_class_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                       class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                <select name="assign_class_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">All Classes</option>
                     <?php foreach ($classes as $c): ?>
                     <option value="<?= $c['id'] ?>" <?= $assignClassId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select name="assign_gender" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="assign_gender" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">All Genders</option>
                     <option value="male" <?= $assignGender === 'male' ? 'selected' : '' ?>>Male</option>
                     <option value="female" <?= $assignGender === 'female' ? 'selected' : '' ?>>Female</option>
@@ -264,7 +264,7 @@ ob_start();
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Action *</label>
-                    <select name="action_type" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                    <select name="action_type" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                         <option value="">— Select Action —</option>
                         <option value="assign_fee">Assign Fee</option>
                         <option value="remove_fee">Remove Fee</option>
@@ -273,7 +273,7 @@ ob_start();
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fee *</label>
-                    <select name="fee_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                    <select name="fee_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                         <option value="">— Select Fee —</option>
                         <?php foreach ($allFees as $f): ?>
                         <option value="<?= $f['id'] ?>"><?= e($f['description']) ?> (<?= format_money($f['amount']) ?>)</option>
@@ -282,7 +282,7 @@ ob_start();
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adjustment Amount</label>
-                    <input type="number" name="amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="For adjustments only">
+                    <input type="number" name="amount" step="0.01" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" placeholder="For adjustments only">
                 </div>
                 <div class="flex items-center gap-2 pt-6">
                     <input type="checkbox" name="part_payments" value="1" id="partPay" class="rounded">

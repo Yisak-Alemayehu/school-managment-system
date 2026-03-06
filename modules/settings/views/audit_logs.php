@@ -71,7 +71,7 @@ ob_start();
     <!-- Filters -->
     <form class="bg-white dark:bg-dark-card rounded-xl shadow-sm border p-4">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-            <select name="user" class="rounded-lg border-gray-300 dark:border-dark-border text-sm">
+            <select name="user" class="rounded-lg border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text text-sm">
                 <option value="">All Users</option>
                 <?php foreach ($users as $u): ?>
                     <option value="<?= $u['user_id'] ?>" <?= $filterUser == $u['user_id'] ? 'selected' : '' ?>>
@@ -79,7 +79,7 @@ ob_start();
                     </option>
                 <?php endforeach; ?>
             </select>
-            <select name="act" class="rounded-lg border-gray-300 dark:border-dark-border text-sm">
+            <select name="act" class="rounded-lg border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text text-sm">
                 <option value="">All Actions</option>
                 <?php foreach ($actions as $a): ?>
                     <option value="<?= e($a['action']) ?>" <?= $filterAction === $a['action'] ? 'selected' : '' ?>>
@@ -87,7 +87,7 @@ ob_start();
                     </option>
                 <?php endforeach; ?>
             </select>
-            <select name="tbl" class="rounded-lg border-gray-300 dark:border-dark-border text-sm">
+            <select name="tbl" class="rounded-lg border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text text-sm">
                 <option value="">All Tables</option>
                 <?php foreach ($tables as $t): ?>
                     <option value="<?= e($t['table_name']) ?>" <?= $filterTable === $t['table_name'] ? 'selected' : '' ?>>

@@ -215,7 +215,7 @@ ob_start();
                 </label>
 
                 <textarea name="body" rows="1" required maxlength="5000" placeholder="Type a message…"
-                          class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-green-500 resize-none"
+                          class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-green-500 resize-none"
                           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.form.submit();}"
                           oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';"></textarea>
 
@@ -261,7 +261,7 @@ ob_start();
                 <form method="POST" action="<?= url('messaging', 'group-add-member') ?>" class="flex gap-2">
                     <?= csrf_field() ?>
                     <input type="hidden" name="group_id" value="<?= $groupId ?>">
-                    <select name="user_id" required class="flex-1 px-2 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-xs focus:ring-2 focus:ring-green-500">
+                    <select name="user_id" required class="flex-1 px-2 py-1.5 border border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text rounded-lg text-xs focus:ring-2 focus:ring-green-500">
                         <option value="">Add member…</option>
                         <?php foreach ($availableClassmates as $cm): ?>
                         <option value="<?= $cm['id'] ?>"><?= e($cm['full_name']) ?></option>

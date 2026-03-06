@@ -1,6 +1,6 @@
-﻿<?php
+<?php
 /**
- * Results — Add Assessment
+ * Results � Add Assessment
  * Per-assessment marks are user-defined. Sum for a class+subject+term must total 100.
  */
 
@@ -39,7 +39,7 @@ foreach ($assessments as $row) {
         $grouped[$key] = [
             'class'   => $row['class_name'],
             'subject' => $row['subject_name'],
-            'term'    => $row['term_name'] ?? '—',
+            'term'    => $row['term_name'] ?? '�',
             'total'   => 0,
             'rows'    => [],
         ];
@@ -58,7 +58,7 @@ ob_start();
 
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-        <!-- ── Left: Form (2/5) ── -->
+        <!-- -- Left: Form (2/5) -- -->
         <div class="lg:col-span-2">
             <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
                 <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">New Assessment</h2>
@@ -72,14 +72,14 @@ ob_start();
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assessment Name <span class="text-red-500">*</span></label>
                             <input type="text" name="name" id="f_name" required placeholder="e.g. Test 1, Final Exam"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Term -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Term <span class="text-red-500">*</span></label>
                             <select name="term_id" id="f_term" required
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 <option value="">Select Term</option>
                                 <?php foreach ($terms as $t): ?>
                                     <option value="<?= $t['id'] ?>"><?= e($t['name']) ?></option>
@@ -91,7 +91,7 @@ ob_start();
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                             <select name="class_id" id="f_class" required
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 <option value="">Select Class</option>
                                 <?php foreach ($classes as $c): ?>
                                     <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
@@ -103,8 +103,8 @@ ob_start();
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject <span class="text-red-500">*</span></label>
                             <select name="subject_id" id="f_subject" required
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500" disabled>
-                                <option value="">— Select Class First —</option>
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" disabled>
+                                <option value="">� Select Class First �</option>
                             </select>
                         </div>
 
@@ -115,7 +115,7 @@ ob_start();
                             </label>
                             <input type="number" name="total_marks" id="f_marks" required
                                    min="1" max="100" placeholder="e.g. 50"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">All assessments for a subject must sum to exactly 100.</p>
                         </div>
 
@@ -136,8 +136,8 @@ ob_start();
                         <!-- Description -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
-                            <textarea name="description" rows="2" placeholder="Optional notes…"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
+                            <textarea name="description" rows="2" placeholder="Optional notes�"
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 resize-none"></textarea>
                         </div>
 
                         <button type="submit" id="saveBtn"
@@ -149,16 +149,16 @@ ob_start();
             </div>
         </div>
 
-        <!-- ── Right: Existing assessments (3/5) ── -->
+        <!-- -- Right: Existing assessments (3/5) -- -->
         <div class="lg:col-span-3">
 
-            <!-- Filter bar (its own GET form — only for filtering the list) -->
+            <!-- Filter bar (its own GET form � only for filtering the list) -->
             <form method="GET" class="flex flex-wrap gap-3 mb-4 items-end">
                 <input type="hidden" name="module" value="exams">
                 <input type="hidden" name="action" value="add-assessment">
                 <div>
                     <label class="block text-xs text-gray-500 dark:text-dark-muted mb-1">Filter by Class</label>
-                    <select name="filter_class" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                    <select name="filter_class" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                         <option value="">All Classes</option>
                         <?php foreach ($classes as $c): ?>
                             <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -167,7 +167,7 @@ ob_start();
                 </div>
                 <div>
                     <label class="block text-xs text-gray-500 dark:text-dark-muted mb-1">Filter by Term</label>
-                    <select name="filter_term" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                    <select name="filter_term" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                         <option value="">All Terms</option>
                         <?php foreach ($terms as $t): ?>
                             <option value="<?= $t['id'] ?>" <?= $filterTerm == $t['id'] ? 'selected' : '' ?>><?= e($t['name']) ?></option>
@@ -194,7 +194,7 @@ ob_start();
                     if ($grpTotal === 100) {
                         $badgeCls = 'bg-green-100 text-green-800';
                         $barCls   = 'bg-green-500';
-                        $statusTxt = 'Complete ✓';
+                        $statusTxt = 'Complete ?';
                     } elseif ($grpTotal > 100) {
                         $badgeCls = 'bg-red-100 text-red-800';
                         $barCls   = 'bg-red-500';
@@ -210,9 +210,9 @@ ob_start();
                 <div class="px-4 py-2.5 bg-gray-50 dark:bg-dark-bg border-b flex items-center justify-between gap-3">
                     <div class="text-sm">
                         <span class="font-semibold text-gray-800 dark:text-dark-text"><?= e($grp['class']) ?></span>
-                        <span class="text-gray-400 dark:text-gray-500 mx-1">›</span>
+                        <span class="text-gray-400 dark:text-gray-500 mx-1">�</span>
                         <span class="text-gray-700 dark:text-gray-300"><?= e($grp['subject']) ?></span>
-                        <span class="text-gray-400 dark:text-gray-500 mx-1">›</span>
+                        <span class="text-gray-400 dark:text-gray-500 mx-1">�</span>
                         <span class="text-gray-500 dark:text-dark-muted text-xs"><?= e($grp['term']) ?></span>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
@@ -220,7 +220,7 @@ ob_start();
                             <div class="<?= $barCls ?> h-1.5 rounded-full" style="width:<?= $barWidth ?>%"></div>
                         </div>
                         <span class="text-xs font-semibold px-2 py-0.5 rounded-full <?= $badgeCls ?>">
-                            <?= $grpTotal ?>/100 — <?= $statusTxt ?>
+                            <?= $grpTotal ?>/100 � <?= $statusTxt ?>
                         </span>
                     </div>
                 </div>
@@ -237,7 +237,7 @@ ob_start();
                         <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                             <td class="px-4 py-2 pl-8 text-gray-800 dark:text-dark-text"><?= e($a['name']) ?>
                                 <?php if ($a['description']): ?>
-                                    <span class="text-gray-400 dark:text-gray-500 text-xs ml-1">— <?= e(mb_strimwidth($a['description'], 0, 40, '…')) ?></span>
+                                    <span class="text-gray-400 dark:text-gray-500 text-xs ml-1">� <?= e(mb_strimwidth($a['description'], 0, 40, '�')) ?></span>
                                 <?php endif; ?>
                             </td>
                             <td class="px-4 py-2 text-center">
@@ -261,7 +261,7 @@ ob_start();
     </div>
 </div>
 
-<!-- ── JavaScript: AJAX subjects + live total validation ── -->
+<!-- -- JavaScript: AJAX subjects + live total validation -- -->
 <script>
 (function () {
     var fClass   = document.getElementById('f_class');
@@ -279,16 +279,16 @@ ob_start();
 
     var currentCommitted = 0;
 
-    // ── Load subjects for chosen class ──
+    // -- Load subjects for chosen class --
     function loadSubjects() {
         var classId = fClass.value;
-        fSubject.innerHTML = '<option value="">Loading…</option>';
+        fSubject.innerHTML = '<option value="">Loading�</option>';
         fSubject.disabled  = true;
         currentCommitted   = 0;
         updateBadge();
 
         if (!classId) {
-            fSubject.innerHTML = '<option value="">— Select Class First —</option>';
+            fSubject.innerHTML = '<option value="">� Select Class First �</option>';
             return;
         }
         fetch('<?= url('exams', 'ajax-subjects') ?>class_id=' + classId)
@@ -311,7 +311,7 @@ ob_start();
             });
     }
 
-    // ── Load committed total for class+subject+term ──
+    // -- Load committed total for class+subject+term --
     function loadTotal() {
         var classId   = fClass.value;
         var subjectId = fSubject.value;
@@ -330,7 +330,7 @@ ob_start();
             .catch(function(){ currentCommitted = 0; updateBadge(); });
     }
 
-    // ── Recalculate and render the live badge ──
+    // -- Recalculate and render the live badge --
     function updateBadge() {
         var thisVal  = parseInt(fMarks.value, 10) || 0;
         var combined = currentCommitted + thisVal;
@@ -350,13 +350,13 @@ ob_start();
         if (combined === 100) {
             badge.classList.add('border-green-300', 'bg-green-50');
             bar.className   = 'h-2 rounded-full transition-all bg-green-500';
-            msg.textContent = '✓ Total is exactly 100. Ready to save.';
+            msg.textContent = '? Total is exactly 100. Ready to save.';
             msg.className   = 'text-xs mt-1 text-green-700 font-medium';
             saveBtn.disabled = false;
         } else if (combined > 100) {
             badge.classList.add('border-red-300', 'bg-red-50');
             bar.className   = 'h-2 rounded-full transition-all bg-red-500';
-            msg.textContent = '✗ Total would be ' + combined + '. Exceeds 100 by ' + (combined - 100) + ' mark(s).';
+            msg.textContent = '? Total would be ' + combined + '. Exceeds 100 by ' + (combined - 100) + ' mark(s).';
             msg.className   = 'text-xs mt-1 text-red-700 font-medium';
             saveBtn.disabled = true;
         } else {
@@ -368,7 +368,7 @@ ob_start();
         }
     }
 
-    // ── Prevent submit if total > 100 ──
+    // -- Prevent submit if total > 100 --
     form.addEventListener('submit', function(e) {
         var thisVal  = parseInt(fMarks.value, 10) || 0;
         var combined = currentCommitted + thisVal;
@@ -378,7 +378,7 @@ ob_start();
         }
     });
 
-    // ── Event bindings ──
+    // -- Event bindings --
     fClass.addEventListener('change', function() { loadSubjects(); });
     fSubject.addEventListener('change', function() { loadTotal(); });
     fTerm.addEventListener('change', function() { if (fSubject.value) loadTotal(); });

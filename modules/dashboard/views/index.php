@@ -2,13 +2,15 @@
 /**
  * Dashboard — Main View
  * Role-based dashboard with summary cards and quick actions
+ * Styled as mobile-first app-like portals per role
  */
 $user = auth_user();
 $isSuperAdmin = auth_is_super_admin();
-$isAdmin      = auth_has_role('admin') || $isSuperAdmin;
+$isAdmin      = auth_has_role('admin') || auth_has_role('school_admin') || $isSuperAdmin;
 $isTeacher    = auth_has_role('teacher');
 $isStudent    = auth_has_role('student');
 $isParent     = auth_has_role('parent');
+$isAccountant = auth_has_role('accountant');
 
 // ── Gather Stats ─────────────────────────────────────────
 $stats = [];
@@ -119,7 +121,8 @@ $notifications = db_fetch_all(
 ob_start();
 ?>
 
-<!-- Welcome Bar -->
+<!-- Welcome Bar (Admin/Parent only - Student/Teacher have their own profile headers) -->
+<?php if ($isAdmin || $isParent): ?>
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900 dark:text-dark-text">Welcome, <?= e(explode(' ', $user['name'] ?? $user['full_name'] ?? '')[0]) ?>!</h1>
     <p class="text-sm text-gray-500 dark:text-dark-muted mt-1">
@@ -130,6 +133,7 @@ ob_start();
         <?php endif; ?>
     </p>
 </div>
+<?php endif; ?>
 
 <?php if ($isAdmin): ?>
 <!-- ── Admin Dashboard ────────────────────────────────────── -->
@@ -237,8 +241,8 @@ ob_start();
     </div>
     <!-- Subjects -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 sm:p-5 flex items-center gap-4">
-        <div class="w-11 h-11 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-11 h-11 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
             </svg>
         </div>
@@ -409,91 +413,471 @@ ob_start();
 </div>
 
 <?php elseif ($isTeacher): ?>
-<!-- ── Teacher Dashboard ──────────────────────────────────── -->
-<div class="grid grid-cols-2 gap-4 mb-6">
-    <a href="<?= url('attendance', 'take') ?>" class="flex flex-col items-center gap-3 p-6 bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border hover:border-primary-300 hover:bg-primary-50 transition">
-        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Take Attendance</span>
+<!-- ── Teacher Portal Dashboard ───────────────────────────── -->
+<?php
+// Get teacher's assigned classes
+$teacherName = explode(' ', $user['name'] ?? $user['full_name'] ?? 'Teacher')[0];
+$avatarUrl = !empty($user['avatar']) ? url('/uploads/' . $user['avatar']) : '';
+$activeSession = get_active_session();
+
+$assignedClasses = [];
+if ($activeSession) {
+    $assignedClasses = db_fetch_all(
+        "SELECT DISTINCT c.id, c.name as class_name, sec.name as section_name,
+                (SELECT COUNT(DISTINCT e.student_id) FROM enrollments e WHERE e.section_id = sec.id AND e.status = 'active') as student_count
+         FROM class_teachers ct
+         JOIN sections sec ON ct.section_id = sec.id
+         JOIN classes c ON sec.class_id = c.id
+         WHERE ct.teacher_id = ? AND ct.session_id = ?
+         ORDER BY c.sort_order, c.name",
+        [$user['id'], $activeSession['id']]
+    );
+}
+
+// Today's timetable
+$todayDay = strtolower(date('l'));
+$teacherTimetable = [];
+if ($activeSession) {
+    $teacherTimetable = db_fetch_all(
+        "SELECT t.*, s.name as subject_name, c.name as class_name, sec.name as section_name
+         FROM timetables t
+         JOIN subjects s ON t.subject_id = s.id
+         JOIN sections sec ON t.section_id = sec.id
+         JOIN classes c ON sec.class_id = c.id
+         WHERE t.teacher_id = ? AND t.day = ? AND t.session_id = ?
+         ORDER BY t.start_time",
+        [$user['id'], $todayDay, $activeSession['id']]
+    );
+}
+?>
+
+<!-- Profile Header -->
+<div class="bg-gradient-to-br from-primary-600 to-primary-800 dark:from-primary-800 dark:to-primary-950 rounded-2xl p-5 mb-6 text-white relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8"></div>
+    <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-6 -translate-x-6"></div>
+    <div class="flex items-center gap-4 relative z-10">
+        <?php if ($avatarUrl): ?>
+            <img src="<?= e($avatarUrl) ?>" alt="" class="w-16 h-16 rounded-full border-2 border-white/30 object-cover">
+        <?php else: ?>
+            <div class="w-16 h-16 rounded-full border-2 border-white/30 bg-white/20 flex items-center justify-center text-2xl font-bold">
+                <?= strtoupper(substr($teacherName, 0, 1)) ?>
+            </div>
+        <?php endif; ?>
+        <div>
+            <h1 class="text-xl font-bold">Hi, <?= e($teacherName) ?>!</h1>
+            <p class="text-primary-100 text-sm mt-0.5"><?= count($assignedClasses) ?> class<?= count($assignedClasses) !== 1 ? 'es' : '' ?> assigned</p>
+            <p class="text-primary-200 text-xs mt-0.5"><?= date('l, M j, Y') ?></p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="grid grid-cols-2 gap-3 mb-6">
+    <!-- Take Attendance -->
+    <a href="<?= url('attendance') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Attendance</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Take / View</p>
+        </div>
     </a>
-    <a href="<?= url('exams', 'marks') ?>" class="flex flex-col items-center gap-3 p-6 bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border hover:border-primary-300 hover:bg-primary-50 transition">
-        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Enter Marks</span>
+
+    <!-- Enter Marks -->
+    <a href="<?= url('exams', 'marks') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Enter Marks</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Grade students</p>
+        </div>
     </a>
-    <a href="<?= url('exams', 'assignments') ?>" class="flex flex-col items-center gap-3 p-6 bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border hover:border-primary-300 hover:bg-primary-50 transition">
-        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Assignments</span>
+
+    <!-- Assignments -->
+    <a href="<?= url('exams', 'assignments') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Assignments</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Manage tasks</p>
+        </div>
     </a>
-    <a href="<?= url('communication', 'messages') ?>" class="flex flex-col items-center gap-3 p-6 bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border hover:border-primary-300 hover:bg-primary-50 transition">
-        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Messages</span>
+
+    <!-- Timetable -->
+    <a href="<?= url('academics', 'my-timetable') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Timetable</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Schedule</p>
+        </div>
+    </a>
+
+    <!-- Report Cards -->
+    <a href="<?= url('exams', 'report-cards') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Report Cards</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">View / Print</p>
+        </div>
+    </a>
+
+    <!-- Messages -->
+    <a href="<?= url('messaging', 'inbox') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Messages</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Inbox</p>
+        </div>
+    </a>
+
+    <!-- Students -->
+    <a href="<?= url('students', 'details') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Students</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Class roster</p>
+        </div>
+    </a>
+
+    <!-- Profile -->
+    <a href="<?= url('auth', 'profile') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-gray-50 dark:bg-gray-800/40 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Profile</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">My info</p>
+        </div>
     </a>
 </div>
 
+<!-- Today's Timetable -->
+<?php if (!empty($teacherTimetable)): ?>
+<div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-3">Today's Schedule</h2>
+    <div class="space-y-2">
+        <?php
+        $periodColors = ['bg-blue-500', 'bg-purple-500', 'bg-amber-500', 'bg-rose-500', 'bg-cyan-500', 'bg-indigo-500', 'bg-emerald-500', 'bg-primary-500'];
+        foreach ($teacherTimetable as $i => $tt):
+            $color = $periodColors[$i % count($periodColors)];
+        ?>
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3">
+            <div class="w-1.5 h-12 <?= $color ?> rounded-full flex-shrink-0"></div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-800 dark:text-dark-text"><?= e($tt['subject_name']) ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted"><?= e($tt['class_name']) ?> — <?= e($tt['section_name']) ?></p>
+            </div>
+            <div class="text-right flex-shrink-0">
+                <p class="text-xs font-medium text-gray-700 dark:text-gray-300"><?= date('g:i A', strtotime($tt['start_time'])) ?></p>
+                <p class="text-xs text-gray-400 dark:text-dark-muted"><?= date('g:i A', strtotime($tt['end_time'])) ?></p>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- My Classes -->
+<?php if (!empty($assignedClasses)): ?>
+<div class="mb-6">
+    <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-3">My Classes</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <?php foreach ($assignedClasses as $ac): ?>
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-semibold text-gray-800 dark:text-dark-text"><?= e($ac['class_name']) ?> — <?= e($ac['section_name']) ?></p>
+                <p class="text-xs text-gray-500 dark:text-dark-muted"><?= $ac['student_count'] ?> student<?= $ac['student_count'] != 1 ? 's' : '' ?></p>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php elseif ($isStudent): ?>
-<!-- ── Student Dashboard ──────────────────────────────────── -->
-<div class="grid grid-cols-2 gap-4 mb-6">
-    <a href="<?= url('exams', 'my-results') ?>" class="flex flex-col items-center gap-3 p-6 bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border hover:border-primary-300 hover:bg-primary-50 transition">
-        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">My Results</span>
+<!-- ── Student Portal Dashboard ───────────────────────────── -->
+<?php
+// Get student info
+$studentInfo = rbac_get_student();
+$enrollment = null;
+if ($studentInfo) {
+    $enrollment = db_fetch_one(
+        "SELECT e.*, c.name as class_name, sec.name as section_name
+         FROM enrollments e
+         JOIN sections sec ON e.section_id = sec.id
+         JOIN classes c ON sec.class_id = c.id
+         WHERE e.student_id = ? AND e.status = 'active'
+         ORDER BY e.id DESC LIMIT 1",
+        [$studentInfo['id']]
+    );
+}
+$studentName = explode(' ', $user['name'] ?? $user['full_name'] ?? 'Student')[0];
+$avatarUrl = !empty($user['avatar']) ? url('/uploads/' . $user['avatar']) : '';
+?>
+
+<!-- Profile Header -->
+<div class="bg-gradient-to-br from-primary-600 to-primary-800 dark:from-primary-800 dark:to-primary-950 rounded-2xl p-5 mb-6 text-white relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8"></div>
+    <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-6 -translate-x-6"></div>
+    <div class="flex items-center gap-4 relative z-10">
+        <?php if ($avatarUrl): ?>
+            <img src="<?= e($avatarUrl) ?>" alt="" class="w-16 h-16 rounded-full border-2 border-white/30 object-cover">
+        <?php else: ?>
+            <div class="w-16 h-16 rounded-full border-2 border-white/30 bg-white/20 flex items-center justify-center text-2xl font-bold">
+                <?= strtoupper(substr($studentName, 0, 1)) ?>
+            </div>
+        <?php endif; ?>
+        <div>
+            <h1 class="text-xl font-bold">Hi, <?= e($studentName) ?>!</h1>
+            <?php if ($enrollment): ?>
+                <p class="text-primary-100 text-sm mt-0.5"><?= e($enrollment['class_name']) ?> — <?= e($enrollment['section_name']) ?></p>
+            <?php endif; ?>
+            <p class="text-primary-200 text-xs mt-0.5"><?= date('l, M j, Y') ?></p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Menu Cards -->
+<div class="grid grid-cols-2 gap-3 mb-6">
+    <!-- Attendance -->
+    <a href="<?= url('attendance', 'student') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Attendance</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">View records</p>
+        </div>
     </a>
-    <a href="<?= url('attendance', 'my-attendance') ?>" class="flex flex-col items-center gap-3 p-6 bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border hover:border-primary-300 hover:bg-primary-50 transition">
-        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Attendance</span>
+
+    <!-- Timetable -->
+    <a href="<?= url('academics', 'my-timetable') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Timetable</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Daily schedule</p>
+        </div>
     </a>
-    <a href="<?= url('academics', 'timetable') ?>" class="flex flex-col items-center gap-3 p-6 bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border hover:border-primary-300 hover:bg-primary-50 transition">
-        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Timetable</span>
+
+    <!-- Exams -->
+    <a href="<?= url('exams', 'exams') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Exams</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Exam schedule</p>
+        </div>
+    </a>
+
+    <!-- Results -->
+    <a href="<?= url('exams', 'report-cards') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Results</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Report cards</p>
+        </div>
+    </a>
+
+    <!-- Assignments -->
+    <a href="<?= url('exams', 'assignments') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Assignments</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Homework</p>
+        </div>
+    </a>
+
+    <!-- Messages -->
+    <a href="<?= url('messaging', 'inbox') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Messages</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Inbox</p>
+        </div>
+    </a>
+
+    <!-- Subjects -->
+    <a href="<?= url('academics', 'my-subjects') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Subjects</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">My subjects</p>
+        </div>
+    </a>
+
+    <!-- Profile -->
+    <a href="<?= url('auth', 'profile') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-gray-50 dark:bg-gray-800/40 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Profile</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">My info</p>
+        </div>
     </a>
 </div>
 
 <?php elseif ($isParent): ?>
-<!-- ── Parent Dashboard ───────────────────────────────────── -->
-<div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
-    <h3 class="text-lg font-semibold text-gray-900 dark:text-dark-text mb-4">My Children</h3>
-    <?php
-    $children = db_fetch_all(
-        "SELECT s.id, s.admission_no, s.full_name, c.name as class_name, sec.name as section_name
-         FROM students s
-         JOIN student_guardians sg ON s.id = sg.student_id
-         JOIN guardians g ON sg.guardian_id = g.id
-         LEFT JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
-         LEFT JOIN sections sec ON e.section_id = sec.id
-         LEFT JOIN classes c ON sec.class_id = c.id
-         WHERE g.user_id = ? AND s.status = 'active' AND s.deleted_at IS NULL",
-        [$user['id']]
-    );
-    ?>
-    <?php if (empty($children)): ?>
-        <p class="text-sm text-gray-500 dark:text-dark-muted">No children linked to your account.</p>
-    <?php else: ?>
-        <div class="space-y-3">
-            <?php foreach ($children as $child): ?>
-                <a href="<?= url('students', 'view', $child['id']) ?>" class="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 dark:bg-dark-bg transition">
-                    <div>
-                        <p class="font-medium text-gray-900 dark:text-dark-text"><?= e($child['full_name']) ?></p>
-                        <p class="text-xs text-gray-500 dark:text-dark-muted"><?= e($child['admission_no']) ?> &bull; <?= e($child['class_name'] ?? 'N/A') ?> <?= e($child['section_name'] ?? '') ?></p>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </a>
-            <?php endforeach; ?>
+<!-- ── Parent Portal Dashboard ────────────────────────────── -->
+<?php
+$parentName = explode(' ', $user['name'] ?? $user['full_name'] ?? 'Parent')[0];
+$avatarUrl = !empty($user['avatar']) ? url('/uploads/' . $user['avatar']) : '';
+$children = db_fetch_all(
+    "SELECT s.id, s.admission_no, s.full_name, s.first_name, c.name as class_name, sec.name as section_name
+     FROM students s
+     JOIN student_guardians sg ON s.id = sg.student_id
+     JOIN guardians g ON sg.guardian_id = g.id
+     LEFT JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
+     LEFT JOIN sections sec ON e.section_id = sec.id
+     LEFT JOIN classes c ON sec.class_id = c.id
+     WHERE g.user_id = ? AND s.status = 'active' AND s.deleted_at IS NULL",
+    [$user['id']]
+);
+?>
+
+<!-- Profile Header -->
+<div class="bg-gradient-to-br from-primary-600 to-primary-700 dark:from-primary-800 dark:to-primary-900 rounded-2xl p-5 mb-6 text-white relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8"></div>
+    <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-6 -translate-x-6"></div>
+    <div class="flex items-center gap-4 relative z-10">
+        <?php if ($avatarUrl): ?>
+            <img src="<?= e($avatarUrl) ?>" alt="" class="w-16 h-16 rounded-full border-2 border-white/30 object-cover">
+        <?php else: ?>
+            <div class="w-16 h-16 rounded-full border-2 border-white/30 bg-white/20 flex items-center justify-center text-2xl font-bold">
+                <?= strtoupper(substr($parentName, 0, 1)) ?>
+            </div>
+        <?php endif; ?>
+        <div>
+            <h1 class="text-xl font-bold">Hi, <?= e($parentName) ?>!</h1>
+            <p class="text-primary-100 text-sm mt-0.5"><?= count($children) ?> child<?= count($children) !== 1 ? 'ren' : '' ?> enrolled</p>
+            <p class="text-primary-200 text-xs mt-0.5"><?= date('l, M j, Y') ?></p>
         </div>
-    <?php endif; ?>
+    </div>
+</div>
+
+<!-- My Children -->
+<?php if (empty($children)): ?>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 text-center mb-6">
+        <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <p class="text-gray-500 dark:text-dark-muted">No children linked to your account.</p>
+    </div>
+<?php else: ?>
+    <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-3">My Children</h2>
+    <div class="space-y-3 mb-6">
+        <?php foreach ($children as $child): ?>
+        <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center text-primary-700 dark:text-primary-400 font-bold text-sm flex-shrink-0">
+                    <?= strtoupper(substr($child['first_name'] ?? $child['full_name'], 0, 1)) ?>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-dark-text"><?= e($child['full_name']) ?></p>
+                    <p class="text-xs text-gray-500 dark:text-dark-muted"><?= e($child['class_name'] ?? 'N/A') ?> — <?= e($child['section_name'] ?? '') ?></p>
+                </div>
+                <a href="<?= url('students', 'view', $child['id']) ?>" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">View Profile</a>
+            </div>
+            <!-- Quick links for this child -->
+            <div class="grid grid-cols-4 gap-2">
+                <a href="<?= url('attendance', 'student') ?>?student_id=<?= $child['id'] ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-card2 transition">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-600 dark:text-dark-muted">Attendance</span>
+                </a>
+                <a href="<?= url('exams', 'report-cards') ?>?student_id=<?= $child['id'] ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-card2 transition">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-600 dark:text-dark-muted">Results</span>
+                </a>
+                <a href="<?= url('academics', 'my-subjects') ?>?student_id=<?= $child['id'] ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-card2 transition">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-600 dark:text-dark-muted">Subjects</span>
+                </a>
+                <a href="<?= url('exams', 'assignments') ?>" class="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-card2 transition">
+                    <div class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </div>
+                    <span class="text-[10px] text-gray-600 dark:text-dark-muted">Homework</span>
+                </a>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<!-- Quick Menu Cards -->
+<div class="grid grid-cols-2 gap-3 mb-6">
+    <!-- Messages -->
+    <a href="<?= url('messaging', 'inbox') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Messages</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Contact school</p>
+        </div>
+    </a>
+
+    <!-- Announcements -->
+    <a href="<?= url('communication', 'announcements') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Announcements</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">School news</p>
+        </div>
+    </a>
+
+    <!-- Finance -->
+    <a href="<?= url('finance', 'students') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Fees</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Payment status</p>
+        </div>
+    </a>
+
+    <!-- Profile -->
+    <a href="<?= url('auth', 'profile') ?>" class="portal-card group bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border p-4 flex items-center gap-3 hover:shadow-md transition-all active:scale-[0.98]">
+        <div class="w-11 h-11 rounded-xl bg-gray-50 dark:bg-gray-800/40 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-dark-text">Profile</p>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">My info</p>
+        </div>
+    </a>
 </div>
 <?php endif; ?>
 

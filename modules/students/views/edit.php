@@ -55,20 +55,20 @@ ob_start();
                 <div>
                     <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name <span class="text-red-500">*</span></label>
                     <input type="text" id="first_name" name="first_name" value="<?= e(old('first_name') ?: $student['first_name']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <?php if ($err = get_validation_error('first_name')): ?><p class="mt-1 text-xs text-red-600"><?= e($err) ?></p><?php endif; ?>
                 </div>
 
                 <div>
                     <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name <span class="text-red-500">*</span></label>
                     <input type="text" id="last_name" name="last_name" value="<?= e(old('last_name') ?: $student['last_name']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <?php if ($err = get_validation_error('last_name')): ?><p class="mt-1 text-xs text-red-600"><?= e($err) ?></p><?php endif; ?>
                 </div>
 
                 <div>
                     <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gender <span class="text-red-500">*</span></label>
-                    <select id="gender" name="gender" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <select id="gender" name="gender" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="male" <?= $student['gender'] === 'male' ? 'selected' : '' ?>>Male</option>
                         <option value="female" <?= $student['gender'] === 'female' ? 'selected' : '' ?>>Female</option>
                     </select>
@@ -77,12 +77,12 @@ ob_start();
                 <div>
                     <label for="date_of_birth" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth <span class="text-red-500">*</span></label>
                     <input type="date" id="date_of_birth" name="date_of_birth" value="<?= e(old('date_of_birth') ?: $student['date_of_birth']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
 
                 <div>
                     <label for="blood_group" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Blood Group</label>
-                    <select id="blood_group" name="blood_group" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <select id="blood_group" name="blood_group" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">Select...</option>
                         <?php foreach (['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $bg): ?>
                             <option value="<?= $bg ?>" <?= $student['blood_group'] === $bg ? 'selected' : '' ?>><?= $bg ?></option>
@@ -93,31 +93,31 @@ ob_start();
                 <div>
                     <label for="religion" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Religion</label>
                     <input type="text" id="religion" name="religion" value="<?= e(old('religion') ?: $student['religion']) ?>"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
 
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone <span class="text-red-500">*</span></label>
                     <input type="text" id="phone" name="phone" value="<?= e(old('phone') ?: $student['phone']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="+251...">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" placeholder="+251...">
                     <?php if ($err = get_validation_error('phone')): ?><p class="mt-1 text-xs text-red-600"><?= e($err) ?></p><?php endif; ?>
                 </div>
 
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                     <input type="email" id="email" name="email" value="<?= e(old('email') ?: $student['email']) ?>"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
 
                 <div>
                     <label for="medical_conditions" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Medical Conditions</label>
                     <input type="text" id="medical_conditions" name="medical_conditions" value="<?= e(old('medical_conditions') ?: $student['medical_notes']) ?>"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
 
                 <div>
                     <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                    <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <?php foreach (['active','inactive','graduated','transferred','expelled'] as $st): ?>
                             <option value="<?= $st ?>" <?= $student['status'] === $st ? 'selected' : '' ?>><?= ucfirst($st) ?></option>
                         <?php endforeach; ?>
@@ -141,7 +141,7 @@ ob_start();
                 </div>
                 <div class="flex-1">
                     <input type="file" id="photo" name="photo" accept="image/jpeg,image/png"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary-50 file:text-primary-700 file:text-sm"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-primary-50 file:text-primary-700 file:text-sm"
                            onchange="previewPhoto(this)">
                     <p class="mt-1 text-xs text-gray-500 dark:text-dark-muted">Leave empty to keep current photo. JPEG or PNG, max 2 MB.</p>
                 </div>
@@ -155,38 +155,38 @@ ob_start();
                 <div>
                     <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Country <span class="text-red-500">*</span></label>
                     <input type="text" id="country" name="country" value="<?= e(old('country') ?: ($student['country'] ?? 'Ethiopia')) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
                     <label for="region" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Region <span class="text-red-500">*</span></label>
                     <input type="text" id="region" name="region" value="<?= e(old('region') ?: $student['region']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
                     <label for="city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City <span class="text-red-500">*</span></label>
                     <input type="text" id="city" name="city" value="<?= e(old('city') ?: $student['city']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
                     <label for="sub_city" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sub-city <span class="text-red-500">*</span></label>
                     <input type="text" id="sub_city" name="sub_city" value="<?= e(old('sub_city') ?: $student['sub_city']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
                     <label for="woreda" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Woreda <span class="text-red-500">*</span></label>
                     <input type="text" id="woreda" name="woreda" value="<?= e(old('woreda') ?: $student['woreda']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
                     <label for="house_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">House Number <span class="text-red-500">*</span></label>
                     <input type="text" id="house_number" name="house_number" value="<?= e(old('house_number') ?: $student['house_number']) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <p class="mt-1 text-xs text-gray-500 dark:text-dark-muted">Enter "NEW" if the house has no assigned number.</p>
                 </div>
                 <div class="sm:col-span-2 lg:col-span-3">
                     <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Additional Address Details</label>
                     <textarea id="address" name="address" rows="2"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"><?= e(old('address') ?: $student['address']) ?></textarea>
+                              class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"><?= e(old('address') ?: $student['address']) ?></textarea>
                 </div>
             </div>
         </div>
@@ -220,16 +220,16 @@ ob_start();
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name <span class="text-red-500">*</span></label>
                                     <input type="text" name="guardians[<?= $gi ?>][first_name]" value="<?= e($g['first_name']) ?>" required
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name <span class="text-red-500">*</span></label>
                                     <input type="text" name="guardians[<?= $gi ?>][last_name]" value="<?= e($g['last_name']) ?>" required
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship <span class="text-red-500">*</span></label>
-                                    <select name="guardians[<?= $gi ?>][relation]" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                    <select name="guardians[<?= $gi ?>][relation]" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                         <option value="">Select...</option>
                                         <?php foreach (['father','mother','guardian','uncle','aunt','sibling','grandparent','other'] as $rel): ?>
                                             <option value="<?= $rel ?>" <?= ($g['relationship'] ?? $g['relation']) === $rel ? 'selected' : '' ?>><?= ucfirst($rel) ?></option>
@@ -239,17 +239,17 @@ ob_start();
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone <span class="text-red-500">*</span></label>
                                     <input type="text" name="guardians[<?= $gi ?>][phone]" value="<?= e($g['phone']) ?>" required
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="+251...">
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" placeholder="+251...">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                                     <input type="email" name="guardians[<?= $gi ?>][email]" value="<?= e($g['email']) ?>"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Occupation</label>
                                     <input type="text" name="guardians[<?= $gi ?>][occupation]" value="<?= e($g['occupation']) ?>"
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 </div>
                             </div>
                         </div>
@@ -264,16 +264,16 @@ ob_start();
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name <span class="text-red-500">*</span></label>
                                 <input type="text" name="guardians[0][first_name]" required
-                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name <span class="text-red-500">*</span></label>
                                 <input type="text" name="guardians[0][last_name]" required
-                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship <span class="text-red-500">*</span></label>
-                                <select name="guardians[0][relation]" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                <select name="guardians[0][relation]" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                     <option value="">Select...</option>
                                     <?php foreach (['father','mother','guardian','uncle','aunt','sibling','grandparent','other'] as $rel): ?>
                                         <option value="<?= $rel ?>"><?= ucfirst($rel) ?></option>
@@ -283,17 +283,17 @@ ob_start();
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone <span class="text-red-500">*</span></label>
                                 <input type="text" name="guardians[0][phone]" required
-                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="+251...">
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" placeholder="+251...">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                                 <input type="email" name="guardians[0][email]"
-                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Occupation</label>
                                 <input type="text" name="guardians[0][occupation]"
-                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             </div>
                         </div>
                     </div>
@@ -302,7 +302,7 @@ ob_start();
         </div>
 
         <div class="flex justify-end gap-3">
-            <a href="<?= url('students', 'view', $id) ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
+            <a href="<?= url('students', 'view', $id) ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
             <button type="submit" class="px-6 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                 Update Student
             </button>
@@ -324,16 +324,16 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name <span class="text-red-500">*</span></label>
                 <input type="text" name="guardians[__INDEX__][first_name]" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name <span class="text-red-500">*</span></label>
                 <input type="text" name="guardians[__INDEX__][last_name]" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship <span class="text-red-500">*</span></label>
-                <select name="guardians[__INDEX__][relation]" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="guardians[__INDEX__][relation]" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">Select...</option>
                     <option value="father">Father</option>
                     <option value="mother">Mother</option>
@@ -348,17 +348,17 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone <span class="text-red-500">*</span></label>
                 <input type="text" name="guardians[__INDEX__][phone]" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="+251...">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" placeholder="+251...">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                 <input type="email" name="guardians[__INDEX__][email]"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Occupation</label>
                 <input type="text" name="guardians[__INDEX__][occupation]"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
         </div>
     </div>

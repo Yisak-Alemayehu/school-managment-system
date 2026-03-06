@@ -188,6 +188,19 @@ switch ($action) {
         if (is_post()) { require __DIR__ . '/actions/timetable_save.php'; }
         break;
 
+    // ── My Subjects (Student-facing) ─────────────────────────
+    case 'my-subjects':
+        auth_require_permission('academics.view');
+        $pageTitle = 'My Subjects';
+        require __DIR__ . '/views/my_subjects.php';
+        break;
+
+    // ── My Timetable (Student/Teacher personal view) ─────────
+    case 'my-timetable':
+        $pageTitle = 'My Timetable';
+        require __DIR__ . '/views/my_timetable.php';
+        break;
+
     default:
         redirect(url('academics', 'sessions'));
         break;

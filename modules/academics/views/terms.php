@@ -34,7 +34,7 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Session <span class="text-red-500">*</span></label>
-                <select name="session_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="session_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">Select</option>
                     <?php foreach ($sessions as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= (($editing['session_id'] ?? $filterSession) == $s['id']) ? 'selected' : '' ?>><?= e($s['name']) ?></option>
@@ -44,24 +44,24 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Term Name <span class="text-red-500">*</span></label>
                 <input type="text" name="name" value="<?= e($editing['name'] ?? '') ?>" required placeholder="e.g. Term 1"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date <span class="text-red-500">*</span></label>
                 <input type="date" name="start_date" value="<?= e($editing['start_date'] ?? '') ?>" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date <span class="text-red-500">*</span></label>
                 <input type="date" name="end_date" value="<?= e($editing['end_date'] ?? '') ?>" required
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             </div>
             <div class="flex items-end gap-2">
                 <button type="submit" class="px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                     <?= $editing ? 'Update' : 'Add' ?>
                 </button>
                 <?php if ($editing): ?>
-                    <a href="<?= url('academics', 'terms') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
+                    <a href="<?= url('academics', 'terms') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                 <?php endif; ?>
             </div>
         </form>
@@ -70,7 +70,7 @@ ob_start();
     <!-- Filter -->
     <div class="flex items-center gap-3 mb-4">
         <label class="text-sm text-gray-600 dark:text-dark-muted">Filter by Session:</label>
-        <select onchange="window.location='<?= url('academics', 'terms') ?>&session_id='+this.value" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+        <select onchange="window.location='<?= url('academics', 'terms') ?>&session_id='+this.value" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
             <option value="0">All Sessions</option>
             <?php foreach ($sessions as $s): ?>
                 <option value="<?= $s['id'] ?>" <?= $filterSession == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>

@@ -58,7 +58,7 @@ ob_start();
             <?php if (auth_has_permission('students.edit')): ?>
                 <a href="<?= url('students', 'edit', $id) ?>" class="px-4 py-2 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">Edit</a>
             <?php endif; ?>
-            <button onclick="printContent('student-profile')" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">Print</button>
+            <button onclick="printContent('student-profile')" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">Print</button>
         </div>
     </div>
 

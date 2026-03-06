@@ -7,7 +7,20 @@ $classes  = db_fetch_all("SELECT id, name FROM classes ORDER BY sort_order ASC")
 $sections = db_fetch_all("SELECT id, name, class_id FROM sections ORDER BY name ASC");
 $exams    = db_fetch_all("SELECT id, name FROM exams WHERE session_id = ? ORDER BY start_date DESC", [get_active_session()['id'] ?? 0]);
 
+// Restrict class list for teachers
+if (auth_has_role('teacher') && !auth_is_super_admin()) {
+    $tClassIds = rbac_teacher_class_ids();
+    if (!empty($tClassIds)) {
+        $classes = array_values(array_filter($classes, fn($c) => in_array($c['id'], $tClassIds)));
+    }
+}
+
 $filterClass   = input_int('class_id');
+
+// Validate teacher access to selected class
+if ($filterClass && auth_has_role('teacher') && !auth_is_super_admin()) {
+    rbac_require_teacher_class($filterClass);
+}
 $filterSection = input_int('section_id');
 $filterExam    = input_int('exam_id');
 
@@ -61,7 +74,7 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exam</label>
-                <select name="exam_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="exam_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">Select Exam</option>
                     <?php foreach ($exams as $ex): ?>
                         <option value="<?= $ex['id'] ?>" <?= $filterExam == $ex['id'] ? 'selected' : '' ?>><?= e($ex['name']) ?></option>
@@ -71,7 +84,7 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                 <select name="class_id" id="rcClassSel" required
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text"
                         onchange="ajaxLoadSections(this.value,'rcSecSel',<?= (int)$filterSection ?>,'All')">
                     <option value="">Select</option>
                     <?php foreach ($classes as $c): ?>
@@ -82,7 +95,7 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
                 <select name="section_id" id="rcSecSel"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text"
                         <?= !$filterClass ? 'disabled' : '' ?>>
                     <option value="">All</option>
                     <?php foreach ($sections as $s): ?>

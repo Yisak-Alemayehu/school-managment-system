@@ -105,8 +105,8 @@ header('Content-Type: text/html; charset=utf-8');
         tr:nth-child(even) { background: #fafafa; }
         .no-print { margin-bottom: 12px; text-align: center; }
         @media print { .no-print { display: none; } }
-        .btn { padding: 8px 20px; background: #2563eb; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn:hover { background: #1d4ed8; }
+        .btn { padding: 8px 20px; background: #074DD9; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn:hover { background: #0640b8; }
     </style>
 </head>
 <body>

@@ -6,14 +6,14 @@
     <title><?= __('forgot_password') ?> — <?= e(APP_NAME) ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="<?= url('assets/css/app.css') ?>">
-    <meta name="theme-color" content="#1e40af">
+    <meta name="theme-color" content="#074DD9">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: { 50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',800:'#1e40af',900:'#1e3a8a' },
+                        primary: { 50:'#eef2ff',100:'#dbe4ff',200:'#bfcefe',300:'#93adfc',400:'#6080f8',500:'#3b5ef4',600:'#074DD9',700:'#0640b8',800:'#0a3596',900:'#0d2d76',950:'#091c4d' },
                         dark: {"bg":"#0f172a","card":"#1e293b","card2":"#334155","border":"#475569","text":"#e2e8f0","muted":"#94a3b8"}
                     }
                 }
@@ -86,7 +86,7 @@
         var theme=d.classList.contains('dark')?'dark':'light';
         document.cookie='theme='+theme+';path=/;max-age=31536000;SameSite=Lax';
         var m=document.querySelector('meta[name="theme-color"]');
-        if(m)m.setAttribute('content',theme==='dark'?'#0f172a':'#1e40af');
+        if(m)m.setAttribute('content',theme==='dark'?'#0f172a':'#074DD9');
     }
     </script>
 </body>

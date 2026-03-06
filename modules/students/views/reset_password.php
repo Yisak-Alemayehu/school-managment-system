@@ -32,12 +32,12 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Admission No. or Username <span class="text-red-500">*</span></label>
                     <input type="text" name="identifier" required placeholder="e.g. STU-001"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password <span class="text-red-500">*</span></label>
                     <input type="text" name="new_password" required placeholder="New password"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Leave blank to auto-generate.</p>
                 </div>
             </div>
@@ -59,7 +59,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                     <select name="class_id" required onchange="this.form.submit()"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">Select Class…</option>
                         <?php foreach ($classes as $c): ?>
                             <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -70,7 +70,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
                     <select name="section_id"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">All Sections in Class</option>
                         <?php foreach ($sections as $sec): ?>
                             <option value="<?= $sec['id'] ?>"><?= e($sec['name']) ?></option>
@@ -81,7 +81,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reset Password To</label>
                     <select name="bulk_password_mode"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="adm_no">Admission Number</option>
                         <option value="dob">Date of Birth (DDMMYYYY)</option>
                         <option value="random">Random 8-char</option>

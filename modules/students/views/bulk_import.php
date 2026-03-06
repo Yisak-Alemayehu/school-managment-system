@@ -73,7 +73,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Default Class (if not in CSV)</label>
                     <select name="default_class_id"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">— from CSV column —</option>
                         <?php
                         $classes = db_fetch_all("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY sort_order");
@@ -85,7 +85,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">On Duplicate Admission No.</label>
                     <select name="duplicate_mode"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="skip">Skip row</option>
                         <option value="update">Update existing</option>
                     </select>

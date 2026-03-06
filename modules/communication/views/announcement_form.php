@@ -33,19 +33,19 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title *</label>
                     <input type="text" name="title" required value="<?= e($edit['title'] ?? '') ?>"
-                           class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                           class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Content *</label>
                     <textarea name="content" required rows="8"
-                              class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500"><?= e($edit['content'] ?? '') ?></textarea>
+                              class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text"><?= e($edit['content'] ?? '') ?></textarea>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Audience</label>
-                        <select name="target_audience" class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                        <select name="target_audience" class="w-full rounded-lg border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text shadow-sm focus:border-primary-500 focus:ring-primary-500">
                             <option value="all" <?= ($edit['target_audience'] ?? 'all') === 'all' ? 'selected' : '' ?>>Everyone</option>
                             <option value="teacher" <?= ($edit['target_audience'] ?? '') === 'teacher' ? 'selected' : '' ?>>Teachers</option>
                             <option value="student" <?= ($edit['target_audience'] ?? '') === 'student' ? 'selected' : '' ?>>Students</option>
@@ -58,12 +58,12 @@ ob_start();
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Publish Date</label>
                         <input type="datetime-local" name="publish_date"
                                value="<?= $edit ? date('Y-m-d\TH:i', strtotime($edit['publish_date'])) : date('Y-m-d\TH:i') ?>"
-                               class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                               class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                        <select name="status" class="w-full rounded-lg border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text shadow-sm focus:border-primary-500 focus:ring-primary-500">
                             <option value="published" <?= ($edit['status'] ?? 'published') === 'published' ? 'selected' : '' ?>>Published</option>
                             <option value="draft" <?= ($edit['status'] ?? '') === 'draft' ? 'selected' : '' ?>>Draft</option>
                         </select>
@@ -83,7 +83,7 @@ ob_start();
                     <button type="submit" class="px-6 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900">
                         <?= $edit ? 'Update' : 'Publish' ?> Announcement
                     </button>
-                    <a href="<?= url('communication', 'announcements') ?>" class="px-6 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
+                    <a href="<?= url('communication', 'announcements') ?>" class="px-6 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                 </div>
             </div>
         </form>

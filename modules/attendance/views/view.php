@@ -1,6 +1,6 @@
-﻿<?php
+<?php
 /**
- * Attendance — View Attendance (read-only daily records)
+ * Attendance � View Attendance (read-only daily records)
  */
 
 $classes  = db_fetch_all("SELECT id, name FROM classes ORDER BY sort_order ASC");
@@ -83,7 +83,7 @@ ob_start();
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">View Attendance</h1>
         <?php if ($loaded && !empty($records)): ?>
-        <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">
+        <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">
             <svg class="w-4 h-4 text-gray-500 dark:text-dark-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
             </svg>
@@ -100,7 +100,7 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
-                <select name="class_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <select name="class_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -110,7 +110,7 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
-                <select name="section_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <select name="section_id" onchange="this.form.submit()" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $s): ?>
                         <?php if ($s['class_id'] == $filterClass): ?>
@@ -124,7 +124,7 @@ ob_start();
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
                 <input type="date" name="date" value="<?= e($filterDate) ?>" max="<?= date('Y-m-d') ?>"
                        onchange="this.form.submit()"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
             </div>
 
             <div class="flex items-end">
@@ -185,18 +185,18 @@ ob_start();
         <p class="text-sm text-yellow-700">Attendance has <strong>not been marked</strong> for this class on
             <strong><?= date('D, d M Y', strtotime($filterDate)) ?></strong>.
             <a href="<?= url('attendance', 'index') ?>&class_id=<?= $filterClass ?>&section_id=<?= $filterSection ?>&date=<?= $filterDate ?>"
-               class="underline font-medium ml-1">Mark attendance now →</a>
+               class="underline font-medium ml-1">Mark attendance now ?</a>
         </p>
     </div>
     <?php endif; ?>
 
     <!-- Print Header -->
     <div class="hidden print:block mb-4">
-        <h2 class="text-lg font-bold">Attendance Record — <?= date('D, d M Y', strtotime($filterDate)) ?></h2>
+        <h2 class="text-lg font-bold">Attendance Record � <?= date('D, d M Y', strtotime($filterDate)) ?></h2>
         <p class="text-sm text-gray-600 dark:text-dark-muted">
             Class: <?= e(current(array_filter($classes, fn($c) => $c['id'] == $filterClass))['name'] ?? '') ?>
             <?php if ($filterSection): ?>
-                — Section: <?= e(current(array_filter($sections, fn($s) => $s['id'] == $filterSection))['name'] ?? '') ?>
+                � Section: <?= e(current(array_filter($sections, fn($s) => $s['id'] == $filterSection))['name'] ?? '') ?>
             <?php endif; ?>
         </p>
     </div>
@@ -218,7 +218,7 @@ ob_start();
             <?php if ($summary['total'] > 0): ?>
             <a href="<?= url('attendance', 'index') ?>&class_id=<?= $filterClass ?>&section_id=<?= $filterSection ?>&date=<?= $filterDate ?>"
                class="text-xs font-medium text-primary-700 hover:underline no-print">
-                Edit Attendance →
+                Edit Attendance ?
             </a>
             <?php endif; ?>
         </div>
@@ -226,7 +226,7 @@ ob_start();
         <!-- Search bar (hidden on print) -->
         <div class="px-4 py-2 border-b border-gray-100 dark:border-dark-border no-print">
             <input type="text" id="searchInput" placeholder="Search student..." onkeyup="filterTable()"
-                   class="w-full px-3 py-1.5 border border-gray-200 dark:border-dark-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-400">
+                   class="w-full px-3 py-1.5 border border-gray-200 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary-400">
         </div>
 
         <table class="w-full" id="viewTable">
@@ -263,7 +263,7 @@ ob_start();
                         </div>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['admission_no']) ?></td>
-                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['section_name'] ?? '—') ?></td>
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['section_name'] ?? '�') ?></td>
                     <td class="px-4 py-3 text-center">
                         <?php if ($cfg): ?>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium <?= $cfg['bg'] ?> <?= $cfg['text'] ?>">
@@ -271,10 +271,10 @@ ob_start();
                                 <?= $cfg['label'] ?>
                             </span>
                         <?php else: ?>
-                            <span class="text-xs text-gray-400 dark:text-gray-500 italic">—</span>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 italic">�</span>
                         <?php endif; ?>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['remarks'] ?: '—') ?></td>
+                    <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted"><?= e($r['remarks'] ?: '�') ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

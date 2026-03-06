@@ -31,7 +31,7 @@ ob_start();
             <a href="<?= url('communication', 'message-compose') ?>"
                class="px-4 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900">Compose</a>
             <a href="<?= url('communication', 'sent') ?>"
-               class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Sent</a>
+               class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Sent</a>
         </div>
     </div>
 

@@ -48,7 +48,7 @@ ob_start();
             <input type="hidden" name="route" value="academics/promote">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Session</label>
-                <select name="from_session" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                <select name="from_session" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Session</option>
                     <?php foreach ($sessions as $s): ?>
                         <option value="<?= $s['id'] ?>" <?= $fromSession == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
@@ -58,7 +58,7 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Class</label>
                 <select name="from_class" id="promFromClass" onchange="filterPromSections(this.value, 'promFromSection')"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $fromClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -68,7 +68,7 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">From Section</label>
                 <select name="from_section" id="promFromSection"
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     <option value="">All Sections</option>
                     <?php foreach ($allSections as $sec): ?>
                         <option value="<?= $sec['id'] ?>" data-class="<?= $sec['class_id'] ?>"
@@ -100,7 +100,7 @@ ob_start();
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Session <span class="text-red-500">*</span></label>
-                    <select name="to_session" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <select name="to_session" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">Select Session</option>
                         <?php foreach ($sessions as $s): ?>
                             <option value="<?= $s['id'] ?>"><?= e($s['name']) ?></option>
@@ -110,7 +110,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Class <span class="text-red-500">*</span></label>
                     <select name="to_class" required id="promToClass" onchange="filterPromSections(this.value, 'promToSection')"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">Select Class</option>
                         <?php foreach ($classes as $c): ?>
                             <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
@@ -120,7 +120,7 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To Section</label>
                     <select name="to_section" id="promToSection"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">Select Section</option>
                         <?php foreach ($allSections as $sec): ?>
                             <option value="<?= $sec['id'] ?>" data-class="<?= $sec['class_id'] ?>" style="display:none">
@@ -163,7 +163,7 @@ ob_start();
                             <td class="px-4 py-2 text-sm text-gray-600 dark:text-dark-muted"><?= e($st['admission_no']) ?></td>
                             <td class="px-4 py-2 text-sm text-gray-600 dark:text-dark-muted"><?= e($st['section_name'] ?? 'N/A') ?></td>
                             <td class="px-4 py-2">
-                                <select name="status[<?= $st['id'] ?>]" class="px-2 py-1 border border-gray-300 dark:border-dark-border rounded text-xs">
+                                <select name="status[<?= $st['id'] ?>]" class="px-2 py-1 border border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text rounded text-xs">
                                     <option value="promoted">Promoted</option>
                                     <option value="repeated">Repeated</option>
                                     <option value="graduated">Graduated</option>

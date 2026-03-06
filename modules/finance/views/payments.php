@@ -93,23 +93,23 @@ ob_start();
     <form method="GET" action="<?= url('finance', 'payments') ?>" class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4">
         <div class="flex flex-wrap gap-3">
             <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search student, code, receipt…"
-                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="flex-1 min-w-48 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
 
-            <select name="fee_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <select name="fee_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 <option value="">All Fees</option>
                 <?php foreach ($fees as $f): ?>
                     <option value="<?= $f['id'] ?>" <?= $feeId == $f['id'] ? 'selected' : '' ?>><?= e($f['description']) ?></option>
                 <?php endforeach; ?>
             </select>
 
-            <select name="class_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <select name="class_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 <option value="">All Classes</option>
                 <?php foreach ($classes as $c): ?>
                     <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
                 <?php endforeach; ?>
             </select>
 
-            <select name="channel" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+            <select name="channel" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 <option value="">All Channels</option>
                 <option value="cash" <?= $channel === 'cash' ? 'selected' : '' ?>>Cash</option>
                 <option value="bank" <?= $channel === 'bank' ? 'selected' : '' ?>>Bank</option>
@@ -118,9 +118,9 @@ ob_start();
             </select>
 
             <input type="date" name="date_from" value="<?= e($dateFrom) ?>" placeholder="From"
-                   class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             <input type="date" name="date_to" value="<?= e($dateTo) ?>" placeholder="To"
-                   class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
 
             <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Search</button>
             <a href="<?= url('finance', 'payments') ?>" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>

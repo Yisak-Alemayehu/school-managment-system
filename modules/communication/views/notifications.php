@@ -26,7 +26,7 @@ ob_start();
         </div>
         <?php if ($unreadCount['cnt'] > 0): ?>
             <a href="<?= url('communication', 'notifications-read-all') ?>"
-               class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Mark All Read</a>
+               class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Mark All Read</a>
         <?php endif; ?>
     </div>
 

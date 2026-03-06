@@ -75,14 +75,14 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group Type *</label>
                     <select name="source" id="groupSource" onchange="toggleClassSelect()" required
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="empty">Empty Group</option>
                         <option value="class">From Class</option>
                     </select>
                 </div>
                 <div id="classSelectRow" class="hidden">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Class *</label>
-                    <select name="source_class_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                    <select name="source_class_id" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">— Select Class —</option>
                         <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
@@ -91,11 +91,11 @@ ob_start();
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group Name *</label>
-                    <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="Group Name">
+                    <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" placeholder="Group Name">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group Description *</label>
-                    <textarea name="description" required rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" placeholder="Group Description"></textarea>
+                    <textarea name="description" required rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" placeholder="Group Description"></textarea>
                 </div>
                 <div class="flex items-center gap-2">
                     <input type="checkbox" name="is_active" value="1" checked id="grpActive" class="rounded">

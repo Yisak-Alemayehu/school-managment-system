@@ -23,8 +23,8 @@ if (!function_exists('imagecreatetruecolor')) {
 $img = imagecreatetruecolor($size, $size);
 imagesavealpha($img, true);
 
-// Background color — primary-800 (#1e40af)
-$bg = imagecolorallocate($img, 30, 64, 175);
+// Background color — primary-600 (#074DD9)
+$bg = imagecolorallocate($img, 7, 77, 217);
 $white = imagecolorallocate($img, 255, 255, 255);
 
 // Fill rounded rect (approx with full fill; browsers handle masking)

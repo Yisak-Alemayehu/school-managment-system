@@ -39,7 +39,7 @@ ob_start();
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">To *</label>
-                    <select name="receiver_id" required class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                    <select name="receiver_id" required class="w-full rounded-lg border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text shadow-sm focus:border-primary-500 focus:ring-primary-500">
                         <option value="">Select Recipient</option>
                         <?php foreach ($users as $u): ?>
                             <option value="<?= $u['id'] ?>" <?= ($prefill['receiver_id'] ?? '') == $u['id'] ? 'selected' : '' ?>>
@@ -52,18 +52,18 @@ ob_start();
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject *</label>
                     <input type="text" name="subject" required value="<?= e($prefill['subject'] ?? '') ?>"
-                           class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                           class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text">
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message *</label>
                     <textarea name="body" required rows="8"
-                              class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500"><?= e($prefill['body'] ?? '') ?></textarea>
+                              class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text"><?= e($prefill['body'] ?? '') ?></textarea>
                 </div>
 
                 <div class="flex gap-3">
                     <button type="submit" class="px-6 py-2 bg-primary-800 text-white rounded-lg text-sm font-medium hover:bg-primary-900">Send Message</button>
-                    <a href="<?= url('communication', 'inbox') ?>" class="px-6 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
+                    <a href="<?= url('communication', 'inbox') ?>" class="px-6 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Cancel</a>
                 </div>
             </div>
         </form>

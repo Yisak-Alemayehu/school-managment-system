@@ -24,7 +24,7 @@ ob_start();
         <a href="<?= url('communication', 'announcements') ?>" class="text-sm text-gray-500 dark:text-dark-muted hover:text-gray-700 dark:text-gray-300">&larr; All Announcements</a>
         <?php if (has_permission('manage_communication')): ?>
             <a href="<?= url('communication', 'announcement-edit') ?>&id=<?= $a['id'] ?>"
-               class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Edit</a>
+               class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Edit</a>
         <?php endif; ?>
     </div>
 

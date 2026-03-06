@@ -21,7 +21,7 @@ ob_start();
     <!-- Scale selector -->
     <div class="flex items-center gap-3 mb-4">
         <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Select Scale:</label>
-        <select onchange="window.location='<?= url('exams', 'grade-scale') ?>&scale_id='+this.value" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+        <select onchange="window.location='<?= url('exams', 'grade-scale') ?>&scale_id='+this.value" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
             <?php foreach ($scales as $s): ?>
                 <option value="<?= $s['id'] ?>" <?= $editScaleId == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?> <?= $s['is_default'] ? '(Default)' : '' ?></option>
             <?php endforeach; ?>

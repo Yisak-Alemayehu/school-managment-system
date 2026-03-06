@@ -24,19 +24,19 @@ ob_start();
         <form method="GET" action="<?= url('students', 'promote') ?>" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <input type="hidden" name="module" value="students">
             <input type="hidden" name="action" value="promote">
-            <select name="from_session" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+            <select name="from_session" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                 <option value="">From Session...</option>
                 <?php foreach ($sessions as $sess): ?>
                     <option value="<?= $sess['id'] ?>" <?= input_int('from_session') == $sess['id'] ? 'selected' : '' ?>><?= e($sess['name']) ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="from_class" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+            <select name="from_class" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                 <option value="">From Class...</option>
                 <?php foreach ($classes as $cls): ?>
                     <option value="<?= $cls['id'] ?>" <?= input_int('from_class') == $cls['id'] ? 'selected' : '' ?>><?= e($cls['name']) ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="from_section" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+            <select name="from_section" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                 <option value="">All Sections</option>
                 <?php foreach ($sections as $sec): ?>
                     <option value="<?= $sec['id'] ?>" <?= input_int('from_section') == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?> (Class <?= $sec['class_id'] ?>)</option>
@@ -79,19 +79,19 @@ ob_start();
         <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-4">
             <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Promote To</h2>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <select name="to_session" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="to_session" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">To Session...</option>
                     <?php foreach ($sessions as $sess): ?>
                         <option value="<?= $sess['id'] ?>"><?= e($sess['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select name="to_class" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm" onchange="loadToSections(this.value)">
+                <select name="to_class" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" onchange="loadToSections(this.value)">
                     <option value="">To Class...</option>
                     <?php foreach ($classes as $cls): ?>
                         <option value="<?= $cls['id'] ?>"><?= e($cls['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select name="to_section" id="to_section" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="to_section" id="to_section" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">To Section...</option>
                 </select>
             </div>
@@ -120,7 +120,7 @@ ob_start();
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300"><?= e($sp['class_name']) ?> <?= e($sp['section_name']) ?></td>
                             <td class="px-4 py-3">
-                                <select name="promote_status[<?= $sp['id'] ?>]" class="px-2 py-1 border rounded text-xs">
+                                <select name="promote_status[<?= $sp['id'] ?>]" class="px-2 py-1 border rounded text-xs dark:bg-dark-card dark:text-dark-text dark:border-dark-border">
                                     <option value="promoted">Promote</option>
                                     <option value="repeated">Repeat</option>
                                     <option value="graduated">Graduate</option>

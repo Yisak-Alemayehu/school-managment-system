@@ -66,7 +66,7 @@ ob_start();
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group Name</label>
             <input type="text" name="name" value="<?= old('name') ?>" required maxlength="100"
-                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-green-500 <?= !empty($errors['name']) ? 'border-red-300' : '' ?>"
+                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-green-500 <?= !empty($errors['name']) ? 'border-red-300' : '' ?>"
                    placeholder="e.g. Study Group A">
             <?php if (!empty($errors['name'])): ?>
             <p class="mt-1 text-xs text-red-600"><?= e($errors['name']) ?></p>
@@ -76,7 +76,7 @@ ob_start();
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description <span class="text-gray-400 dark:text-gray-500">(optional)</span></label>
             <input type="text" name="description" value="<?= old('description') ?>" maxlength="255"
-                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-green-500"
+                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-green-500"
                    placeholder="Brief description of the group">
         </div>
 

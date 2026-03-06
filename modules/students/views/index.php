@@ -90,7 +90,7 @@ ob_start();
                 New Admission
             </a>
         <?php endif; ?>
-        <a href="<?= url('students', 'export') ?>&class_id=<?= $classFilter ?>&section_id=<?= $sectionFilter ?>" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
+        <a href="<?= url('students', 'export') ?>&class_id=<?= $classFilter ?>&section_id=<?= $sectionFilter ?>" class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-dark-bg">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             Export
         </a>
@@ -102,9 +102,9 @@ ob_start();
     <form method="GET" action="<?= url('students') ?>" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <input type="hidden" name="module" value="students">
         <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search name, admission no..."
-               class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+               class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
         <select name="class_id" id="stdClassSel"
-                class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                 onchange="ajaxLoadSections(this.value,'stdSecSel',<?= (int)$sectionFilter ?>,'All Sections')">
             <option value="">All Classes</option>
             <?php foreach ($classes as $cls): ?>
@@ -112,14 +112,14 @@ ob_start();
             <?php endforeach; ?>
         </select>
         <select name="section_id" id="stdSecSel"
-                class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                 <?= !$classFilter ? 'disabled' : '' ?>>
             <option value="">All Sections</option>
             <?php foreach ($sections as $sec): ?>
                 <option value="<?= $sec['id'] ?>" <?= $sectionFilter == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
             <?php endforeach; ?>
         </select>
-        <select name="status" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+        <select name="status" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             <option value="active" <?= $statusFilter === 'active' || !$statusFilter ? 'selected' : '' ?>>Active</option>
             <option value="graduated" <?= $statusFilter === 'graduated' ? 'selected' : '' ?>>Graduated</option>
             <option value="transferred" <?= $statusFilter === 'transferred' ? 'selected' : '' ?>>Transferred</option>
@@ -128,7 +128,7 @@ ob_start();
         </select>
         <div class="flex gap-2">
             <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900">Filter</button>
-            <a href="<?= url('students') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm hover:bg-gray-50 dark:bg-dark-bg">Clear</a>
+            <a href="<?= url('students') ?>" class="px-4 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text hover:bg-gray-50 dark:bg-dark-bg">Clear</a>
         </div>
     </form>
 </div>

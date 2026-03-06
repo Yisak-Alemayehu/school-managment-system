@@ -78,7 +78,7 @@ ob_start();
             <input type="hidden" name="route" value="academics/elective-subjects">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
-                <select name="class_id" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="class_id" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -88,7 +88,7 @@ ob_start();
             <?php if ($filterClass && !empty($sectionsForClass)): ?>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
-                <select name="section_id" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="section_id" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">All Sections</option>
                     <?php foreach ($sectionsForClass as $sec): ?>
                         <option value="<?= $sec['id'] ?>" <?= $filterSection == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>

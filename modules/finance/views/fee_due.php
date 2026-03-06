@@ -66,7 +66,7 @@ ob_start();
     <form method="GET" action="<?= url('finance', 'fee-due') ?>" class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4">
         <div class="flex gap-3">
             <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search fees…"
-                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
             <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Search</button>
             <a href="<?= url('finance', 'fee-due') ?>" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 font-medium">Clear</a>
         </div>
@@ -85,7 +85,7 @@ ob_start();
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fee Type *</label>
                         <select name="fee_type" id="feeType" required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             <option value="1">Recurrent</option>
                             <option value="0">One-Time</option>
                         </select>
@@ -94,7 +94,7 @@ ob_start();
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Currency *</label>
                         <select name="currency" id="feeCurrency" onchange="toggleForeignAmount()"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             <option value="ETB">ETB (Birr)</option>
                             <option value="USD">USD</option>
                         </select>
@@ -103,28 +103,28 @@ ob_start();
                     <div id="foreignAmountWrap" class="hidden">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exchange Rate Amount (ETB)</label>
                         <input type="number" name="foreign_amount" step="0.01" min="0"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                                placeholder="ETB equivalent">
                     </div>
 
                     <div class="md:col-span-2 lg:col-span-3">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description *</label>
                         <input type="text" name="description" required maxlength="255"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                                placeholder="e.g. Monthly Tuition Fee">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount *</label>
                         <input type="number" name="amount" step="0.01" min="0" required
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                                placeholder="0.00">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assign to Classes</label>
                         <select name="class_ids[]" multiple
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                                 style="min-height: 80px;">
                             <?php foreach ($classes as $c): ?>
                                 <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
@@ -142,12 +142,12 @@ ob_start();
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Effective Date *</label>
                         <input type="date" name="effective_date" required
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date *</label>
                         <input type="date" name="end_date" required
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     </div>
                 </div>
             </div>
@@ -159,12 +159,12 @@ ob_start();
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Apply Every</label>
                         <input type="number" name="apply_every" min="1" max="31" value="1"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Frequency</label>
                         <select name="frequency"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             <option value="months">Month(s)</option>
                             <option value="weeks">Week(s)</option>
                             <option value="days">Day(s)</option>
@@ -202,9 +202,9 @@ ob_start();
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unpaid After</label>
                         <div class="flex gap-2">
                             <input type="number" name="penalty_unpaid_after" min="1" value="1"
-                                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             <select name="penalty_unpaid_unit"
-                                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 <option value="months">Month(s)</option>
                                 <option value="weeks">Week(s)</option>
                                 <option value="days">Day(s)</option>
@@ -215,7 +215,7 @@ ob_start();
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Penalty Type</label>
                         <select name="penalty_type" id="penaltyType" onchange="toggleVaryingPenalty()"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             <option value="fixed_amount">Fixed Amount</option>
                             <option value="fixed_percentage">Fixed Percentage</option>
                             <option value="varying_amount">Varying Amount</option>
@@ -226,14 +226,14 @@ ob_start();
                     <div id="fixedPenaltyValue">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Penalty Value</label>
                         <input type="number" name="penalty_value" step="0.01" min="0"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                                placeholder="Amount or %">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Penalty Frequency</label>
                         <select name="penalty_frequency" id="penaltyFreq" onchange="togglePenaltyReapply()"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             <option value="one_time">One-Time</option>
                             <option value="recurrent">Recurrent</option>
                         </select>
@@ -243,9 +243,9 @@ ob_start();
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reapply Every</label>
                         <div class="flex gap-2">
                             <input type="number" name="penalty_reapply_every" min="1"
-                                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                             <select name="penalty_reapply_unit"
-                                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                                    class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 <option value="months">Month(s)</option>
                                 <option value="weeks">Week(s)</option>
                                 <option value="days">Day(s)</option>
@@ -256,19 +256,19 @@ ob_start();
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Penalty Expiry Date</label>
                         <input type="date" name="penalty_expiry_date"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Penalty Amount</label>
                         <input type="number" name="max_penalty_amount" step="0.01" min="0" value="1000"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Penalty Count</label>
                         <input type="number" name="max_penalty_count" min="0" value="0"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                                placeholder="0 = unlimited">
                     </div>
                 </div>
@@ -280,7 +280,7 @@ ob_start();
                         <div class="flex gap-2 items-center varying-row">
                             <span class="text-sm text-gray-500 dark:text-dark-muted w-8">1.</span>
                             <input type="number" name="varying_values[]" step="0.01" min="0"
-                                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500"
+                                   class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                                    placeholder="Value">
                             <button type="button" onclick="removeVaryingRow(this)" class="text-red-500 hover:text-red-700 text-sm">Remove</button>
                         </div>
@@ -396,7 +396,7 @@ function addVaryingRow() {
     const row = document.createElement('div');
     row.className = 'flex gap-2 items-center varying-row';
     row.innerHTML = '<span class="text-sm text-gray-500 dark:text-dark-muted w-8">' + count + '.</span>' +
-        '<input type="number" name="varying_values[]" step="0.01" min="0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm focus:ring-2 focus:ring-primary-500" placeholder="Value">' +
+        '<input type="number" name="varying_values[]" step="0.01" min="0" class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" placeholder="Value">' +
         '<button type="button" onclick="removeVaryingRow(this)" class="text-red-500 hover:text-red-700 text-sm">Remove</button>';
     list.appendChild(row);
 }

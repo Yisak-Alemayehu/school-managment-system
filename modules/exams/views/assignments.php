@@ -50,7 +50,7 @@ ob_start();
     </div>
 
     <div class="flex items-center gap-3 mb-4">
-        <select onchange="window.location='<?= url('exams', 'assignments') ?>&class_id='+this.value" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+        <select onchange="window.location='<?= url('exams', 'assignments') ?>&class_id='+this.value" class="px-3 py-1.5 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
             <option value="0">All Classes</option>
             <?php foreach ($classes as $c): ?>
                 <option value="<?= $c['id'] ?>" <?= $filterClass == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>

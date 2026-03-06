@@ -13,8 +13,21 @@ $allTerms    = $sessionId
     ? db_fetch_all("SELECT id, name, start_date, end_date FROM terms WHERE session_id=? ORDER BY sort_order", [$sessionId])
     : [];
 
+// Restrict class list for teachers
+if (auth_has_role('teacher') && !auth_is_super_admin()) {
+    $tClassIds = rbac_teacher_class_ids();
+    if (!empty($tClassIds)) {
+        $allClasses = array_values(array_filter($allClasses, fn($c) => in_array($c['id'], $tClassIds)));
+    }
+}
+
 $selTerm    = input_int('term_id');
 $selClass   = input_int('class_id');
+
+// Validate teacher access to selected class
+if ($selClass && auth_has_role('teacher') && !auth_is_super_admin()) {
+    rbac_require_teacher_class($selClass);
+}
 $selSection = input_int('section_id'); // 0 = all sections
 $generate   = ($selTerm && $selClass && isset($_GET['generate']));
 
@@ -220,7 +233,7 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Term <span class="text-red-500">*</span></label>
-                <select name="term_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="term_id" required class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">Select Term</option>
                     <?php foreach ($allTerms as $t): ?>
                         <option value="<?= $t['id'] ?>" <?= $selTerm == $t['id'] ? 'selected' : '' ?>><?= e($t['name']) ?></option>
@@ -231,7 +244,7 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class <span class="text-red-500">*</span></label>
                 <select name="class_id" id="rosterClassSel" required
-                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text"
                         onchange="ajaxLoadSections(this.value,'rosterSecSel',0,'All Sections')">
                     <option value="">Select Class</option>
                     <?php foreach ($allClasses as $c): ?>
@@ -242,7 +255,7 @@ ob_start();
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
-                <select name="section_id" id="rosterSecSel" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                <select name="section_id" id="rosterSecSel" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
                     <option value="">All Sections</option>
                     <?php foreach ($allSections as $s): ?>
                         <?php if ($s['class_id'] == $selClass): ?>

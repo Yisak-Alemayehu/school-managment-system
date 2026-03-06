@@ -35,21 +35,21 @@ ob_start();
                             <div class="md:col-span-2">
                                 <?php if ($s['setting_type'] === 'boolean'): ?>
                                     <select name="settings[<?= e($s['setting_key']) ?>]"
-                                            class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                            class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text">
                                         <option value="1" <?= $s['setting_value'] == '1' ? 'selected' : '' ?>>Yes</option>
                                         <option value="0" <?= $s['setting_value'] == '0' ? 'selected' : '' ?>>No</option>
                                     </select>
                                 <?php elseif ($s['setting_type'] === 'textarea'): ?>
                                     <textarea name="settings[<?= e($s['setting_key']) ?>]" rows="3"
-                                              class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500"><?= e($s['setting_value']) ?></textarea>
+                                              class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text"><?= e($s['setting_value']) ?></textarea>
                                 <?php elseif ($s['setting_type'] === 'number'): ?>
                                     <input type="number" name="settings[<?= e($s['setting_key']) ?>]"
                                            value="<?= e($s['setting_value']) ?>"
-                                           class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                           class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text">
                                 <?php else: ?>
                                     <input type="text" name="settings[<?= e($s['setting_key']) ?>]"
                                            value="<?= e($s['setting_value']) ?>"
-                                           class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                           class="w-full rounded-lg border-gray-300 dark:border-dark-border shadow-sm focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-dark-card dark:text-dark-text">
                                 <?php endif; ?>
                             </div>
                         </div>

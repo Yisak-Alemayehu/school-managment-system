@@ -17,8 +17,8 @@
         theme: {
             extend: {
                 colors: {
-                    primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a"},
-                    sidebar: {"bg":"#1e293b","hover":"#334155","active":"#0f172a","text":"#cbd5e1"},
+                    primary: {"50":"#eef2ff","100":"#dbe4ff","200":"#bfcefe","300":"#93adfc","400":"#6080f8","500":"#3b5ef4","600":"#074DD9","700":"#0640b8","800":"#0a3596","900":"#0d2d76","950":"#091c4d"},
+                    sidebar: {"bg":"#091c4d","hover":"#0d2d76","active":"#074DD9","text":"#bfcefe"},
                     dark: {"bg":"#0f172a","card":"#1e293b","card2":"#334155","border":"#475569","text":"#e2e8f0","muted":"#94a3b8"}
                 }
             }
@@ -44,7 +44,7 @@
             document.cookie = 'theme=dark;path=/;max-age=' + (365*86400) + ';SameSite=Lax';
         }
         var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.content = isDark ? '#1e40af' : '#0f172a';
+        if (meta) meta.content = isDark ? '#0f172a' : '#074DD9';
         setTimeout(function(){ html.classList.remove('theme-transition'); }, 350);
     }
     function toggleLangMenu() {
@@ -94,8 +94,54 @@
             .no-print { display: none !important; }
             .print-only { display: block !important; }
         }
+
+        /* Dark mode form inputs (inline — guaranteed to load) */
+        html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]):not([type="range"]):not([type="hidden"]),
+        html.dark select,
+        html.dark textarea {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+            border-color: #475569 !important;
+            color-scheme: dark;
+        }
+        html.dark input::placeholder,
+        html.dark textarea::placeholder {
+            color: #94a3b8 !important;
+        }
+        html.dark input:focus:not([type="checkbox"]):not([type="radio"]),
+        html.dark select:focus,
+        html.dark textarea:focus {
+            background-color: #334155 !important;
+            border-color: #6080f8 !important;
+            color: #f1f5f9 !important;
+        }
+        html.dark option {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+        html.dark input[type="file"] {
+            background-color: #1e293b !important;
+            color: #94a3b8 !important;
+        }
+        html.dark input[type="file"]::file-selector-button {
+            background-color: #334155 !important;
+            color: #e2e8f0 !important;
+            border-color: #475569 !important;
+        }
+        html.dark input[type="date"],
+        html.dark input[type="time"],
+        html.dark input[type="datetime-local"] {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+            color-scheme: dark;
+        }
+        html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+        html.dark input[type="time"]::-webkit-calendar-picker-indicator,
+        html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
     </style>
-    <link rel="stylesheet" href="<?= url('/assets/css/app.css') ?>">
+    <link rel="stylesheet" href="<?= url('/assets/css/app.css') ?>?v=<?= filemtime(APP_ROOT . '/public/assets/css/app.css') ?>">
 </head>
 <body class="h-full bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-dark-text transition-colors">
     <?php if (auth_check()): ?>

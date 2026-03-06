@@ -61,7 +61,7 @@ ob_start();
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                 <select name="class_id" id="attClassSel" required
-                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text"
                         onchange="ajaxLoadSections(this.value,'attSecSel',<?= (int)$filterSection ?>, 'All Sections')">
                     <option value="">Select Class</option>
                     <?php foreach ($classes as $c): ?>
@@ -71,7 +71,7 @@ ob_start();
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
-                <select name="section_id" id="attSecSel" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm"
+                <select name="section_id" id="attSecSel" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text"
                         <?= !$filterClass ? 'disabled' : '' ?>>
                     <option value="">All Sections</option>
                     <?php foreach ($sections as $s): ?>
@@ -85,7 +85,7 @@ ob_start();
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
                 <input type="date" name="date" value="<?= e($filterDate) ?>" max="<?= date('Y-m-d') ?>"
                        onchange="this.form.submit()"
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm">
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
             </div>
             <div class="flex items-end">
                 <button type="submit" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 hover:bg-gray-200 text-gray-700 dark:text-gray-300 font-medium rounded-lg text-sm transition">Load</button>
@@ -168,7 +168,7 @@ ob_start();
           </div>
         </div>
 
-        <div class="mt-4 flex justify-end">
+        <div class="mt-4 mb-20 lg:mb-4 flex justify-end">
             <button type="submit" class="px-6 py-2.5 bg-primary-800 hover:bg-primary-900 text-white font-medium rounded-lg text-sm transition">
                 Save Attendance
             </button>
