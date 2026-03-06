@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= $_SESSION['lang'] ?? 'en' ?>" class="<?= ($_COOKIE['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
+<html lang="<?= $_SESSION['lang'] ?? 'en' ?>" class="<?= isset($_COOKIE['theme']) ? ($_COOKIE['theme'] === 'dark' ? 'dark' : '') : '' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +23,7 @@
         }
     </script>
     <script>
-    (function(){var t=document.cookie.match(/(?:^|;\s*)theme=(\w+)/);if(t&&t[1]==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');})();
+    (function(){var t=document.cookie.match(/(?:^|;\s*)theme=(\w+)/);if(t){if(t[1]==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark');}})();
     </script>
     <style>
         .blob-1 { position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: linear-gradient(135deg, #074DD9 0%, #3b82f6 100%); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; opacity: 0.15; animation: blob-float 8s ease-in-out infinite; }

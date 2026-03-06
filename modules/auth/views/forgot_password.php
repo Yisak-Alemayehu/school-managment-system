@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<?= $_SESSION['lang'] ?? 'en' ?>" class="<?= ($_COOKIE['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
+<html lang="<?= $_SESSION['lang'] ?? 'en' ?>" class="<?= isset($_COOKIE['theme']) ? ($_COOKIE['theme'] === 'dark' ? 'dark' : '') : '' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@
         }
     </script>
     <script>
-    (function(){var t=document.cookie.match(/(?:^|;\s*)theme=(\w+)/);if(t&&t[1]==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');})();
+    (function(){var t=document.cookie.match(/(?:^|;\s*)theme=(\w+)/);if(t){if(t[1]==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');}else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark');}})();
     </script>
 </head>
 <body class="bg-gray-100 dark:bg-dark-bg min-h-screen flex items-center justify-center p-4">
