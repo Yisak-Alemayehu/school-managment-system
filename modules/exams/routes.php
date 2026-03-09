@@ -143,13 +143,38 @@ switch ($action) {
         require __DIR__ . '/actions/report_card_generate.php';
         break;
     case 'report-card-print':
-        auth_require_permission('report_card.view');
+        $_isCopy = false;
+        if (!empty($_GET['copy']) && !empty($_GET['sig'])) {
+            // Public copy access: validate HMAC signature
+            $copyId  = input_int('id');
+            $copySig = trim($_GET['sig']);
+            if ($copyId > 0 && $copySig !== '') {
+                $copyRc = db_fetch_one("SELECT student_id, session_id FROM report_cards WHERE id = ?", [$copyId]);
+                if ($copyRc) {
+                    $expectedSig = hash_hmac('sha256', $copyId . '|' . $copyRc['student_id'] . '|' . $copyRc['session_id'], 'urjiberi_report_card_secret_2026');
+                    if (hash_equals($expectedSig, $copySig)) {
+                        $_isCopy = true;
+                    }
+                }
+            }
+            if (!$_isCopy) {
+                http_response_code(403);
+                echo 'Invalid or tampered link.';
+                exit;
+            }
+        } else {
+            auth_require_permission('report_card.view');
+        }
         $pageTitle = 'Print Report Card';
         require __DIR__ . '/views/report_card_print.php';
         break;
     case 'qr-code':
         auth_require_permission('report_card.view');
         require __DIR__ . '/actions/qr_code.php';
+        break;
+    case 'report-card-verify':
+        // Public verification — no auth required (QR scanner access)
+        require __DIR__ . '/actions/report_card_verify.php';
         break;
 
     // ===== AJAX: current total marks committed for class+subject+term =====

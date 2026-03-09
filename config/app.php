@@ -65,7 +65,7 @@ define('UPLOAD_ALLOWED_TYPES', [
 ]);
 
 // ── Pagination ───────────────────────────────────────────────
-define('DEFAULT_PER_PAGE', 20);
+define('DEFAULT_PER_PAGE', 15);
 define('ITEMS_PER_PAGE', DEFAULT_PER_PAGE); // Alias
 define('MAX_PER_PAGE', 100);
 

@@ -236,7 +236,7 @@ if ($isAdmin) {
             ],
             'Reports' => [
                 ['action' => 'roster',          'label' => 'Generate Roster'],
-                ['action' => 'result-cards',    'label' => 'Report Card'],
+                ['action' => 'report-cards',    'label' => 'Report Card'],
                 ['action' => 'result-analysis', 'label' => 'Result Analysis'],
             ],
         ],
@@ -255,7 +255,7 @@ if ($isAdmin) {
             ],
             'Reports' => [
                 ['action' => 'roster',          'label' => 'Generate Roster'],
-                ['action' => 'result-cards',    'label' => 'Report Card'],
+                ['action' => 'report-cards',    'label' => 'Report Card'],
                 ['action' => 'result-analysis', 'label' => 'Result Analysis'],
             ],
         ],
@@ -269,7 +269,7 @@ if ($isAdmin) {
         'tree'   => true,
         'groups' => [
             'Reports' => [
-                ['action' => 'result-cards',    'label' => 'Report Card'],
+                ['action' => 'report-cards',    'label' => 'Report Card'],
                 ['action' => 'result-analysis', 'label' => 'Result Analysis'],
             ],
         ],

@@ -107,9 +107,25 @@ ob_start();
                             <?php endif; ?>
                         </td>
                         <td class="px-4 py-3 text-right">
-                            <a href="<?= url('academics', 'terms') ?>&edit=<?= $t['id'] ?>" class="p-2 text-gray-400 dark:text-gray-500 hover:text-yellow-600 rounded inline-block" title="Edit">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            </a>
+                            <div class="flex items-center justify-end gap-1">
+                                <!-- Toggle active/inactive -->
+                                <form method="POST" action="<?= url('academics', 'term-toggle') ?>" class="inline">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="term_id" value="<?= $t['id'] ?>">
+                                    <?php if ($t['is_active']): ?>
+                                        <button type="submit" title="Deactivate" class="p-2 text-green-600 hover:text-red-600 rounded" onclick="return confirm('Deactivate this term?')">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </button>
+                                    <?php else: ?>
+                                        <button type="submit" title="Activate" class="p-2 text-gray-400 hover:text-green-600 rounded" onclick="return confirm('Activate this term? Multiple terms can be active simultaneously.')">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </button>
+                                    <?php endif; ?>
+                                </form>
+                                <a href="<?= url('academics', 'terms') ?>&edit=<?= $t['id'] ?>" class="p-2 text-gray-400 dark:text-gray-500 hover:text-yellow-600 rounded inline-block" title="Edit">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>

@@ -2,12 +2,14 @@
 /**
  * Students — Admission Form (Create)
  * Supports: first/last name, mandatory phone, Ethiopian address fields,
- * mandatory photo, multiple guardians with dynamic "Add Guardian" button.
+ * mandatory photo, multiple guardians with dynamic "Add Guardian" button,
+ * guardian search (sibling detection), returning student search for re-enrollment.
  */
 
-$classes  = db_fetch_all("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY sort_order");
+$classes  = db_fetch_all("SELECT id, name, numeric_name FROM classes WHERE is_active = 1 ORDER BY sort_order");
 $sections = db_fetch_all("SELECT id, name, class_id FROM sections WHERE is_active = 1 ORDER BY name");
 $session  = get_active_session();
+$sessions = db_fetch_all("SELECT id, name FROM academic_sessions ORDER BY start_date DESC LIMIT 5");
 
 ob_start();
 ?>
@@ -23,9 +25,31 @@ ob_start();
     <?php if ($msg = get_flash('error')): ?>
         <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm"><?= e($msg) ?></div>
     <?php endif; ?>
+    <?php if ($msg = get_flash('success')): ?>
+        <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm"><?= $msg ?></div>
+    <?php endif; ?>
+
+    <!-- ─── Returning Student Search ─────────────────────── -->
+    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800 p-6 mb-6">
+        <h2 class="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            Search Returning Student (Re-enrollment)
+        </h2>
+        <p class="text-xs text-blue-700 dark:text-blue-400 mb-3">Search for a student from a previous academic session to re-enroll them. Their information will be auto-filled.</p>
+        <div class="flex gap-3">
+            <input type="text" id="returningStudentSearch" placeholder="Search by name, admission number, or phone..."
+                   class="flex-1 px-3 py-2 border border-blue-300 dark:border-blue-700 rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-blue-500">
+            <button type="button" onclick="searchReturningStudent()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm transition">Search</button>
+        </div>
+        <div id="returningStudentResults" class="mt-3 hidden">
+            <div class="bg-white dark:bg-dark-card rounded-lg border border-blue-200 dark:border-blue-700 max-h-48 overflow-y-auto"></div>
+        </div>
+    </div>
 
     <form method="POST" action="<?= url('students', 'create') ?>" enctype="multipart/form-data" class="space-y-6" id="admissionForm">
         <?= csrf_field() ?>
+        <input type="hidden" name="returning_student_id" id="returning_student_id" value="">
+        <input type="hidden" name="use_existing_guardians" id="use_existing_guardians" value="0">
 
         <!-- ─── Personal Information ─────────────────────────── -->
         <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
@@ -216,17 +240,34 @@ ob_start();
         <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
             <div class="flex items-center justify-between mb-4 pb-2 border-b">
                 <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text">Guardian Information</h2>
-                <button type="button" onclick="addGuardian()" class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-50 text-primary-700 hover:bg-primary-100 text-xs font-medium rounded-lg transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Add Guardian
-                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="addGuardian()" class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-50 text-primary-700 hover:bg-primary-100 text-xs font-medium rounded-lg transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add New
+                    </button>
+                </div>
+            </div>
+
+            <!-- Guardian Search (Sibling Detection) -->
+            <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                <p class="text-xs text-yellow-800 dark:text-yellow-300 mb-2 font-medium">Search existing guardians (for siblings already registered)</p>
+                <div class="flex gap-2">
+                    <input type="text" id="guardianSearchInput" placeholder="Search by phone number or name..."
+                           class="flex-1 px-3 py-1.5 border border-yellow-300 dark:border-yellow-700 rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-yellow-500">
+                    <button type="button" onclick="searchGuardian()" class="px-3 py-1.5 bg-yellow-600 hover:bg-yellow-700 text-white text-xs font-medium rounded-lg transition">Search</button>
+                </div>
+                <div id="guardianSearchResults" class="mt-2 hidden">
+                    <div class="bg-white dark:bg-dark-card rounded-lg border border-yellow-200 dark:border-yellow-700 max-h-40 overflow-y-auto"></div>
+                </div>
             </div>
 
             <div id="guardiansContainer">
                 <!-- Guardian #1 (default, cannot be removed) -->
                 <div class="guardian-block border border-gray-100 dark:border-dark-border rounded-lg p-4 mb-4 bg-gray-50 dark:bg-dark-bg" data-guardian-index="0">
+                    <input type="hidden" name="guardians[0][existing_guardian_id]" value="" class="existing-guardian-id">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Guardian #1 <span class="text-xs text-green-600">(Primary)</span></h3>
+                        <span class="existing-guardian-badge hidden text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">Existing Guardian</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -281,12 +322,16 @@ ob_start();
 <!-- ─── Guardian Template (hidden) ────────────────────────── -->
 <template id="guardianTemplate">
     <div class="guardian-block border border-gray-100 dark:border-dark-border rounded-lg p-4 mb-4 bg-gray-50 dark:bg-dark-bg" data-guardian-index="__INDEX__">
+        <input type="hidden" name="guardians[__INDEX__][existing_guardian_id]" value="" class="existing-guardian-id">
         <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Guardian #__DISPLAY__</h3>
-            <button type="button" onclick="removeGuardian(this)" class="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1">
+            <div class="flex items-center gap-2">
+                <span class="existing-guardian-badge hidden text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">Existing Guardian</span>
+                <button type="button" onclick="removeGuardian(this)" class="text-red-500 hover:text-red-700 text-xs font-medium flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 Remove
             </button>
+            </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -359,7 +404,6 @@ function previewPhoto(input) {
     var preview = document.getElementById('photoPreview');
     if (input.files && input.files[0]) {
         var file = input.files[0];
-        // Validate size client-side (2 MB)
         if (file.size > 2 * 1024 * 1024) {
             alert('Photo must be under 2 MB.');
             input.value = '';
@@ -374,7 +418,7 @@ function previewPhoto(input) {
 }
 
 // ─── Dynamic guardians ──────────────────────────────────────
-var guardianIndex = 1; // start at 1 since index 0 is already rendered
+var guardianIndex = 1;
 
 function addGuardian() {
     var template = document.getElementById('guardianTemplate').content.cloneNode(true);
@@ -403,6 +447,219 @@ function renumberGuardians() {
         }
     });
 }
+
+// ─── Returning Student Search ────────────────────────────────
+function searchReturningStudent() {
+    var q = document.getElementById('returningStudentSearch').value.trim();
+    if (q.length < 2) { alert('Enter at least 2 characters.'); return; }
+
+    var container = document.getElementById('returningStudentResults');
+    var inner = container.querySelector('div');
+    inner.innerHTML = '<p class="p-3 text-sm text-gray-500">Searching...</p>';
+    container.classList.remove('hidden');
+
+    fetch('<?= url('api') ?>&action=student-search&q=' + encodeURIComponent(q))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.data || data.data.length === 0) {
+                inner.innerHTML = '<p class="p-3 text-sm text-gray-500">No students found.</p>';
+                return;
+            }
+            var html = '';
+            data.data.forEach(function(s) {
+                html += '<div class="p-3 hover:bg-blue-50 dark:hover:bg-blue-900/30 cursor-pointer border-b border-blue-100 dark:border-blue-800 flex justify-between items-center" onclick="selectReturningStudent(' + s.id + ')">'
+                     + '<div><span class="font-medium text-sm text-gray-900 dark:text-dark-text">' + escHtml(s.first_name + ' ' + s.last_name) + '</span>'
+                     + '<span class="text-xs text-gray-500 ml-2">' + escHtml(s.admission_number || '') + '</span></div>'
+                     + '<span class="text-xs text-blue-600">' + escHtml(s.class_name || '') + '</span></div>';
+            });
+            inner.innerHTML = html;
+        })
+        .catch(function() { inner.innerHTML = '<p class="p-3 text-sm text-red-500">Search failed.</p>'; });
+}
+
+function selectReturningStudent(id) {
+    fetch('<?= url('api') ?>&action=student-for-enroll&id=' + id)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.data) { alert('Could not load student data.'); return; }
+            var s = data.data;
+            document.getElementById('returning_student_id').value = s.id;
+
+            // Fill personal info
+            setVal('first_name', s.first_name);
+            setVal('last_name', s.last_name);
+            setVal('gender', s.gender);
+            setVal('date_of_birth', s.date_of_birth);
+            setVal('nationality', s.nationality);
+            setVal('religion', s.religion);
+            setVal('country', s.country);
+            setVal('sub_city', s.sub_city);
+            setVal('woreda', s.woreda);
+            setVal('house_number', s.house_number);
+            setVal('phone', s.phone);
+            setVal('medical_info', s.medical_info);
+            setVal('previous_school', s.previous_school);
+
+            // Fill guardians
+            if (s.guardians && s.guardians.length > 0) {
+                document.getElementById('use_existing_guardians').value = '1';
+                fillGuardiansFromData(s.guardians);
+            }
+
+            // Close search results
+            document.getElementById('returningStudentResults').classList.add('hidden');
+            document.getElementById('returningStudentSearch').value = s.first_name + ' ' + s.last_name + ' (selected)';
+
+            // Show notice
+            var notice = document.createElement('div');
+            notice.className = 'mt-2 p-2 bg-green-100 text-green-800 text-xs rounded-lg';
+            notice.textContent = 'Student data loaded. Update enrollment details (class, section) and submit.';
+            document.getElementById('returningStudentResults').parentNode.appendChild(notice);
+        })
+        .catch(function() { alert('Failed to load student data.'); });
+}
+
+// ─── Guardian Search (Sibling Detection) ─────────────────────
+function searchGuardian() {
+    var q = document.getElementById('guardianSearchInput').value.trim();
+    if (q.length < 2) { alert('Enter at least 2 characters.'); return; }
+
+    var container = document.getElementById('guardianSearchResults');
+    var inner = container.querySelector('div');
+    inner.innerHTML = '<p class="p-2 text-sm text-gray-500">Searching...</p>';
+    container.classList.remove('hidden');
+
+    fetch('<?= url('api') ?>&action=guardian-search&q=' + encodeURIComponent(q))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.data || data.data.length === 0) {
+                inner.innerHTML = '<p class="p-2 text-sm text-gray-500">No guardians found.</p>';
+                return;
+            }
+            var html = '';
+            data.data.forEach(function(g) {
+                var children = g.children ? ' — Children: ' + escHtml(g.children) : '';
+                html += '<div class="p-2 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 cursor-pointer border-b border-yellow-100 dark:border-yellow-800 text-sm" onclick=\'selectExistingGuardian(' + JSON.stringify(g).replace(/'/g, "\\'") + ')\'>'
+                     + '<span class="font-medium">' + escHtml(g.first_name + ' ' + g.last_name) + '</span>'
+                     + '<span class="text-xs text-gray-500 ml-2">' + escHtml(g.phone || '') + '</span>'
+                     + '<span class="text-xs text-gray-400 block">' + escHtml(children) + '</span></div>';
+            });
+            inner.innerHTML = html;
+        })
+        .catch(function() { inner.innerHTML = '<p class="p-2 text-sm text-red-500">Search failed.</p>'; });
+}
+
+function selectExistingGuardian(guardian) {
+    // Find first empty guardian block or add a new one
+    var blocks = document.querySelectorAll('#guardiansContainer .guardian-block');
+    var targetBlock = null;
+    blocks.forEach(function(b) {
+        var fname = b.querySelector('input[name$="[first_name]"]');
+        if (fname && !fname.value && !targetBlock) targetBlock = b;
+    });
+    if (!targetBlock) {
+        addGuardian();
+        blocks = document.querySelectorAll('#guardiansContainer .guardian-block');
+        targetBlock = blocks[blocks.length - 1];
+    }
+
+    // Populate fields
+    var idx = targetBlock.getAttribute('data-guardian-index');
+    setGuardianField(targetBlock, 'first_name', guardian.first_name);
+    setGuardianField(targetBlock, 'last_name', guardian.last_name);
+    setGuardianField(targetBlock, 'phone', guardian.phone);
+    setGuardianField(targetBlock, 'email', guardian.email);
+    setGuardianField(targetBlock, 'occupation', guardian.occupation);
+
+    // Set existing_guardian_id
+    var hiddenInput = targetBlock.querySelector('.existing-guardian-id');
+    if (hiddenInput) hiddenInput.value = guardian.id;
+
+    // Show badge
+    var badge = targetBlock.querySelector('.existing-guardian-badge');
+    if (badge) badge.classList.remove('hidden');
+
+    // Make fields read-only (visual indicator)
+    targetBlock.querySelectorAll('input[type="text"], input[type="email"]').forEach(function(inp) {
+        inp.classList.add('bg-green-50', 'dark:bg-green-900/20');
+    });
+
+    document.getElementById('guardianSearchResults').classList.add('hidden');
+    document.getElementById('guardianSearchInput').value = '';
+}
+
+function fillGuardiansFromData(guardians) {
+    var container = document.getElementById('guardiansContainer');
+    // Clear existing blocks
+    container.innerHTML = '';
+    guardianIndex = 0;
+
+    guardians.forEach(function(g, i) {
+        var isFirst = (i === 0);
+        var html = '<div class="guardian-block border border-gray-100 dark:border-dark-border rounded-lg p-4 mb-4 bg-gray-50 dark:bg-dark-bg" data-guardian-index="' + i + '">'
+            + '<input type="hidden" name="guardians[' + i + '][existing_guardian_id]" value="' + (g.id || '') + '" class="existing-guardian-id">'
+            + '<div class="flex items-center justify-between mb-3">'
+            + '<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">Guardian #' + (i + 1) + (isFirst ? ' <span class="text-xs text-green-600">(Primary)</span>' : '') + '</h3>'
+            + '<span class="existing-guardian-badge text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full">Existing Guardian</span>'
+            + '</div>'
+            + '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">'
+            + guardianField(i, 'first_name', 'First Name', g.first_name, true)
+            + guardianField(i, 'last_name', 'Last Name', g.last_name, true)
+            + guardianSelect(i, 'relation', 'Relationship', g.relationship || g.relation || '')
+            + guardianField(i, 'phone', 'Phone', g.phone, true)
+            + guardianField(i, 'email', 'Email', g.email, false)
+            + guardianField(i, 'occupation', 'Occupation', g.occupation, false)
+            + '</div></div>';
+        container.insertAdjacentHTML('beforeend', html);
+        guardianIndex = i + 1;
+    });
+}
+
+// ─── Helper functions ────────────────────────────────────────
+function setVal(name, value) {
+    var el = document.querySelector('[name="' + name + '"]');
+    if (el && value !== null && value !== undefined) el.value = value;
+}
+
+function setGuardianField(block, field, value) {
+    var inp = block.querySelector('input[name$="[' + field + ']"]');
+    if (inp && value) inp.value = value;
+}
+
+function guardianField(idx, name, label, value, required) {
+    return '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">' + label + (required ? ' <span class="text-red-500">*</span>' : '') + '</label>'
+        + '<input type="' + (name === 'email' ? 'email' : 'text') + '" name="guardians[' + idx + '][' + name + ']" value="' + escAttr(value || '') + '"' + (required ? ' required' : '')
+        + ' class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-green-50 dark:bg-green-900/20 dark:text-dark-text focus:ring-2 focus:ring-primary-500"></div>';
+}
+
+function guardianSelect(idx, name, label, value) {
+    var opts = ['father','mother','guardian','uncle','aunt','sibling','grandparent','other'];
+    var html = '<div><label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">' + label + ' <span class="text-red-500">*</span></label>'
+        + '<select name="guardians[' + idx + '][relation]" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">'
+        + '<option value="">Select...</option>';
+    opts.forEach(function(o) {
+        html += '<option value="' + o + '"' + (value === o ? ' selected' : '') + '>' + o.charAt(0).toUpperCase() + o.slice(1) + '</option>';
+    });
+    return html + '</select></div>';
+}
+
+function escHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str || ''));
+    return div.innerHTML;
+}
+
+function escAttr(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Enter key triggers search ───────────────────────────────
+document.getElementById('returningStudentSearch').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); searchReturningStudent(); }
+});
+document.getElementById('guardianSearchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); searchGuardian(); }
+});
 </script>
 
 <?php

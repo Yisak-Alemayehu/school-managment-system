@@ -95,52 +95,104 @@ $addressParts = array_filter([
 ]);
 $fullAddress = implode(', ', $addressParts);
 
+// ── Determine if this is a returning student re-enrollment ───
+$returningStudentId = intval($_POST['returning_student_id'] ?? 0);
+$useExistingGuardians = ($_POST['use_existing_guardians'] ?? '0') === '1';
+
 // ── Insert everything in a transaction ───────────────────────
 db_begin();
 
 try {
-    // 1. Create student
-    $studentId = db_insert('students', [
-        'admission_no'   => $admissionNo,
-        'first_name'     => trim($_POST['first_name']),
-        'last_name'      => trim($_POST['last_name']),
-        'gender'         => $_POST['gender'],
-        'date_of_birth'  => $_POST['date_of_birth'],
-        'blood_group'    => $_POST['blood_group'] ?: null,
-        'religion'       => trim($_POST['religion'] ?? '') ?: null,
-        'phone'          => trim($_POST['phone']),
-        'email'          => trim($_POST['email'] ?? '') ?: null,
-        'address'        => $fullAddress,
-        'country'        => trim($_POST['country']),
-        'region'         => trim($_POST['region']),
-        'city'           => trim($_POST['city']),
-        'sub_city'       => trim($_POST['sub_city']),
-        'woreda'         => trim($_POST['woreda']),
-        'house_number'   => $houseNumber,
-        'photo'          => $photoPath,
-        'medical_notes'  => trim($_POST['medical_conditions'] ?? '') ?: null,
-        'previous_school' => trim($_POST['previous_school'] ?? '') ?: null,
-        'admission_date' => $_POST['admission_date'],
-        'status'         => 'active',
-    ]);
+    if ($returningStudentId > 0) {
+        // Re-enrollment: reuse existing student record
+        $existingStudent = db_fetch_one("SELECT * FROM students WHERE id = ?", [$returningStudentId]);
+        if (!$existingStudent) {
+            throw new Exception('Returning student not found.');
+        }
+        $studentId = $returningStudentId;
+        $admissionNo = $existingStudent['admission_no'];
 
-    // 2. Create guardians (multiple) and link them
+        // Update student fields with any new data
+        db_update('students', [
+            'phone'          => trim($_POST['phone']),
+            'address'        => $fullAddress,
+            'country'        => trim($_POST['country']),
+            'region'         => trim($_POST['region']),
+            'city'           => trim($_POST['city']),
+            'sub_city'       => trim($_POST['sub_city']),
+            'woreda'         => trim($_POST['woreda']),
+            'house_number'   => $houseNumber,
+            'photo'          => $photoPath ?: $existingStudent['photo'],
+            'medical_notes'  => trim($_POST['medical_conditions'] ?? '') ?: $existingStudent['medical_notes'],
+            'status'         => 'active',
+        ], 'id = ?', [$studentId]);
+
+        $fullName = $existingStudent['first_name'] . ' ' . $existingStudent['last_name'];
+    } else {
+        // New student: create record
+        $studentId = db_insert('students', [
+            'admission_no'   => $admissionNo,
+            'first_name'     => trim($_POST['first_name']),
+            'last_name'      => trim($_POST['last_name']),
+            'gender'         => $_POST['gender'],
+            'date_of_birth'  => $_POST['date_of_birth'],
+            'blood_group'    => $_POST['blood_group'] ?: null,
+            'religion'       => trim($_POST['religion'] ?? '') ?: null,
+            'phone'          => trim($_POST['phone']),
+            'email'          => trim($_POST['email'] ?? '') ?: null,
+            'address'        => $fullAddress,
+            'country'        => trim($_POST['country']),
+            'region'         => trim($_POST['region']),
+            'city'           => trim($_POST['city']),
+            'sub_city'       => trim($_POST['sub_city']),
+            'woreda'         => trim($_POST['woreda']),
+            'house_number'   => $houseNumber,
+            'photo'          => $photoPath,
+            'medical_notes'  => trim($_POST['medical_conditions'] ?? '') ?: null,
+            'previous_school' => trim($_POST['previous_school'] ?? '') ?: null,
+            'admission_date' => $_POST['admission_date'],
+            'status'         => 'active',
+        ]);
+
+        $fullName = trim($_POST['first_name']) . ' ' . trim($_POST['last_name']);
+    }
+
+    // 2. Handle guardians
     foreach ($guardians as $i => $g) {
-        $guardianId = db_insert('guardians', [
-            'first_name' => trim($g['first_name']),
-            'last_name'  => trim($g['last_name']),
-            'relation'   => $g['relation'],
-            'phone'      => trim($g['phone']),
-            'email'      => trim($g['email'] ?? '') ?: null,
-            'occupation' => trim($g['occupation'] ?? '') ?: null,
-        ]);
+        $existingGuardianId = intval($g['existing_guardian_id'] ?? 0);
 
-        db_insert('student_guardians', [
-            'student_id'   => $studentId,
-            'guardian_id'   => $guardianId,
-            'relationship'  => $g['relation'],
-            'is_primary'    => ($i === 0) ? 1 : 0,
-        ]);
+        if ($existingGuardianId > 0) {
+            // Link existing guardian — skip if already linked
+            $alreadyLinked = db_fetch_one(
+                "SELECT id FROM student_guardians WHERE student_id = ? AND guardian_id = ?",
+                [$studentId, $existingGuardianId]
+            );
+            if (!$alreadyLinked) {
+                db_insert('student_guardians', [
+                    'student_id'   => $studentId,
+                    'guardian_id'  => $existingGuardianId,
+                    'relationship' => $g['relation'],
+                    'is_primary'   => ($i === 0) ? 1 : 0,
+                ]);
+            }
+        } else {
+            // Create new guardian
+            $guardianId = db_insert('guardians', [
+                'first_name' => trim($g['first_name']),
+                'last_name'  => trim($g['last_name']),
+                'relation'   => $g['relation'],
+                'phone'      => trim($g['phone']),
+                'email'      => trim($g['email'] ?? '') ?: null,
+                'occupation' => trim($g['occupation'] ?? '') ?: null,
+            ]);
+
+            db_insert('student_guardians', [
+                'student_id'   => $studentId,
+                'guardian_id'  => $guardianId,
+                'relationship' => $g['relation'],
+                'is_primary'   => ($i === 0) ? 1 : 0,
+            ]);
+        }
     }
 
     // 3. Create enrollment — use correct column names per schema
@@ -156,44 +208,42 @@ try {
         'status'      => 'active',
     ]);
 
-    // 4. Auto-create user account for the student
-    $fullName = trim($_POST['first_name']) . ' ' . trim($_POST['last_name']);
-    $studentUsername = strtolower(str_replace([' ', '/'], '_', $admissionNo));
-    $studentPlainPw = $admissionNo;
-    $studentEmail   = trim($_POST['email'] ?? '') ?: ($studentUsername . '@student.local');
+    // 4. Auto-create user account (only for new students)
+    if ($returningStudentId <= 0) {
+        $studentUsername = strtolower(str_replace([' ', '/'], '_', $admissionNo));
+        $studentPlainPw = $admissionNo;
+        $studentEmail   = trim($_POST['email'] ?? '') ?: ($studentUsername . '@student.local');
 
-    // Ensure unique username/email
-    if (db_exists('users', 'username = ?', [$studentUsername])) {
-        $studentUsername .= '_' . $studentId;
-    }
-    if (db_exists('users', 'email = ?', [$studentEmail])) {
-        $studentEmail = $studentUsername . '@student.local';
-    }
+        if (db_exists('users', 'username = ?', [$studentUsername])) {
+            $studentUsername .= '_' . $studentId;
+        }
+        if (db_exists('users', 'email = ?', [$studentEmail])) {
+            $studentEmail = $studentUsername . '@student.local';
+        }
 
-    $studentUserId = db_insert('users', [
-        'username'      => $studentUsername,
-        'email'         => $studentEmail,
-        'password_hash' => password_hash($studentPlainPw, PASSWORD_BCRYPT, ['cost' => 12]),
-        'full_name'     => $fullName,
-        'first_name'    => trim($_POST['first_name']),
-        'last_name'     => trim($_POST['last_name']),
-        'phone'         => trim($_POST['phone']),
-        'gender'        => $_POST['gender'],
-        'date_of_birth' => $_POST['date_of_birth'],
-        'address'       => $fullAddress,
-        'avatar'        => $photoPath,
-        'is_active'     => 1,
-        'status'        => 'active',
-        'force_password_change' => 1,
-    ]);
+        $studentUserId = db_insert('users', [
+            'username'      => $studentUsername,
+            'email'         => $studentEmail,
+            'password_hash' => password_hash($studentPlainPw, PASSWORD_BCRYPT, ['cost' => 12]),
+            'full_name'     => $fullName,
+            'first_name'    => trim($_POST['first_name']),
+            'last_name'     => trim($_POST['last_name']),
+            'phone'         => trim($_POST['phone']),
+            'gender'        => $_POST['gender'],
+            'date_of_birth' => $_POST['date_of_birth'],
+            'address'       => $fullAddress,
+            'avatar'        => $photoPath,
+            'is_active'     => 1,
+            'status'        => 'active',
+            'force_password_change' => 1,
+        ]);
 
-    // Link user to student record
-    db_update('students', ['user_id' => $studentUserId], 'id = ?', [$studentId]);
+        db_update('students', ['user_id' => $studentUserId], 'id = ?', [$studentId]);
 
-    // Assign student role
-    $studentRoleId = db_fetch_value("SELECT id FROM roles WHERE slug = 'student' LIMIT 1");
-    if ($studentRoleId) {
-        db_query("INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)", [$studentUserId, $studentRoleId]);
+        $studentRoleId = db_fetch_value("SELECT id FROM roles WHERE slug = 'student' LIMIT 1");
+        if ($studentRoleId) {
+            db_query("INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)", [$studentUserId, $studentRoleId]);
+        }
     }
 
     db_commit();
@@ -201,10 +251,15 @@ try {
     audit_log('student_admitted', 'students', $studentId, null, [
         'admission_no' => $admissionNo,
         'full_name'    => $fullName,
+        'returning'    => $returningStudentId > 0,
     ]);
 
-    $credentialInfo = " Login: <strong>{$studentUsername}</strong> / Password: <strong>{$studentPlainPw}</strong>";
-    set_flash('success', "Student \"{$fullName}\" admitted successfully. Admission No: {$admissionNo}." . $credentialInfo);
+    if ($returningStudentId > 0) {
+        set_flash('success', "Returning student \"{$fullName}\" re-enrolled successfully for the current session.");
+    } else {
+        $credentialInfo = " Login: <strong>{$studentUsername}</strong> / Password: <strong>{$studentPlainPw}</strong>";
+        set_flash('success', "Student \"{$fullName}\" admitted successfully. Admission No: {$admissionNo}." . $credentialInfo);
+    }
     redirect(url('students', 'view', $studentId));
 
 } catch (Exception $e) {

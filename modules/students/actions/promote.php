@@ -15,6 +15,14 @@ if (empty($studentIds) || !$toSession || !$toSection) {
     redirect(url('students', 'promote'));
 }
 
+// Resolve class_id from the target section
+$targetSection = db_fetch_one("SELECT id, class_id FROM sections WHERE id = ?", [$toSection]);
+if (!$targetSection) {
+    set_flash('error', 'Invalid target section.');
+    redirect(url('students', 'promote'));
+}
+$toClass = $targetSection['class_id'];
+
 $promoted = 0;
 $repeated = 0;
 $graduated = 0;
@@ -26,8 +34,8 @@ try {
         $sid = (int) $sid;
         $status = $_POST['promote_status'][$sid] ?? 'promoted';
 
-        // Close current enrollment
-        db_update('enrollments', ['status' => $status], 'student_id = ? AND status = ?', [$sid, 'active']);
+        // Close current enrollment in the source session
+        db_update('enrollments', ['status' => $status], 'student_id = ? AND session_id = ? AND status = ?', [$sid, $fromSession, 'active']);
 
         if ($status === 'graduated') {
             db_update('students', ['status' => 'graduated'], 'id = ?', [$sid]);

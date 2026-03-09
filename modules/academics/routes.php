@@ -39,6 +39,11 @@ switch ($action) {
         if (is_post()) { require __DIR__ . '/actions/term_save.php'; }
         break;
 
+    case 'term-toggle':
+        auth_require_permission('academics.manage');
+        if (is_post()) { require __DIR__ . '/actions/term_toggle.php'; }
+        break;
+
     // ── Mediums ──────────────────────────────────────────────
     case 'mediums':
         auth_require_permission('academics.manage');

@@ -98,6 +98,12 @@ switch ($action) {
         require __DIR__ . '/views/id_cards.php';
         break;
 
+    case 'id-card-print':
+        auth_require_permission('students.view');
+        $pageTitle = 'Print ID Cards';
+        require __DIR__ . '/views/id_card_print.php';
+        break;
+
     // ── Generate Username & Password ─────────────────────────────────────
     case 'credentials':
         auth_require_permission('students.edit');

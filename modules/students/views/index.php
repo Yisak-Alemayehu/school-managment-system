@@ -3,11 +3,20 @@
  * Students — List View
  */
 
-$search       = input('search');
-$classFilter  = input_int('class_id');
+$search        = input('search');
+$classFilter   = input_int('class_id');
 $sectionFilter = input_int('section_id');
-$statusFilter = input('status');
-$page         = max(1, input_int('page') ?: 1);
+$statusFilter  = input('status');
+$sessionFilter = input_int('session_id');
+$page          = max(1, input_int('page') ?: 1);
+
+$activeSession = get_active_session();
+$allSessions   = db_fetch_all("SELECT id, name FROM academic_sessions ORDER BY start_date DESC");
+
+// Default to active session if no filter specified
+if (!$sessionFilter && $activeSession) {
+    $sessionFilter = $activeSession['id'];
+}
 
 $where  = ["s.deleted_at IS NULL"];
 $params = [];
@@ -26,23 +35,22 @@ if ($statusFilter) {
     $where[]  = "s.status = 'active'";
 }
 
-$joinEnrollment = "";
-if ($classFilter || $sectionFilter) {
-    $joinEnrollment = "JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
-                       JOIN sections sec ON e.section_id = sec.id
-                       JOIN classes c ON sec.class_id = c.id";
-    if ($classFilter) {
-        $where[]  = "c.id = ?";
-        $params[] = $classFilter;
-    }
-    if ($sectionFilter) {
-        $where[]  = "sec.id = ?";
-        $params[] = $sectionFilter;
-    }
-} else {
-    $joinEnrollment = "LEFT JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
-                       LEFT JOIN sections sec ON e.section_id = sec.id
-                       LEFT JOIN classes c ON sec.class_id = c.id";
+// Always join enrollment to scope by session
+$joinEnrollment = "JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
+                   JOIN sections sec ON e.section_id = sec.id
+                   JOIN classes c ON sec.class_id = c.id";
+
+if ($sessionFilter) {
+    $where[]  = "e.session_id = ?";
+    $params[] = $sessionFilter;
+}
+if ($classFilter) {
+    $where[]  = "c.id = ?";
+    $params[] = $classFilter;
+}
+if ($sectionFilter) {
+    $where[]  = "sec.id = ?";
+    $params[] = $sectionFilter;
 }
 
 $whereClause = implode(' AND ', $where);
@@ -52,7 +60,7 @@ $totalStudents = db_fetch_value(
     $params
 );
 
-$perPage    = ITEMS_PER_PAGE;
+$perPage    = 15;
 $totalPages = max(1, ceil($totalStudents / $perPage));
 $offset     = ($page - 1) * $perPage;
 
@@ -99,10 +107,17 @@ ob_start();
 
 <!-- Filters -->
 <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 mb-4">
-    <form method="GET" action="<?= url('students') ?>" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+    <form method="GET" action="<?= url('students') ?>" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
         <input type="hidden" name="module" value="students">
         <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search name, admission no..."
                class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+        <select name="session_id"
+                class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+            <option value="">All Sessions</option>
+            <?php foreach ($allSessions as $ses): ?>
+                <option value="<?= $ses['id'] ?>" <?= $sessionFilter == $ses['id'] ? 'selected' : '' ?>><?= e($ses['name']) ?></option>
+            <?php endforeach; ?>
+        </select>
         <select name="class_id" id="stdClassSel"
                 class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                 onchange="ajaxLoadSections(this.value,'stdSecSel',<?= (int)$sectionFilter ?>,'All Sections')">
@@ -202,15 +217,15 @@ ob_start();
             <p class="text-xs text-gray-500 dark:text-dark-muted">Showing <?= ($offset + 1) ?>-<?= min($offset + $perPage, $totalStudents) ?> of <?= $totalStudents ?></p>
             <div class="flex gap-1">
                 <?php if ($page > 1): ?>
-                    <a href="<?= url('students') ?>&page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>&class_id=<?= $classFilter ?>&section_id=<?= $sectionFilter ?>&status=<?= urlencode($statusFilter) ?>"
+                    <a href="<?= url('students') ?>&page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>&session_id=<?= $sessionFilter ?>&class_id=<?= $classFilter ?>&section_id=<?= $sectionFilter ?>&status=<?= urlencode($statusFilter) ?>"
                        class="px-3 py-1 border rounded text-xs hover:bg-gray-50 dark:bg-dark-bg">Prev</a>
                 <?php endif; ?>
                 <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
-                    <a href="<?= url('students') ?>&page=<?= $i ?>&search=<?= urlencode($search) ?>&class_id=<?= $classFilter ?>&section_id=<?= $sectionFilter ?>&status=<?= urlencode($statusFilter) ?>"
+                    <a href="<?= url('students') ?>&page=<?= $i ?>&search=<?= urlencode($search) ?>&session_id=<?= $sessionFilter ?>&class_id=<?= $classFilter ?>&section_id=<?= $sectionFilter ?>&status=<?= urlencode($statusFilter) ?>"
                        class="px-3 py-1 border rounded text-xs <?= $i === $page ? 'bg-primary-800 text-white border-primary-800' : 'hover:bg-gray-50 dark:bg-dark-bg' ?>"><?= $i ?></a>
                 <?php endfor; ?>
                 <?php if ($page < $totalPages): ?>
-                    <a href="<?= url('students') ?>&page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>&class_id=<?= $classFilter ?>&section_id=<?= $sectionFilter ?>&status=<?= urlencode($statusFilter) ?>"
+                    <a href="<?= url('students') ?>&page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>&session_id=<?= $sessionFilter ?>&class_id=<?= $classFilter ?>&section_id=<?= $sectionFilter ?>&status=<?= urlencode($statusFilter) ?>"
                        class="px-3 py-1 border rounded text-xs hover:bg-gray-50 dark:bg-dark-bg">Next</a>
                 <?php endif; ?>
             </div>

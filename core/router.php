@@ -49,10 +49,16 @@ function router_dispatch(): void {
     $publicRoutes = [
         'auth/login', 'auth/forgot-password', 'auth/reset-password',
         'offline',
+        'exams/report-card-verify',
     ];
 
     $routeKey = $module . '/' . $action;
     $isPublic = in_array($routeKey, $publicRoutes) || $module === 'auth';
+
+    // Allow copy-print access with signature (route handler validates HMAC)
+    if ($routeKey === 'exams/report-card-print' && !empty($_GET['copy']) && !empty($_GET['sig'])) {
+        $isPublic = true;
+    }
 
     // Require auth for non-public routes
     if (!$isPublic) {

@@ -550,6 +550,286 @@ switch ($action) {
         ]);
         exit;
 
+    // ══════════════════════════════════════════════════════════════
+    // GUARDIAN & STUDENT SEARCH API ENDPOINTS
+    // ══════════════════════════════════════════════════════════════
+
+    // ── GET /api/guardian-search?phone=X or ?name=X ─────────────
+    // Search guardians by phone or name for sibling auto-fill
+    case 'guardian-search':
+        auth_require_permission('students.create');
+        $phone = trim(input('phone'));
+        $name  = trim(input('name'));
+
+        if (!$phone && !$name) {
+            echo json_encode(['data' => []]);
+            exit;
+        }
+
+        $where = [];
+        $params = [];
+
+        if ($phone) {
+            $where[] = "g.phone LIKE ?";
+            $params[] = "%" . $phone . "%";
+        }
+        if ($name) {
+            $where[] = "(g.first_name LIKE ? OR g.last_name LIKE ? OR CONCAT(g.first_name, ' ', g.last_name) LIKE ?)";
+            $like = "%" . $name . "%";
+            $params = array_merge($params, [$like, $like, $like]);
+        }
+
+        $whereStr = implode(' AND ', $where);
+
+        $guardians = db_fetch_all(
+            "SELECT g.id, g.first_name, g.last_name, g.full_name, g.relation, g.phone, g.alt_phone, g.email, g.occupation, g.address, g.city, g.region,
+                    GROUP_CONCAT(DISTINCT s.full_name ORDER BY s.full_name SEPARATOR ', ') AS children
+             FROM guardians g
+             LEFT JOIN student_guardians sg ON g.id = sg.guardian_id
+             LEFT JOIN students s ON sg.student_id = s.id AND s.deleted_at IS NULL
+             WHERE {$whereStr}
+             GROUP BY g.id
+             ORDER BY g.full_name
+             LIMIT 20",
+            $params
+        );
+
+        echo json_encode(['data' => $guardians ?: []]);
+        exit;
+
+    // ── GET /api/guardian-detail?id=X ────────────────────────────
+    // Get full guardian details with linked students
+    case 'guardian-detail':
+        auth_require_permission('students.view');
+        $gid = input_int('id');
+        if (!$gid) { echo json_encode(['error' => 'ID required']); exit; }
+
+        $guardian = db_fetch_one("SELECT * FROM guardians WHERE id = ?", [$gid]);
+        if (!$guardian) { http_response_code(404); echo json_encode(['error' => 'Not found']); exit; }
+
+        $children = db_fetch_all(
+            "SELECT s.id, s.admission_no, s.full_name, s.status,
+                    c.name AS class_name, sec.name AS section_name, sg.is_primary
+             FROM student_guardians sg
+             JOIN students s ON sg.student_id = s.id AND s.deleted_at IS NULL
+             LEFT JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
+             LEFT JOIN classes c ON e.class_id = c.id
+             LEFT JOIN sections sec ON e.section_id = sec.id
+             WHERE sg.guardian_id = ?
+             ORDER BY s.full_name",
+            [$gid]
+        );
+
+        $guardian['children'] = $children ?: [];
+        echo json_encode(['data' => $guardian]);
+        exit;
+
+    // ── GET /api/student-search?q=X&session_id=X ────────────────
+    // Cross-session student search for re-enrollment / promotion
+    case 'student-search':
+        auth_require_permission('students.view');
+        $q = trim(input('q'));
+        $sessionId = input_int('session_id');
+
+        if (strlen($q) < 2) {
+            echo json_encode(['data' => []]);
+            exit;
+        }
+
+        $where = ["s.deleted_at IS NULL", "(s.full_name LIKE ? OR s.admission_no LIKE ? OR s.phone LIKE ?)"];
+        $like = "%" . $q . "%";
+        $params = [$like, $like, $like];
+
+        if ($sessionId) {
+            $where[] = "e.session_id = ?";
+            $params[] = $sessionId;
+        }
+
+        $whereStr = implode(' AND ', $where);
+
+        $students = db_fetch_all(
+            "SELECT s.id, s.admission_no, s.full_name, s.first_name, s.last_name,
+                    s.gender, s.date_of_birth, s.phone, s.status, s.photo,
+                    c.name AS class_name, sec.name AS section_name,
+                    asess.name AS session_name, e.status AS enrollment_status,
+                    e.session_id
+             FROM students s
+             LEFT JOIN enrollments e ON s.id = e.student_id
+             LEFT JOIN classes c ON e.class_id = c.id
+             LEFT JOIN sections sec ON e.section_id = sec.id
+             LEFT JOIN academic_sessions asess ON e.session_id = asess.id
+             WHERE {$whereStr}
+             GROUP BY s.id, e.id
+             ORDER BY e.session_id DESC, s.full_name
+             LIMIT 30",
+            $params
+        );
+
+        echo json_encode(['data' => $students ?: []]);
+        exit;
+
+    // ── GET /api/student-for-enroll?id=X ────────────────────────
+    // Get full student data for re-enrollment form auto-fill
+    case 'student-for-enroll':
+        auth_require_permission('students.create');
+        $sid = input_int('id');
+        if (!$sid) { echo json_encode(['error' => 'ID required']); exit; }
+
+        $student = db_fetch_one(
+            "SELECT s.*, c.name AS class_name, c.numeric_name AS class_numeric,
+                    sec.name AS section_name, e.class_id, e.section_id, e.session_id
+             FROM students s
+             LEFT JOIN enrollments e ON s.id = e.student_id
+             LEFT JOIN classes c ON e.class_id = c.id
+             LEFT JOIN sections sec ON e.section_id = sec.id
+             WHERE s.id = ? AND s.deleted_at IS NULL
+             ORDER BY e.session_id DESC
+             LIMIT 1",
+            [$sid]
+        );
+
+        if (!$student) { http_response_code(404); echo json_encode(['error' => 'Not found']); exit; }
+
+        // Get guardians
+        $guardians = db_fetch_all(
+            "SELECT g.*, sg.is_primary
+             FROM guardians g
+             JOIN student_guardians sg ON g.id = sg.guardian_id
+             WHERE sg.student_id = ?
+             ORDER BY sg.is_primary DESC, g.full_name",
+            [$sid]
+        );
+
+        // Check latest academic results for promotion decision
+        $latestResult = db_fetch_one(
+            "SELECT rc.percentage, rc.grade, rc.status AS result_status
+             FROM report_cards rc
+             WHERE rc.student_id = ? AND rc.status = 'published'
+             ORDER BY rc.session_id DESC, rc.term_id DESC
+             LIMIT 1",
+            [$sid]
+        );
+
+        $student['guardians'] = $guardians ?: [];
+        $student['latest_result'] = $latestResult;
+        echo json_encode(['data' => $student]);
+        exit;
+
+    // ── POST /api/term-toggle ────────────────────────────────────
+    // Toggle term active status (allows multiple active terms)
+    case 'term-toggle':
+        auth_require_permission('academics.manage');
+        if (!is_post()) { http_response_code(405); echo json_encode(['error' => 'POST required']); exit; }
+        csrf_protect();
+
+        $termId = input_int('id');
+        if (!$termId) { echo json_encode(['error' => 'Term ID required']); exit; }
+
+        $term = db_fetch_one("SELECT * FROM terms WHERE id = ?", [$termId]);
+        if (!$term) { http_response_code(404); echo json_encode(['error' => 'Term not found']); exit; }
+
+        $newStatus = $term['is_active'] ? 0 : 1;
+        db_update('terms', ['is_active' => $newStatus], 'id = ?', [$termId]);
+
+        $statusText = $newStatus ? 'activated' : 'deactivated';
+        audit_log("term.{$statusText}", "Term {$term['name']} {$statusText}");
+
+        echo json_encode([
+            'success' => true,
+            'is_active' => $newStatus,
+            'message' => "Term \"{$term['name']}\" {$statusText} successfully."
+        ]);
+        exit;
+
+    // ── GET /api/students-paginated ─────────────────────────────
+    // AJAX paginated student list
+    case 'students-paginated':
+        auth_require_permission('students.view');
+
+        $search        = trim(input('search'));
+        $classFilter   = input_int('class_id');
+        $sectionFilter = input_int('section_id');
+        $sessionFilter = input_int('session_id');
+        $statusFilter  = input('status');
+        $page          = max(1, input_int('page') ?: 1);
+        $perPage       = 15;
+
+        $where  = ["s.deleted_at IS NULL"];
+        $params = [];
+
+        if ($search) {
+            $where[]  = "(s.full_name LIKE ? OR s.admission_no LIKE ? OR s.phone LIKE ?)";
+            $params[] = "%{$search}%";
+            $params[] = "%{$search}%";
+            $params[] = "%{$search}%";
+        }
+
+        if ($statusFilter && $statusFilter !== 'all') {
+            $where[] = "s.status = ?";
+            $params[] = $statusFilter;
+        } else if (!$statusFilter) {
+            $where[] = "s.status = 'active'";
+        }
+
+        $joinEnrollment = "LEFT JOIN enrollments e ON s.id = e.student_id";
+        $enrollWhere = "";
+
+        if ($sessionFilter) {
+            $enrollWhere = " AND e.session_id = ?";
+            $params[] = $sessionFilter;
+        }
+
+        if ($classFilter) {
+            $where[] = "e.class_id = ?";
+            $params[] = $classFilter;
+        }
+        if ($sectionFilter) {
+            $where[] = "e.section_id = ?";
+            $params[] = $sectionFilter;
+        }
+
+        $whereStr = implode(' AND ', $where);
+
+        $countParams = $params;
+        $total = (int) db_fetch_value(
+            "SELECT COUNT(DISTINCT s.id)
+             FROM students s
+             {$joinEnrollment}{$enrollWhere}
+             LEFT JOIN classes c ON e.class_id = c.id
+             LEFT JOIN sections sec ON e.section_id = sec.id
+             WHERE {$whereStr}",
+            $countParams
+        );
+
+        $offset = ($page - 1) * $perPage;
+        $dataParams = $params;
+        $dataParams[] = $perPage;
+        $dataParams[] = $offset;
+
+        $students = db_fetch_all(
+            "SELECT s.id, s.admission_no, s.full_name, s.gender, s.date_of_birth, s.phone, s.status, s.photo,
+                    c.name AS class_name, sec.name AS section_name, asess.name AS session_name
+             FROM students s
+             {$joinEnrollment}{$enrollWhere}
+             LEFT JOIN classes c ON e.class_id = c.id
+             LEFT JOIN sections sec ON e.section_id = sec.id
+             LEFT JOIN academic_sessions asess ON e.session_id = asess.id
+             WHERE {$whereStr}
+             GROUP BY s.id
+             ORDER BY s.full_name ASC
+             LIMIT ? OFFSET ?",
+            $dataParams
+        );
+
+        echo json_encode([
+            'data'       => $students ?: [],
+            'total'      => $total,
+            'page'       => $page,
+            'per_page'   => $perPage,
+            'last_page'  => max(1, (int) ceil($total / $perPage)),
+        ]);
+        exit;
+
     default:
         http_response_code(404);
         echo json_encode(['error' => 'Endpoint not found']);

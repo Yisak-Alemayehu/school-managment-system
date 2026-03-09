@@ -1,20 +1,19 @@
 <?php
 /**
- * Exams — Generate Report Cards Action
+ * Exams — Generate Report Cards Action (Term-Based)
+ * Generates report card records for all students in a class/section for a given term.
  */
 csrf_protect();
 
-$examId    = input_int('exam_id');
+$termId    = input_int('term_id');
 $classId   = input_int('class_id');
 $sectionId = input_int('section_id');
 
 $activeSession = get_active_session();
 $sessionId = $activeSession['id'] ?? 0;
-$activeTerm = get_active_term();
-$termId = $activeTerm['id'] ?? 0;
 
-if (!$examId || !$classId) {
-    set_flash('error', 'Missing exam or class.');
+if (!$termId || !$classId) {
+    set_flash('error', 'Missing term or class.');
     redirect_back();
 }
 
@@ -27,7 +26,7 @@ if ($sectionId) {
 }
 
 $students = db_fetch_all("
-    SELECT s.id, s.first_name, s.last_name
+    SELECT s.id, e.section_id
     FROM students s
     JOIN enrollments e ON e.student_id = s.id
     {$where}
@@ -38,113 +37,149 @@ if (empty($students)) {
     redirect_back();
 }
 
-// Get exam schedules for this class + exam
-$schedules = db_fetch_all("
-    SELECT es.id, es.subject_id, es.full_marks, sub.name AS subject_name
-    FROM exam_schedules es
-    JOIN subjects sub ON sub.id = es.subject_id
-    WHERE es.exam_id = ? AND es.class_id = ?
-", [$examId, $classId]);
+// Get subjects for this class
+$subjects = db_fetch_all("
+    SELECT s.id FROM subjects s
+    JOIN class_subjects cs ON cs.subject_id = s.id
+    WHERE cs.class_id = ? AND cs.session_id = ?
+", [$classId, $sessionId]);
 
-$subjectCount = count($schedules);
-$maxTotal     = array_sum(array_column($schedules, 'full_marks'));
+$subjectIds = array_column($subjects, 'id');
+$numSubjects = count($subjectIds);
+$studentIds  = array_column($students, 'id');
+$idPh = implode(',', array_fill(0, count($studentIds), '?'));
+
+// Build section map
+$sectionMap = [];
+foreach ($students as $st) {
+    $sectionMap[$st['id']] = $st['section_id'];
+}
+
+// Get marks: SUM all assessment marks per student/subject for this term
+$marksGrid = [];
+if ($subjectIds) {
+    $subPh = implode(',', array_fill(0, count($subjectIds), '?'));
+    $mkRows = db_fetch_all(
+        "SELECT sr.student_id, a.subject_id,
+                SUM(CASE WHEN sr.is_absent = 0 THEN sr.marks_obtained ELSE 0 END) AS total_marks,
+                MAX(CASE WHEN sr.is_absent = 0 THEN 1 ELSE 0 END) AS has_marks
+         FROM student_results sr
+         JOIN assessments a ON a.id = sr.assessment_id
+         WHERE a.class_id = ? AND a.term_id = ? AND a.session_id = ?
+           AND a.subject_id IN ({$subPh})
+           AND sr.student_id IN ({$idPh})
+         GROUP BY sr.student_id, a.subject_id",
+        array_merge([$classId, $termId, $sessionId], $subjectIds, $studentIds)
+    );
+    foreach ($mkRows as $rr) {
+        $marksGrid[$rr['student_id']][$rr['subject_id']] =
+            $rr['has_marks'] ? (float)$rr['total_marks'] : null;
+    }
+}
+
+// Absent days
+$abMap = [];
+$abRows = db_fetch_all(
+    "SELECT student_id, COUNT(*) AS cnt FROM attendance
+     WHERE student_id IN ({$idPh}) AND session_id=? AND term_id=? AND status='absent'
+     GROUP BY student_id",
+    array_merge($studentIds, [$sessionId, $termId])
+);
+foreach ($abRows as $r) $abMap[$r['student_id']] = (int)$r['cnt'];
+
+// Attendance days total
+$attRows = db_fetch_all(
+    "SELECT student_id, COUNT(*) AS cnt FROM attendance
+     WHERE student_id IN ({$idPh}) AND session_id=? AND term_id=?
+     GROUP BY student_id",
+    array_merge($studentIds, [$sessionId, $termId])
+);
+$attMap = [];
+foreach ($attRows as $r) $attMap[$r['student_id']] = (int)$r['cnt'];
 
 db_begin();
 try {
     $results = [];
 
     foreach ($students as $st) {
-        // Get all marks for this student in this exam
-        $marks = db_fetch_all("
-            SELECT m.marks_obtained, m.is_absent, m.grade, m.grade_point, es.full_marks, es.subject_id
-            FROM marks m
-            JOIN exam_schedules es ON es.id = m.exam_schedule_id
-            WHERE m.student_id = ? AND m.exam_id = ? AND es.class_id = ?
-        ", [$st['id'], $examId, $classId]);
-
+        $sid = $st['id'];
         $totalMarks = 0;
-        $totalFull  = 0;
-        $totalGP    = 0;
-        $subjectsGraded = 0;
+        $totalMaxMarks = $numSubjects * 100; // Each subject out of 100
 
-        foreach ($marks as $m) {
-            if (!$m['is_absent'] && $m['marks_obtained'] !== null) {
-                $totalMarks += $m['marks_obtained'];
-                $totalFull  += $m['full_marks'];
-                if ($m['grade_point'] !== null) {
-                    $totalGP += $m['grade_point'];
-                    $subjectsGraded++;
-                }
-            }
+        foreach ($subjectIds as $subjId) {
+            $m = $marksGrid[$sid][$subjId] ?? null;
+            if ($m !== null) $totalMarks += $m;
         }
 
-        $average = $totalFull > 0 ? ($totalMarks / $totalFull) * 100 : 0;
-        $gpa     = $subjectsGraded > 0 ? $totalGP / $subjectsGraded : 0;
+        $percentage = $totalMaxMarks > 0 ? ($totalMarks / $totalMaxMarks) * 100 : 0;
 
-        // Overall grade from average
-        $overallGrade = null;
-        $gradeEntry = db_fetch_one("
-            SELECT grade FROM grade_scale_entries gse
-            JOIN grade_scales gs ON gs.id = gse.grade_scale_id
-            WHERE gs.is_default = 1 AND ? BETWEEN gse.min_mark AND gse.max_mark
-            LIMIT 1
-        ", [$average]);
-        if ($gradeEntry) {
-            $overallGrade = $gradeEntry['grade'];
-        }
+        // Overall grade from percentage
+        $overallGrade = match(true) {
+            $percentage >= 90 => 'A',
+            $percentage >= 80 => 'B',
+            $percentage >= 70 => 'C',
+            $percentage >= 60 => 'D',
+            default           => 'F',
+        };
 
         $results[] = [
-            'student_id'  => $st['id'],
-            'total_marks' => $totalMarks,
-            'average'     => $average,
-            'gpa'         => $gpa,
-            'grade'       => $overallGrade,
+            'student_id'     => $sid,
+            'section_id'     => $sectionMap[$sid] ?? null,
+            'total_marks'    => $totalMarks,
+            'total_max_marks'=> $totalMaxMarks,
+            'percentage'     => round($percentage, 2),
+            'grade'          => $overallGrade,
+            'attendance_days'=> $attMap[$sid] ?? 0,
+            'absent_days'    => $abMap[$sid] ?? 0,
         ];
     }
 
-    // Sort by average DESC for ranking
-    usort($results, fn($a, $b) => $b['average'] <=> $a['average']);
+    // Sort by percentage DESC for ranking
+    usort($results, fn($a, $b) => $b['percentage'] <=> $a['percentage']);
 
     $rank = 0;
-    $prevAvg = null;
+    $prevPct = null;
     foreach ($results as $i => &$r) {
-        if ($r['average'] !== $prevAvg) {
+        if ($r['percentage'] !== $prevPct) {
             $rank = $i + 1;
         }
         $r['rank'] = $rank;
-        $prevAvg = $r['average'];
+        $prevPct = $r['percentage'];
     }
 
     // Save report cards
     foreach ($results as $r) {
-        // Delete existing
-        db_query("DELETE FROM report_cards WHERE student_id = ? AND exam_id = ? AND class_id = ?",
-            [$r['student_id'], $examId, $classId]);
+        // Delete existing for this term
+        db_query("DELETE FROM report_cards WHERE student_id = ? AND term_id = ? AND class_id = ? AND session_id = ?",
+            [$r['student_id'], $termId, $classId, $sessionId]);
 
         db_insert('report_cards', [
-            'student_id'     => $r['student_id'],
-            'exam_id'        => $examId,
-            'class_id'       => $classId,
-            'session_id'     => $sessionId,
-            'term_id'        => $termId,
-            'total_marks'    => $r['total_marks'],
-            'average'        => $r['average'],
-            'gpa'            => $r['gpa'],
-            'grade'          => $r['grade'],
-            'rank'           => $r['rank'],
-            'total_students' => count($students),
-            'status'         => 'generated',
+            'student_id'      => $r['student_id'],
+            'session_id'      => $sessionId,
+            'term_id'         => $termId,
+            'class_id'        => $classId,
+            'section_id'      => $r['section_id'],
+            'total_marks'     => $r['total_marks'],
+            'total_max_marks' => $r['total_max_marks'],
+            'percentage'      => $r['percentage'],
+            'grade'           => $r['grade'],
+            'rank'            => $r['rank'],
+            'attendance_days' => $r['attendance_days'],
+            'absent_days'     => $r['absent_days'],
+            'status'          => 'published',
+            'generated_by'    => $_SESSION['user_id'] ?? null,
+            'generated_at'    => date('Y-m-d H:i:s'),
         ]);
     }
 
     db_commit();
-    audit_log('report_card.generate', "Generated report cards for exam {$examId}, class {$classId}: " . count($students) . " students");
+    audit_log('report_card.generate', "Generated report cards for term {$termId}, class {$classId}: " . count($students) . " students");
     set_flash('success', 'Report cards generated for ' . count($students) . ' students.');
 } catch (Exception $ex) {
     db_rollback();
     set_flash('error', 'Failed to generate: ' . $ex->getMessage());
 }
 
-$redir = url('exams', 'report-cards') . "&exam_id={$examId}&class_id={$classId}";
+$redir = url('exams', 'report-cards') . "&term_id={$termId}&class_id={$classId}";
 if ($sectionId) $redir .= "&section_id={$sectionId}";
 redirect($redir);
