@@ -245,27 +245,23 @@ CREATE TABLE IF NOT EXISTS `fin_supplementary_transactions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- Finance Permissions
--- ============================================================
-INSERT INTO `permissions` (`module`, `action`, `description`) VALUES
+-- Finance Permissions (skip if already seeded)
+INSERT IGNORE INTO `permissions` (`module`, `action`, `description`) VALUES
 ('finance', 'view',    'View finance module'),
 ('finance', 'manage',  'Manage fees, payments, and groups'),
-('finance', 'reports', 'View finance reports')
-ON DUPLICATE KEY UPDATE `description` = VALUES(`description`);
+('finance', 'reports', 'View finance reports');
 
 -- Grant finance permissions to Super Admin and School Admin
-INSERT INTO `role_permissions` (`role_id`, `permission_id`)
-SELECT 1, id FROM permissions WHERE module = 'finance'
-ON DUPLICATE KEY UPDATE `role_id` = VALUES(`role_id`);
-
-INSERT INTO `role_permissions` (`role_id`, `permission_id`)
-SELECT 2, id FROM permissions WHERE module = 'finance'
-ON DUPLICATE KEY UPDATE `role_id` = VALUES(`role_id`);
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
+SELECT r.id, p.id FROM permissions p
+CROSS JOIN roles r
+WHERE p.module = 'finance' AND r.slug IN ('super_admin', 'school_admin');
 
 -- Grant finance permissions to Accountant
-INSERT INTO `role_permissions` (`role_id`, `permission_id`)
-SELECT 6, id FROM permissions WHERE module = 'finance'
-ON DUPLICATE KEY UPDATE `role_id` = VALUES(`role_id`);
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
+SELECT r.id, p.id FROM permissions p
+CROSS JOIN roles r
+WHERE p.module = 'finance' AND r.slug = 'accountant';
 
 SET FOREIGN_KEY_CHECKS = 1;
 

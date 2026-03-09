@@ -9,6 +9,9 @@
 // Define root path
 define('APP_ROOT', dirname(__DIR__));
 
+// Composer autoloader
+require APP_ROOT . '/vendor/autoload.php';
+
 // Load .env first (must be before config files that use getenv)
 require APP_ROOT . '/core/env.php';
 env_load(APP_ROOT . '/.env');

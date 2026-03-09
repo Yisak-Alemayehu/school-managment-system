@@ -1,0 +1,9 @@
+{
+    "name": "urjiberi/school",
+    "description": "Urji Beri School Management System",
+    "type": "project",
+    "require": {
+        "setasign/fpdf": "^1.8",
+        "chillerlan/php-qrcode": "^5.0"
+    }
+}

@@ -147,6 +147,10 @@ switch ($action) {
         $pageTitle = 'Print Report Card';
         require __DIR__ . '/views/report_card_print.php';
         break;
+    case 'qr-code':
+        auth_require_permission('report_card.view');
+        require __DIR__ . '/actions/qr_code.php';
+        break;
 
     // ===== AJAX: current total marks committed for class+subject+term =====
     case 'ajax-subject-total':

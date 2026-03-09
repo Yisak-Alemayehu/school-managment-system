@@ -94,6 +94,26 @@ switch ($action) {
         break;
 
     // ══════════════════════════════════════════════════════════
+    // COLLECT PAYMENT
+    // ══════════════════════════════════════════════════════════
+    case 'collect-payment':
+        auth_require_permission('finance.manage');
+        $pageTitle = 'Collect Payment';
+        require __DIR__ . '/views/collect_payment.php';
+        break;
+
+    case 'collect-payment-save':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/collect_payment_save.php'; }
+        else { redirect(url('finance', 'collect-payment')); }
+        break;
+
+    case 'payment-attachment':
+        auth_require_permission('finance.view');
+        require __DIR__ . '/actions/payment_attachment.php';
+        break;
+
+    // ══════════════════════════════════════════════════════════
     // PAYMENTS
     // ══════════════════════════════════════════════════════════
     case 'payments':

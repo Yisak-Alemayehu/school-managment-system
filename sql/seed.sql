@@ -15,7 +15,7 @@ SET @now = NOW();
 -- ============================================================
 -- SECTION 1: ROLES
 -- ============================================================
-INSERT INTO `roles` (`id`, `name`, `slug`, `description`, `is_system`) VALUES
+INSERT IGNORE INTO `roles` (`id`, `name`, `slug`, `description`, `is_system`) VALUES
 (1, 'Super Admin',   'super_admin',   'Full system access â€” all modules, all operations',             1),
 (2, 'School Admin',  'school_admin',  'Manages school operations, staff, and academic settings',      1),
 (3, 'Teacher',       'teacher',       'Manages classes, assignments, grades, and attendance',          0),
@@ -27,7 +27,7 @@ INSERT INTO `roles` (`id`, `name`, `slug`, `description`, `is_system`) VALUES
 -- ============================================================
 -- SECTION 2: PERMISSIONS (74 total)
 -- ============================================================
-INSERT INTO `permissions` (`id`, `module`, `action`, `description`) VALUES
+INSERT IGNORE INTO `permissions` (`id`, `module`, `action`, `description`) VALUES
 ( 1, 'dashboard',      'view',            'View dashboard overview'),
 ( 2, 'users',          'list',            'View users list'),
 ( 3, 'users',          'create',          'Create a new user'),
@@ -102,54 +102,54 @@ INSERT INTO `permissions` (`id`, `module`, `action`, `description`) VALUES
 -- SECTION 3: ROLE â†’ PERMISSION MAPPING
 -- ============================================================
 -- Super Admin (role 1) â€” ALL permissions
-INSERT INTO `role_permissions` (`role_id`, `permission_id`)
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT 1, `id` FROM `permissions`;
 
 -- School Admin (role 2) â€” all except role create/delete & gateway manage
-INSERT INTO `role_permissions` (`role_id`, `permission_id`)
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`)
 SELECT 2, `id` FROM `permissions` WHERE `id` NOT IN (44, 46);
 
 -- Teacher (role 3)
-INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (3,1),(3,7),(3,11),(3,12),(3,16),(3,19),(3,20),(3,21),(3,22),(3,23),
 (3,24),(3,25),(3,26),(3,28),(3,29),(3,30),(3,38),(3,39),(3,40),
 (3,47),(3,49),(3,50),(3,51),(3,52),(3,54),(3,58),(3,59),(3,60),(3,61),(3,62),
 (3,63),(3,65),(3,66),(3,67),(3,68),(3,69),(3,73);
 
 -- Student (role 4)
-INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (4,1),(4,7),(4,11),(4,19),(4,23),(4,24),(4,28),(4,30),
 (4,40),(4,50),(4,51),(4,52),(4,54),(4,58),(4,59),(4,60),(4,61),(4,62);
 
 -- Parent (role 5)
-INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (5,1),(5,7),(5,11),(5,12),(5,16),(5,19),(5,23),(5,24),(5,28),(5,30),
 (5,39),(5,40),(5,50),(5,51),(5,52),(5,59),(5,60),(5,61),(5,62),(5,75);
 
 -- Registrar (role 7)
-INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (7,1),(7,7),(7,8),(7,9),(7,11),(7,12),(7,13),(7,14),(7,15),(7,16),
 (7,17),(7,18),(7,19),(7,22),(7,23),(7,38),(7,39),(7,40),(7,47),(7,50),(7,51),(7,52),(7,70),(7,73);
 
 -- Accountant (role 6)
-INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
+INSERT IGNORE INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 (6,1),(6,7),(6,11),(6,12),(6,16),(6,19),(6,23),(6,39),(6,40),
 (6,50),(6,51),(6,52),(6,75),(6,76),(6,77);
 
 -- ============================================================
 -- SECTION 4: MEDIUMS, STREAMS, SHIFTS
 -- ============================================================
-INSERT INTO `mediums` (`id`, `name`, `is_active`, `sort_order`) VALUES
+INSERT IGNORE INTO `mediums` (`id`, `name`, `is_active`, `sort_order`) VALUES
 (1, 'English Medium',    1, 1),
 (2, 'Afan Oromo Medium', 1, 2),
 (3, 'Amharic Medium',    1, 3);
 
-INSERT INTO `streams` (`id`, `name`, `description`, `is_active`, `sort_order`) VALUES
+INSERT IGNORE INTO `streams` (`id`, `name`, `description`, `is_active`, `sort_order`) VALUES
 (1, 'Natural Science', 'For Grades 9-12: Physics, Chemistry, Biology',        1, 1),
 (2, 'Social Science',  'For Grades 9-12: History, Geography, Economics',       1, 2),
 (3, 'General',         'For Grades 1-8: All general education subjects apply', 1, 3);
 
-INSERT INTO `shifts` (`id`, `name`, `start_time`, `end_time`, `is_active`, `sort_order`) VALUES
+INSERT IGNORE INTO `shifts` (`id`, `name`, `start_time`, `end_time`, `is_active`, `sort_order`) VALUES
 (1, 'Morning Shift',   '08:00:00', '12:30:00', 1, 1),
 (2, 'Afternoon Shift', '13:00:00', '17:30:00', 1, 2),
 (3, 'Full Day',        '08:00:00', '17:30:00', 1, 3);
@@ -158,7 +158,7 @@ INSERT INTO `shifts` (`id`, `name`, `start_time`, `end_time`, `is_active`, `sort
 -- SECTION 5: USERS â€” Admin (1) + 12 Teachers (2-13)
 -- ============================================================
 -- Admin password: Admin@123   |   Teacher password: Teacher@123
-INSERT INTO `users` (`id`,`username`,`email`,`password_hash`,`full_name`,`first_name`,`last_name`,`phone`,`is_active`,`status`,`force_password_change`) VALUES
+INSERT IGNORE INTO `users` (`id`,`username`,`email`,`password_hash`,`full_name`,`first_name`,`last_name`,`phone`,`is_active`,`status`,`force_password_change`) VALUES
 ( 1, 'admin',     'admin@urjiberischool.com',      '$2y$12$LJ3m4yS6YE5Ks0FMwRNsNuXBeqJKlC9UVPlyuFJV5kBO2.WMfyRrm', 'System Administrator',  'System',    'Administrator', '0912000000', 1, 'active', 0),
 ( 2, 'teacher1',  'tadesse.m@urjiberischool.com',   '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Tadesse Mekonnen',      'Tadesse',   'Mekonnen',      '0913000001', 1, 'active', 1),
 ( 3, 'teacher2',  'almaz.b@urjiberischool.com',     '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Almaz Bekele',          'Almaz',     'Bekele',        '0913000002', 1, 'active', 1),
@@ -174,16 +174,16 @@ INSERT INTO `users` (`id`,`username`,`email`,`password_hash`,`full_name`,`first_
 (13, 'teacher12', 'birhanu.al@urjiberischool.com',  '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Birhanu Alemayehu',     'Birhanu',   'Alemayehu',     '0913000012', 1, 'active', 1);
 
 -- Assign roles: admin=super_admin, teachers=teacher role
-INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
+INSERT IGNORE INTO `user_roles` (`user_id`, `role_id`) VALUES
 (1,1),(2,3),(3,3),(4,3),(5,3),(6,3),(7,3),(8,3),(9,3),(10,3),(11,3),(12,3),(13,3);
 
 -- ============================================================
 -- SECTION 6: ACADEMIC SESSION & TERMS
 -- ============================================================
-INSERT INTO `academic_sessions` (`id`, `name`, `slug`, `start_date`, `end_date`, `is_active`) VALUES
+INSERT IGNORE INTO `academic_sessions` (`id`, `name`, `slug`, `start_date`, `end_date`, `is_active`) VALUES
 (1, '2025/2026 Academic Year', '2025-2026', '2025-09-01', '2026-06-30', 1);
 
-INSERT INTO `terms` (`id`, `session_id`, `name`, `slug`, `start_date`, `end_date`, `is_active`, `sort_order`) VALUES
+INSERT IGNORE INTO `terms` (`id`, `session_id`, `name`, `slug`, `start_date`, `end_date`, `is_active`, `sort_order`) VALUES
 (1, 1, 'Term 1', 'term-1-2025-2026', '2025-09-01', '2025-11-15', 0, 1),
 (2, 1, 'Term 2', 'term-2-2025-2026', '2025-11-16', '2026-01-31', 0, 2),
 (3, 1, 'Term 3', 'term-3-2025-2026', '2026-02-01', '2026-04-15', 1, 3),
@@ -192,7 +192,7 @@ INSERT INTO `terms` (`id`, `session_id`, `name`, `slug`, `start_date`, `end_date
 -- ============================================================
 -- SECTION 7: CLASSES & SECTIONS (Grade 1-12, A & B = 24)
 -- ============================================================
-INSERT INTO `classes` (`id`,`name`,`slug`,`numeric_name`,`description`,`medium_id`,`stream_id`,`shift_id`,`sort_order`,`is_active`) VALUES
+INSERT IGNORE INTO `classes` (`id`,`name`,`slug`,`numeric_name`,`description`,`medium_id`,`stream_id`,`shift_id`,`sort_order`,`is_active`) VALUES
 ( 1, 'Grade 1',  'grade-1',   1, 'First grade',    1, 3, 1,  1, 1),
 ( 2, 'Grade 2',  'grade-2',   2, 'Second grade',   1, 3, 1,  2, 1),
 ( 3, 'Grade 3',  'grade-3',   3, 'Third grade',    1, 3, 1,  3, 1),
@@ -206,7 +206,7 @@ INSERT INTO `classes` (`id`,`name`,`slug`,`numeric_name`,`description`,`medium_i
 (11, 'Grade 11', 'grade-11', 11, 'Eleventh grade', 1, 1, 3, 11, 1),
 (12, 'Grade 12', 'grade-12', 12, 'Twelfth grade',  1, 1, 3, 12, 1);
 
-INSERT INTO `sections` (`id`, `class_id`, `name`, `capacity`, `is_active`) VALUES
+INSERT IGNORE INTO `sections` (`id`, `class_id`, `name`, `capacity`, `is_active`) VALUES
 ( 1,  1,'A',40,1),( 2,  1,'B',40,1),( 3,  2,'A',40,1),( 4,  2,'B',40,1),
 ( 5,  3,'A',40,1),( 6,  3,'B',40,1),( 7,  4,'A',40,1),( 8,  4,'B',40,1),
 ( 9,  5,'A',40,1),(10,  5,'B',40,1),(11,  6,'A',40,1),(12,  6,'B',40,1),
@@ -217,7 +217,7 @@ INSERT INTO `sections` (`id`, `class_id`, `name`, `capacity`, `is_active`) VALUE
 -- ============================================================
 -- SECTION 8: SUBJECTS (14 â€” ensures 10 per class)
 -- ============================================================
-INSERT INTO `subjects` (`id`,`name`,`code`,`description`,`type`,`is_active`) VALUES
+INSERT IGNORE INTO `subjects` (`id`,`name`,`code`,`description`,`type`,`is_active`) VALUES
 ( 1, 'English',               'ENG',  'English Language',                   'theory', 1),
 ( 2, 'Amharic',               'AMH',  'Amharic Language',                   'theory', 1),
 ( 3, 'Afan Oromo',            'ORO',  'Oromo Language',                     'theory', 1),
@@ -241,35 +241,35 @@ INSERT INTO `subjects` (`id`,`name`,`code`,`description`,`type`,`is_active`) VAL
 -- Grade 7-12: ENG,AMH,ORO,MATH, GEO,HIST, ICT,PHY,CHEM,BIO = 10
 
 -- Core languages & math (1,2,3,4) â†’ all 12 grades
-INSERT INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
+INSERT IGNORE INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
 SELECT c.id, s.id, 1, 0 FROM `classes` c CROSS JOIN `subjects` s WHERE s.id IN (1,2,3,4);
 
 -- Geography & History (8,9) â†’ all 12 grades
-INSERT INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
+INSERT IGNORE INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
 SELECT c.id, s.id, 1, 0 FROM `classes` c CROSS JOIN `subjects` s WHERE s.id IN (8,9);
 
 -- Physical Education (11) â†’ grades 1-6
-INSERT INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
+INSERT IGNORE INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
 SELECT c.id, 11, 1, 0 FROM `classes` c WHERE c.numeric_name <= 6;
 
 -- Art & Music (12) â†’ grades 1-4
-INSERT INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
+INSERT IGNORE INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
 SELECT c.id, 12, 1, 0 FROM `classes` c WHERE c.numeric_name <= 4;
 
 -- Civic Education (13) â†’ grades 1-6
-INSERT INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
+INSERT IGNORE INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
 SELECT c.id, 13, 1, 0 FROM `classes` c WHERE c.numeric_name <= 6;
 
 -- Environmental Science (14) â†’ grades 1-6
-INSERT INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
+INSERT IGNORE INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
 SELECT c.id, 14, 1, 0 FROM `classes` c WHERE c.numeric_name <= 6;
 
 -- ICT (10) â†’ grades 5-12
-INSERT INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
+INSERT IGNORE INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
 SELECT c.id, 10, 1, 0 FROM `classes` c WHERE c.numeric_name >= 5;
 
 -- Physics, Chemistry, Biology (5,6,7) â†’ grades 7-12
-INSERT INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
+INSERT IGNORE INTO `class_subjects` (`class_id`,`subject_id`,`session_id`,`is_elective`)
 SELECT c.id, s.id, 1, 0 FROM `classes` c CROSS JOIN `subjects` s
 WHERE c.numeric_name >= 7 AND s.id IN (5,6,7);
 
@@ -277,16 +277,16 @@ WHERE c.numeric_name >= 7 AND s.id IN (5,6,7);
 -- SECTION 10: CLASS TEACHERS (1 teacher per grade)
 -- ============================================================
 -- Teacher user_id = class_id + 1 (user 2 â†’ grade 1, user 13 â†’ grade 12)
-INSERT INTO `class_teachers` (`class_id`,`teacher_id`,`session_id`,`is_class_teacher`) VALUES
+INSERT IGNORE INTO `class_teachers` (`class_id`,`teacher_id`,`session_id`,`is_class_teacher`) VALUES
 (1,2,1,1),(2,3,1,1),(3,4,1,1),(4,5,1,1),(5,6,1,1),(6,7,1,1),
 (7,8,1,1),(8,9,1,1),(9,10,1,1),(10,11,1,1),(11,12,1,1),(12,13,1,1);
 
 -- ============================================================
 -- SECTION 11: GRADE SCALE (Ethiopian Standard)
 -- ============================================================
-INSERT INTO `grade_scales` (`id`, `name`, `is_default`) VALUES (1, 'Ethiopian Standard', 1);
+INSERT IGNORE INTO `grade_scales` (`id`, `name`, `is_default`) VALUES (1, 'Ethiopian Standard', 1);
 
-INSERT INTO `grade_scale_entries` (`grade_scale_id`,`grade`,`min_percentage`,`max_percentage`,`grade_point`,`remark`) VALUES
+INSERT IGNORE INTO `grade_scale_entries` (`grade_scale_id`,`grade`,`min_percentage`,`max_percentage`,`grade_point`,`remark`) VALUES
 (1,'A+',95.00,100.00,4.00,'Outstanding'),
 (1,'A', 90.00, 94.99,4.00,'Excellent'),
 (1,'A-',85.00, 89.99,3.75,'Very Good'),
@@ -302,7 +302,7 @@ INSERT INTO `grade_scale_entries` (`grade_scale_id`,`grade`,`min_percentage`,`ma
 -- ============================================================
 -- SECTION 15: SYSTEM SETTINGS (39 entries)
 -- ============================================================
-INSERT INTO `settings` (`setting_group`,`setting_key`,`setting_value`,`setting_type`,`description`,`is_public`) VALUES
+INSERT IGNORE INTO `settings` (`setting_group`,`setting_key`,`setting_value`,`setting_type`,`description`,`is_public`) VALUES
 ('school','school_name',      'Urji Beri School',            'string', 'Official school name',          1),
 ('school','school_tagline',   'Excellence in Education',     'string', 'School motto / tagline',        1),
 ('school','school_email',     'info@urjiberischool.com',     'string', 'Primary school email',          1),
@@ -334,12 +334,11 @@ INSERT INTO `settings` (`setting_group`,`setting_key`,`setting_value`,`setting_t
 ('email','from_name',     'Urji Beri School',                'string', 'Default from name',             0),
 ('sms','provider',  '',                                      'string', 'SMS provider name',             0),
 ('sms','api_key',   '',                                      'string', 'SMS provider API key',          0),
-('sms','sender_id', 'UrjiBeri',                              'string', 'SMS sender ID',                 0),
-);
+('sms','sender_id', 'UrjiBeri',                              'string', 'SMS sender ID',                 0);
 -- ============================================================
 -- SECTION 16: ANNOUNCEMENTS
 -- ============================================================
-INSERT INTO `announcements` (`title`,`content`,`type`,`target_roles`,`is_pinned`,`status`,`published_at`,`created_by`) VALUES
+INSERT IGNORE INTO `announcements` (`title`,`content`,`type`,`target_roles`,`is_pinned`,`status`,`published_at`,`created_by`) VALUES
 ('Welcome to 2025/2026 Academic Year',
  'We are pleased to welcome all students, parents, and staff to the new academic year. Classes begin September 1, 2025.',
  'general',NULL,1,'published',@now,1),
@@ -358,13 +357,13 @@ INSERT INTO `announcements` (`title`,`content`,`type`,`target_roles`,`is_pinned`
 
 -- â”€â”€ Helper: numbers 1-300 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 CREATE TEMPORARY TABLE IF NOT EXISTS `tmp_nums` (`n` INT PRIMARY KEY);
-INSERT INTO `tmp_nums` (`n`)
+INSERT IGNORE INTO `tmp_nums` (`n`)
 WITH RECURSIVE r AS (SELECT 1 AS n UNION ALL SELECT n+1 FROM r WHERE n < 300)
 SELECT n FROM r;
 
 -- â”€â”€ Helper: weekday dates Sep 1 â€“ Nov 15, 2025 (â‰ˆ55 days) â”€â”€
 CREATE TEMPORARY TABLE IF NOT EXISTS `tmp_dates` (`d` DATE PRIMARY KEY);
-INSERT INTO `tmp_dates` (`d`)
+INSERT IGNORE INTO `tmp_dates` (`d`)
 WITH RECURSIVE r AS (SELECT DATE('2025-09-01') AS d UNION ALL SELECT DATE_ADD(d, INTERVAL 1 DAY) FROM r WHERE d < '2025-11-15')
 SELECT d FROM r WHERE DAYOFWEEK(d) NOT IN (1, 7);
 
@@ -374,7 +373,7 @@ SELECT d FROM r WHERE DAYOFWEEK(d) NOT IN (1, 7);
 -- 25 students per grade (300 / 12 = 25)
 -- 13 in section A, 12 in section B per grade
 -- Odd n = male, Even n = female
-INSERT INTO `students` (`id`, `admission_no`, `first_name`, `last_name`, `gender`,
+INSERT IGNORE INTO `students` (`id`, `admission_no`, `first_name`, `last_name`, `gender`,
     `date_of_birth`, `nationality`, `phone`, `admission_date`, `status`)
 SELECT
     n,
@@ -417,7 +416,7 @@ FROM `tmp_nums`;
 -- ============================================================
 -- SECTION 18: 300 GUARDIANS (1 per student)
 -- ============================================================
-INSERT INTO `guardians` (`id`, `first_name`, `last_name`, `relation`, `phone`,
+INSERT IGNORE INTO `guardians` (`id`, `first_name`, `last_name`, `relation`, `phone`,
     `is_emergency_contact`)
 SELECT
     n,
@@ -451,13 +450,13 @@ FROM `tmp_nums`;
 -- ============================================================
 -- SECTION 19: STUDENT â†” GUARDIAN LINKS
 -- ============================================================
-INSERT INTO `student_guardians` (`student_id`, `guardian_id`, `is_primary`)
+INSERT IGNORE INTO `student_guardians` (`student_id`, `guardian_id`, `is_primary`)
 SELECT n, n, 1 FROM `tmp_nums`;
 
 -- ============================================================
 -- SECTION 20: ENROLLMENTS (300 students â†’ session 1)
 -- ============================================================
-INSERT INTO `enrollments` (`student_id`, `session_id`, `class_id`, `section_id`,
+INSERT IGNORE INTO `enrollments` (`student_id`, `session_id`, `class_id`, `section_id`,
     `roll_no`, `status`, `enrolled_at`)
 SELECT
     n, 1,
@@ -475,7 +474,7 @@ FROM `tmp_nums`;
 -- SECTION 21: TERM 1 ASSESSMENTS (1 midterm per class-subject)
 -- ============================================================
 -- Creates 120 assessments (12 classes Ã— 10 subjects each)
-INSERT INTO `assessments` (`name`, `class_id`, `subject_id`, `session_id`,
+INSERT IGNORE INTO `assessments` (`name`, `class_id`, `subject_id`, `session_id`,
     `term_id`, `total_marks`, `created_by`)
 SELECT
     CONCAT('Term 1 Midterm - ', s.name, ' - ', c.name),
@@ -490,7 +489,7 @@ WHERE cs.session_id = 1;
 -- ============================================================
 -- Each student gets marks 35-100 for all 10 of their class's subjects
 -- ~3% of students marked absent per assessment (NULL marks)
-INSERT INTO `student_results` (`assessment_id`, `student_id`, `class_id`,
+INSERT IGNORE INTO `student_results` (`assessment_id`, `student_id`, `class_id`,
     `section_id`, `marks_obtained`, `is_absent`, `entered_by`)
 SELECT
     sub.aid, sub.sid, sub.cid, sub.secid,
@@ -510,7 +509,7 @@ FROM (
 -- ============================================================
 -- ~55 weekdays Ã— 300 students = ~16,500 rows
 -- Distribution: ~85% present, ~10% late, ~5% absent
-INSERT INTO `attendance` (`student_id`, `class_id`, `section_id`, `session_id`,
+INSERT IGNORE INTO `attendance` (`student_id`, `class_id`, `section_id`, `session_id`,
     `term_id`, `date`, `status`, `marked_by`)
 SELECT
     e.student_id, e.class_id, e.section_id, 1, 1, td.d,
@@ -551,5 +550,6 @@ SET FOREIGN_KEY_CHECKS = 1;
 --   3,000 student results (marks 35-100, ~3% absent)
 --   ~16,500 attendance records (Sep-Nov 2025, 85% present)
 -- ============================================================
+
 
 

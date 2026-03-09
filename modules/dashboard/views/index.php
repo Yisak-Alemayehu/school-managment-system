@@ -73,6 +73,48 @@ if ($isSuperAdmin) {
         ) ?: 0;
     }
 
+    // ── Students per class (for pie chart) ──
+    $studentsPerClass = db_fetch_all(
+        "SELECT c.id, c.name AS class_name, COUNT(e.student_id) AS student_count
+         FROM classes c
+         LEFT JOIN sections sec ON sec.class_id = c.id AND sec.is_active = 1
+         LEFT JOIN enrollments e ON e.section_id = sec.id AND e.status = 'active'
+         LEFT JOIN students s ON s.id = e.student_id AND s.status = 'active' AND s.deleted_at IS NULL
+         WHERE c.is_active = 1
+         GROUP BY c.id, c.name
+         ORDER BY c.sort_order, c.name"
+    );
+
+    // ── Employee gender breakdown ──
+    $superAdminStats['male_employees']   = db_fetch_value("SELECT COUNT(*) FROM hr_employees WHERE gender = 'male'   AND status = 'active' AND deleted_at IS NULL") ?: 0;
+    $superAdminStats['female_employees'] = db_fetch_value("SELECT COUNT(*) FROM hr_employees WHERE gender = 'female' AND status = 'active' AND deleted_at IS NULL") ?: 0;
+    $superAdminStats['total_employees']  = $superAdminStats['male_employees'] + $superAdminStats['female_employees'];
+
+    // ── Financial Summary ──
+    $superAdminStats['total_fees_assigned'] = db_fetch_value(
+        "SELECT COALESCE(SUM(amount), 0) FROM fin_student_fees WHERE is_active = 1"
+    ) ?: 0;
+    $superAdminStats['total_collected'] = db_fetch_value(
+        "SELECT COALESCE(SUM(amount), 0) FROM fin_transactions WHERE type = 'payment'"
+    ) ?: 0;
+    $superAdminStats['total_outstanding'] = db_fetch_value(
+        "SELECT COALESCE(SUM(balance), 0) FROM fin_student_fees WHERE is_active = 1 AND balance > 0"
+    ) ?: 0;
+    $superAdminStats['total_penalties'] = db_fetch_value(
+        "SELECT COALESCE(SUM(amount), 0) FROM fin_transactions WHERE type = 'penalty'"
+    ) ?: 0;
+    $superAdminStats['collection_rate'] = $superAdminStats['total_fees_assigned'] > 0
+        ? round(($superAdminStats['total_collected'] / $superAdminStats['total_fees_assigned']) * 100, 1)
+        : 0;
+    // Recent 5 payments
+    $recentPayments = db_fetch_all(
+        "SELECT t.amount, t.currency, t.channel, t.created_at, s.full_name, s.admission_no
+         FROM fin_transactions t
+         JOIN students s ON t.student_id = s.id
+         WHERE t.type = 'payment'
+         ORDER BY t.created_at DESC LIMIT 5"
+    );
+
     // Recent 6 students
     $recentStudents = db_fetch_all(
         "SELECT s.id, s.full_name, s.admission_no, s.gender, s.created_at,
@@ -284,35 +326,248 @@ ob_start();
     </div>
 </div>
 
-<!-- Row: Gender breakdown + Attendance rate -->
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-    <!-- Gender Breakdown -->
+<!-- ── Class Distribution (Donut Chart + Breakdown) ── -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
-        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Student Gender Breakdown</h3>
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Students per Class</h3>
+        <?php
+        $classColors = ['#3B82F6','#8B5CF6','#EC4899','#F59E0B','#10B981','#06B6D4','#EF4444','#6366F1','#14B8A6','#F97316','#84CC16','#E11D48'];
+        $totalClassStudents = array_sum(array_column($studentsPerClass, 'student_count'));
+        ?>
+        <?php if ($totalClassStudents > 0): ?>
+        <div class="flex items-center gap-6">
+            <!-- SVG Donut -->
+            <div class="flex-shrink-0">
+                <svg width="130" height="130" viewBox="0 0 42 42" class="donut-chart">
+                    <circle cx="21" cy="21" r="15.915" fill="none" stroke="#e5e7eb" stroke-width="5"/>
+                    <?php
+                    $cumulativePercent = 0;
+                    foreach ($studentsPerClass as $i => $cls):
+                        if ($cls['student_count'] <= 0) continue;
+                        $pct = ($cls['student_count'] / $totalClassStudents) * 100;
+                        $color = $classColors[$i % count($classColors)];
+                        $dashArray = $pct . ' ' . (100 - $pct);
+                        $offset = 100 - $cumulativePercent + 25;
+                    ?>
+                    <circle cx="21" cy="21" r="15.915" fill="none" stroke="<?= $color ?>" stroke-width="5"
+                            stroke-dasharray="<?= $dashArray ?>" stroke-dashoffset="<?= $offset ?>"
+                            class="transition-all duration-500"/>
+                    <?php
+                        $cumulativePercent += $pct;
+                    endforeach;
+                    ?>
+                    <text x="21" y="21" text-anchor="middle" dy=".35em" class="text-[6px] font-bold fill-gray-700 dark:fill-gray-200"><?= number_format($totalClassStudents) ?></text>
+                    <text x="21" y="26" text-anchor="middle" class="text-[3px] fill-gray-400">students</text>
+                </svg>
+            </div>
+            <!-- Legend -->
+            <div class="flex-1 space-y-1.5 max-h-[140px] overflow-y-auto">
+                <?php foreach ($studentsPerClass as $i => $cls):
+                    $color = $classColors[$i % count($classColors)];
+                    $pct = $totalClassStudents > 0 ? round($cls['student_count'] / $totalClassStudents * 100, 1) : 0;
+                ?>
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:<?= $color ?>"></span>
+                    <span class="flex-1 text-gray-700 dark:text-gray-300 truncate"><?= e($cls['class_name']) ?></span>
+                    <span class="text-gray-500 dark:text-dark-muted font-medium"><?= number_format($cls['student_count']) ?></span>
+                    <span class="text-gray-400 dark:text-gray-500 w-10 text-right"><?= $pct ?>%</span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php else: ?>
+            <p class="text-sm text-gray-400 dark:text-gray-500">No student enrollments found.</p>
+        <?php endif; ?>
+    </div>
+
+    <!-- Class Breakdown Table -->
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Class Details</h3>
+        <div class="overflow-x-auto max-h-[180px] overflow-y-auto">
+            <table class="w-full text-xs">
+                <thead class="sticky top-0 bg-white dark:bg-dark-card">
+                    <tr class="text-left text-gray-500 dark:text-dark-muted border-b">
+                        <th class="pb-2 font-medium">Class</th>
+                        <th class="pb-2 font-medium text-right">Students</th>
+                        <th class="pb-2 font-medium text-right">Share</th>
+                        <th class="pb-2 font-medium pl-3">Distribution</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50 dark:divide-dark-border">
+                    <?php foreach ($studentsPerClass as $i => $cls):
+                        $color = $classColors[$i % count($classColors)];
+                        $pct = $totalClassStudents > 0 ? round($cls['student_count'] / $totalClassStudents * 100, 1) : 0;
+                    ?>
+                    <tr>
+                        <td class="py-1.5 text-gray-700 dark:text-gray-300 font-medium"><?= e($cls['class_name']) ?></td>
+                        <td class="py-1.5 text-gray-600 dark:text-dark-muted text-right"><?= number_format($cls['student_count']) ?></td>
+                        <td class="py-1.5 text-gray-500 dark:text-dark-muted text-right"><?= $pct ?>%</td>
+                        <td class="py-1.5 pl-3">
+                            <div class="w-full bg-gray-100 dark:bg-dark-card2 rounded-full h-2 overflow-hidden">
+                                <div class="h-2 rounded-full" style="width:<?= $pct ?>%;background:<?= $color ?>"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ── Gender Demographics ── -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <!-- Student Gender Breakdown -->
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Student Gender Ratio</h3>
         <?php
         $totalG   = $superAdminStats['male_students'] + $superAdminStats['female_students'];
         $malePct  = $totalG > 0 ? round($superAdminStats['male_students']   / $totalG * 100) : 50;
         $femPct   = $totalG > 0 ? round($superAdminStats['female_students'] / $totalG * 100) : 50;
         ?>
-        <div class="flex items-center gap-3 mb-2">
-            <span class="text-xs w-14 text-gray-500 dark:text-dark-muted text-right">Male</span>
-            <div class="flex-1 bg-gray-100 dark:bg-dark-card2 rounded-full h-4 overflow-hidden">
-                <div class="bg-blue-500 h-4 rounded-full" style="width:<?= $malePct ?>%"></div>
-            </div>
-            <span class="text-xs w-16 text-gray-700 dark:text-gray-300 font-medium"><?= number_format($superAdminStats['male_students']) ?> (<?= $malePct ?>%)</span>
+        <!-- Stacked Bar -->
+        <div class="flex rounded-full h-5 overflow-hidden mb-3">
+            <div class="bg-blue-500 h-5 flex items-center justify-center text-[10px] text-white font-bold transition-all" style="width:<?= $malePct ?>%"><?= $malePct ?>%</div>
+            <div class="bg-pink-500 h-5 flex items-center justify-center text-[10px] text-white font-bold transition-all" style="width:<?= $femPct ?>%"><?= $femPct ?>%</div>
         </div>
-        <div class="flex items-center gap-3">
-            <span class="text-xs w-14 text-gray-500 dark:text-dark-muted text-right">Female</span>
-            <div class="flex-1 bg-gray-100 dark:bg-dark-card2 rounded-full h-4 overflow-hidden">
-                <div class="bg-pink-500 h-4 rounded-full" style="width:<?= $femPct ?>%"></div>
+        <div class="flex justify-between text-xs">
+            <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                <span class="text-gray-600 dark:text-dark-muted">Male</span>
+                <span class="font-semibold text-gray-800 dark:text-dark-text"><?= number_format($superAdminStats['male_students']) ?></span>
             </div>
-            <span class="text-xs w-16 text-gray-700 dark:text-gray-300 font-medium"><?= number_format($superAdminStats['female_students']) ?> (<?= $femPct ?>%)</span>
+            <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
+                <span class="text-gray-600 dark:text-dark-muted">Female</span>
+                <span class="font-semibold text-gray-800 dark:text-dark-text"><?= number_format($superAdminStats['female_students']) ?></span>
+            </div>
         </div>
         <p class="text-xs text-gray-400 dark:text-gray-500 mt-3">Total active students: <?= number_format($totalG) ?></p>
     </div>
 
-    <!-- Today's Attendance Rate + Class Breakdown -->
+    <!-- Employee Gender Breakdown -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Employee Gender Ratio</h3>
+        <?php
+        $totalEmp     = $superAdminStats['total_employees'];
+        $empMalePct   = $totalEmp > 0 ? round($superAdminStats['male_employees']   / $totalEmp * 100) : 50;
+        $empFemPct    = $totalEmp > 0 ? round($superAdminStats['female_employees'] / $totalEmp * 100) : 50;
+        ?>
+        <!-- Stacked Bar -->
+        <div class="flex rounded-full h-5 overflow-hidden mb-3">
+            <div class="bg-indigo-500 h-5 flex items-center justify-center text-[10px] text-white font-bold transition-all" style="width:<?= $empMalePct ?>%"><?= $empMalePct ?>%</div>
+            <div class="bg-rose-400 h-5 flex items-center justify-center text-[10px] text-white font-bold transition-all" style="width:<?= $empFemPct ?>%"><?= $empFemPct ?>%</div>
+        </div>
+        <div class="flex justify-between text-xs">
+            <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                <span class="text-gray-600 dark:text-dark-muted">Male</span>
+                <span class="font-semibold text-gray-800 dark:text-dark-text"><?= number_format($superAdminStats['male_employees']) ?></span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+                <span class="text-gray-600 dark:text-dark-muted">Female</span>
+                <span class="font-semibold text-gray-800 dark:text-dark-text"><?= number_format($superAdminStats['female_employees']) ?></span>
+            </div>
+        </div>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-3">Total active employees: <?= number_format($totalEmp) ?></p>
+    </div>
+</div>
+
+<!-- ── Financial Summary ── -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Total Collected</p>
+            <p class="text-xl font-bold text-emerald-600"><?= number_format($superAdminStats['total_collected'], 2) ?></p>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500">ETB</p>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Outstanding</p>
+            <p class="text-xl font-bold text-red-600"><?= number_format($superAdminStats['total_outstanding'], 2) ?></p>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500">ETB unpaid</p>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Penalties</p>
+            <p class="text-xl font-bold text-amber-600"><?= number_format($superAdminStats['total_penalties'], 2) ?></p>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500">ETB charged</p>
+        </div>
+    </div>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 sm:p-5 flex items-center gap-4">
+        <div class="w-11 h-11 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 dark:text-dark-muted">Collection Rate</p>
+            <p class="text-xl font-bold <?= $superAdminStats['collection_rate'] >= 75 ? 'text-green-600' : ($superAdminStats['collection_rate'] >= 50 ? 'text-yellow-600' : 'text-red-600') ?>"><?= $superAdminStats['collection_rate'] ?>%</p>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500">of <?= number_format($superAdminStats['total_fees_assigned'], 2) ?> ETB</p>
+        </div>
+    </div>
+</div>
+
+<!-- Financial Collection Progress + Recent Payments -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <!-- Collection Progress -->
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Fee Collection Progress</h3>
+        <div class="w-full bg-gray-100 dark:bg-dark-card2 rounded-full h-4 overflow-hidden mb-2">
+            <div class="h-4 rounded-full transition-all <?= $superAdminStats['collection_rate'] >= 75 ? 'bg-emerald-500' : ($superAdminStats['collection_rate'] >= 50 ? 'bg-yellow-500' : 'bg-red-500') ?>"
+                 style="width:<?= min($superAdminStats['collection_rate'], 100) ?>%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500 dark:text-dark-muted">
+            <span>Collected: <?= number_format($superAdminStats['total_collected'], 2) ?> ETB</span>
+            <span>Total: <?= number_format($superAdminStats['total_fees_assigned'], 2) ?> ETB</span>
+        </div>
+        <a href="<?= url('finance') ?>" class="text-xs text-primary-600 hover:underline mt-3 inline-block">View Finance &rarr;</a>
+    </div>
+
+    <!-- Recent Payments -->
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
+        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Recent Payments</h3>
+        <?php if (empty($recentPayments)): ?>
+            <p class="text-xs text-gray-400 dark:text-gray-500">No payments recorded yet.</p>
+        <?php else: ?>
+        <div class="space-y-2">
+            <?php foreach ($recentPayments as $rp): ?>
+            <div class="flex items-center justify-between text-xs">
+                <div class="min-w-0 flex-1">
+                    <p class="text-gray-700 dark:text-gray-300 font-medium truncate"><?= e($rp['full_name']) ?></p>
+                    <p class="text-gray-400 dark:text-gray-500"><?= e($rp['admission_no']) ?> &bull; <?= time_ago($rp['created_at']) ?></p>
+                </div>
+                <span class="text-emerald-600 font-semibold ml-2">+<?= number_format($rp['amount'], 2) ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Row: Attendance rate -->
+<div class="grid grid-cols-1 gap-4 mb-6">
+
+    <!-- Today's Attendance Rate + Class Breakdown -->
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5 sm:col-span-1">
         <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">Today's Attendance Rate</h3>
             <span class="text-2xl font-bold <?= $superAdminStats['attendance_rate'] >= 75 ? 'text-green-600' : ($superAdminStats['attendance_rate'] >= 50 ? 'text-yellow-600' : 'text-red-600') ?>">

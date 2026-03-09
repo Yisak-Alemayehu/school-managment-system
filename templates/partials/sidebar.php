@@ -17,6 +17,7 @@ $isParent     = auth_has_role('parent');
 $inAcademics  = route_is('academics');
 $inStudents   = route_is('students');
 $inFinance    = route_is('finance');
+$inHr         = route_is('hr');
 $inMessaging  = route_is('messaging');
 
 $navItems = [];
@@ -291,6 +292,7 @@ if ($isAdmin || auth_has_role('accountant')) {
                 ['action' => 'groups',          'label' => 'Groups'],
             ],
             'Payments' => [
+                ['action' => 'collect-payment', 'label' => 'Collect Payment'],
                 ['action' => 'payments',        'label' => 'School Payment History'],
                 ['action' => 'supplementary-payments', 'label' => 'Supplementary Payments'],
             ],
@@ -302,6 +304,70 @@ if ($isAdmin || auth_has_role('accountant')) {
                 ['action' => 'report-students',  'label' => 'Students Report'],
                 ['action' => 'report-penalty',   'label' => 'Penalty Report'],
                 ['action' => 'report-supplementary', 'label' => 'Supplementary Transactions'],
+            ],
+        ],
+    ];
+}
+
+// ══════════════════════════════════════════════════════════════
+// HR MANAGEMENT — Admin, School Admin, Accountant (limited)
+// ══════════════════════════════════════════════════════════════
+if ($isAdmin) {
+    // 🔴🔵 Super Admin / School Admin: Full HR access
+    $navItems[] = [
+        'icon'   => 'briefcase',
+        'label'  => 'HR Management',
+        'module' => 'hr',
+        'tree'   => true,
+        'groups' => [
+            'Staff Management' => [
+                ['action' => 'employees',       'label' => 'Employees'],
+                ['action' => 'employee-form',   'label' => 'Add Employee'],
+            ],
+            'Organization' => [
+                ['action' => 'departments',     'label' => 'Departments'],
+            ],
+            'Attendance' => [
+                ['action' => 'attendance',      'label' => 'Mark Attendance'],
+                ['action' => 'attendance-report','label' => 'Attendance Report'],
+            ],
+            'Leave' => [
+                ['action' => 'leave-types',     'label' => 'Leave Types'],
+                ['action' => 'holidays',        'label' => 'Holidays'],
+                ['action' => 'leave-requests',  'label' => 'Leave Requests'],
+                ['action' => 'leave-request-form', 'label' => 'Submit Leave'],
+                ['action' => 'leave-balances',  'label' => 'Leave Balances'],
+            ],
+            'Payroll' => [
+                ['action' => 'payroll',         'label' => 'Payroll Periods'],
+                ['action' => 'payroll-printing','label' => 'Print Forms'],
+            ],
+            'Reports' => [
+                ['action' => 'reports-dashboard', 'label' => 'Reports Dashboard'],
+                ['action' => 'reports',         'label' => 'Quick Links'],
+            ],
+            'Devices' => [
+                ['action' => 'devices',         'label' => 'Biometric Devices'],
+            ],
+        ],
+    ];
+} elseif (auth_has_role('accountant')) {
+    // 🟣 Accountant: View employees, payroll, reports, print
+    $navItems[] = [
+        'icon'   => 'briefcase',
+        'label'  => 'HR Management',
+        'module' => 'hr',
+        'tree'   => true,
+        'groups' => [
+            'Staff' => [
+                ['action' => 'employees',       'label' => 'Employee List'],
+            ],
+            'Payroll' => [
+                ['action' => 'payroll',         'label' => 'Payroll Periods'],
+                ['action' => 'payroll-printing','label' => 'Print Forms'],
+            ],
+            'Reports' => [
+                ['action' => 'reports-dashboard', 'label' => 'Reports Dashboard'],
             ],
         ],
     ];
@@ -532,6 +598,7 @@ function sidebar_icon(string $name): string {
         'user-group'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>',
         'chart-bar'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>',
         'cog'             => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>',
+        'briefcase'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>',
     ];
 
     $path = $icons[$name] ?? $icons['home'];

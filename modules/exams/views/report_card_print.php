@@ -168,15 +168,62 @@ $schoolName = get_school_name();
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-8 mt-12 pt-4">
-        <div class="text-center">
-            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Class Teacher</div>
+    <?php
+    // Generate QR code locally using chillerlan/php-qrcode
+    use chillerlan\QRCode\QRCode;
+    use chillerlan\QRCode\QROptions;
+    use chillerlan\QRCode\Output\QROutputInterface;
+    use chillerlan\QRCode\Common\EccLevel;
+
+    $qrParts = [
+        'REPORT CARD',
+        $schoolName,
+        ($rc['first_name'] . ' ' . $rc['last_name']),
+        'ID:' . ($rc['admission_no'] ?? ''),
+        ($rc['class_name'] ?? ''),
+        ($rc['exam_name'] ?? ''),
+        'Avg:' . number_format($rc['average'], 1) . '%',
+        'GPA:' . number_format($rc['gpa'], 2),
+        'Grade:' . ($rc['grade'] ?? ''),
+        'Rank:' . $rc['rank'] . '/' . $rc['total_students'],
+    ];
+    $qrData = implode(' | ', $qrParts);
+
+    $qrSvg = '';
+    try {
+        $options = new QROptions([
+            'outputType'  => QROutputInterface::MARKUP_SVG,
+            'eccLevel'    => EccLevel::M,
+            'svgUseCssProperties' => false,
+        ]);
+        $qrSvg = (new QRCode($options))->render($qrData);
+    } catch (\Throwable $e) {
+        $qrSvg = '';
+    }
+    ?>
+
+    <div class="flex items-end justify-between mt-12 pt-4">
+        <!-- QR Code: generated server-side -->
+        <?php if ($qrSvg): ?>
+        <div class="flex flex-col items-center">
+            <img src="<?= $qrSvg ?>" alt="QR" width="96" height="96" style="width:96px;height:96px;">
+            <span class="text-[10px] text-gray-400 mt-1">Scan to verify</span>
         </div>
-        <div class="text-center">
-            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Principal</div>
-        </div>
-        <div class="text-center">
-            <div class="border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Parent/Guardian</div>
+        <?php else: ?>
+        <div></div>
+        <?php endif; ?>
+
+        <!-- Signatures -->
+        <div class="flex gap-8">
+            <div class="text-center">
+                <div class="w-28 border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Class Teacher</div>
+            </div>
+            <div class="text-center">
+                <div class="w-28 border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Principal</div>
+            </div>
+            <div class="text-center">
+                <div class="w-28 border-t border-gray-400 pt-1 text-xs text-gray-600 dark:text-dark-muted">Parent/Guardian</div>
+            </div>
         </div>
     </div>
 

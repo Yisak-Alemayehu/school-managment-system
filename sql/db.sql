@@ -744,29 +744,35 @@ CREATE TABLE IF NOT EXISTS `settings` (
 -- ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 -- ΓöÇΓöÇ Users table: Add full_name and is_active columns ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-ALTER TABLE `users`
-    ADD COLUMN `full_name` VARCHAR(200) DEFAULT NULL AFTER `password_hash`,
-    ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1 AFTER `address`;
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'users' AND column_name = 'full_name');
+SET @sql = IF(@col_exists = 0, "ALTER TABLE `users` ADD COLUMN `full_name` VARCHAR(200) DEFAULT NULL AFTER `password_hash`", 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'users' AND column_name = 'is_active');
+SET @sql = IF(@col_exists = 0, "ALTER TABLE `users` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1 AFTER `address`", 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- Populate full_name from first_name + last_name
-UPDATE `users` SET `full_name` = CONCAT(`first_name`, ' ', `last_name`) WHERE `full_name` IS NULL;
-
--- Make full_name NOT NULL after population
-ALTER TABLE `users` MODIFY COLUMN `full_name` VARCHAR(200) NOT NULL;
-
+UPDATE `users` SET `full_name` = CONCAT(`first_name`, ' ', `last_name`) WHERE `full_name` IS NULL OR `full_name` = '';
 -- Sync is_active with status
 UPDATE `users` SET `is_active` = CASE WHEN `status` = 'active' THEN 1 ELSE 0 END;
 
 -- ΓöÇΓöÇ Classes table: Add is_active column ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-ALTER TABLE `classes` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1 AFTER `sort_order`;
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'classes' AND column_name = 'is_active');
+SET @sql = IF(@col_exists = 0, "ALTER TABLE `classes` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1 AFTER `sort_order`", 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 UPDATE `classes` SET `is_active` = CASE WHEN `status` = 'active' THEN 1 ELSE 0 END;
 
 -- ΓöÇΓöÇ Sections table: Add is_active column ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-ALTER TABLE `sections` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1 AFTER `capacity`;
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'sections' AND column_name = 'is_active');
+SET @sql = IF(@col_exists = 0, "ALTER TABLE `sections` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1 AFTER `capacity`", 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 UPDATE `sections` SET `is_active` = CASE WHEN `status` = 'active' THEN 1 ELSE 0 END;
 
 -- ΓöÇΓöÇ Subjects table: Add is_active column ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-ALTER TABLE `subjects` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1 AFTER `type`;
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'subjects' AND column_name = 'is_active');
+SET @sql = IF(@col_exists = 0, "ALTER TABLE `subjects` ADD COLUMN `is_active` TINYINT(1) NOT NULL DEFAULT 1 AFTER `type`", 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 UPDATE `subjects` SET `is_active` = CASE WHEN `status` = 'active' THEN 1 ELSE 0 END;
 
 -- ΓöÇΓöÇ Students table: Add full_name generated column ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
@@ -826,9 +832,17 @@ INSERT IGNORE INTO shifts (name, start_time, end_time, sort_order) VALUES
 ('Afternoon', '13:00:00', '17:30:00', 2);
 
 -- ΓöÇΓöÇ Add medium_id, stream_id, shift_id to classes ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-ALTER TABLE `classes` ADD COLUMN `medium_id` BIGINT UNSIGNED DEFAULT NULL AFTER `description`;
-ALTER TABLE `classes` ADD COLUMN `stream_id` BIGINT UNSIGNED DEFAULT NULL AFTER `medium_id`;
-ALTER TABLE `classes` ADD COLUMN `shift_id` BIGINT UNSIGNED DEFAULT NULL AFTER `stream_id`;
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'classes' AND column_name = 'medium_id');
+SET @sql = IF(@col_exists = 0, "ALTER TABLE `classes` ADD COLUMN `medium_id` BIGINT UNSIGNED DEFAULT NULL AFTER `description`", 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'classes' AND column_name = 'stream_id');
+SET @sql = IF(@col_exists = 0, "ALTER TABLE `classes` ADD COLUMN `stream_id` BIGINT UNSIGNED DEFAULT NULL AFTER `medium_id`", 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'classes' AND column_name = 'shift_id');
+SET @sql = IF(@col_exists = 0, "ALTER TABLE `classes` ADD COLUMN `shift_id` BIGINT UNSIGNED DEFAULT NULL AFTER `stream_id`", 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- ΓöÇΓöÇ Make class_teachers.subject_id nullable (class teachers don't need a subject)
 ALTER TABLE `class_teachers` MODIFY `subject_id` BIGINT UNSIGNED DEFAULT NULL;
