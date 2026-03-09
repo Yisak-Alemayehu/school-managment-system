@@ -16,7 +16,7 @@ $emp = db_fetch_one(
 if (!$emp) { set_flash('error', 'Employee not found.'); redirect(url('hr', 'employees')); exit; }
 
 $documents = db_fetch_all(
-    "SELECT * FROM hr_employee_documents WHERE employee_id = ? ORDER BY created_at DESC",
+    "SELECT * FROM hr_employee_documents WHERE employee_id = ? ORDER BY uploaded_at DESC",
     [$id]
 );
 
@@ -27,11 +27,11 @@ $allowances = db_fetch_all(
 );
 
 $leaveBalances = db_fetch_all(
-    "SELECT lt.name, lt.max_days,
+    "SELECT lt.name, lt.days_allowed AS max_days,
             COALESCE(SUM(CASE WHEN lr.status='approved' THEN lr.days END), 0) AS used
      FROM hr_leave_types lt
      LEFT JOIN hr_leave_requests lr ON lr.leave_type_id = lt.id AND lr.employee_id = ? AND lr.status='approved'
-     WHERE lt.is_active = 1
+     WHERE lt.status = 'active'
      GROUP BY lt.id
      ORDER BY lt.name",
     [$id]
@@ -42,7 +42,7 @@ $ecHire = !empty($emp['hire_date_ec']) ? $emp['hire_date_ec'] : '';
 
 // Phase 4: Attendance history (last 30 records)
 $attendanceHistory = db_fetch_all(
-    "SELECT date_gregorian, date_ec, status, check_in, check_out, remarks
+    "SELECT date_gregorian, date_ec, status, check_in, check_out, notes AS remarks
      FROM hr_attendance WHERE employee_id = ? ORDER BY date_gregorian DESC LIMIT 30",
     [$id]
 );
@@ -145,7 +145,11 @@ ob_start();
                 <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Salary Breakdown</h2>
                 <?php
                 require_once APP_ROOT . '/core/payroll.php';
-                $calc = payroll_calculate($emp);
+                $calc = payroll_calculate(
+                    (float)($emp['basic_salary'] ?? 0),
+                    (float)($emp['transport_allowance'] ?? 0),
+                    (float)(($emp['position_allowance'] ?? 0) + ($emp['other_allowance'] ?? 0))
+                );
                 ?>
                 <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
                     <div><dt class="text-gray-500 dark:text-dark-muted">Basic Salary</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= number_format($emp['basic_salary'], 2) ?> Br</dd></div>

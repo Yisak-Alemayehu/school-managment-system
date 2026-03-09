@@ -38,10 +38,10 @@ $records = db_fetch_all(
 );
 
 $ecMonths = ec_month_names();
-$monthName = $ecMonths[(int)$period['month_ec']] ?? $period['month_ec'];
+$monthName = $ecMonths[(int)$period['month_ec']]['en'] ?? $period['month_ec'];
 
 // Totals
-$totals = ['basic_salary' => 0, 'transport_allowance' => 0, 'position_allowance' => 0, 'other_allowance' => 0,
+$totals = ['basic_salary' => 0, 'transport_allowance' => 0, 'other_allowance' => 0,
            'overtime' => 0, 'gross_salary' => 0, 'income_tax' => 0, 'employee_pension' => 0, 'employer_pension' => 0,
            'other_deductions' => 0, 'net_salary' => 0];
 foreach ($records as $r) {
@@ -59,7 +59,7 @@ ob_start();
             <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mt-1">
                 Payroll: <?= e($monthName) ?> <?= e($period['year_ec']) ?>
             </h1>
-            <p class="text-sm text-gray-500 dark:text-dark-muted"><?= e($period['start_date_gc']) ?> — <?= e($period['end_date_gc']) ?> &bull; <?= ucfirst($period['status']) ?></p>
+            <p class="text-sm text-gray-500 dark:text-dark-muted"><?= e($period['start_date']) ?> — <?= e($period['end_date']) ?> &bull; <?= ucfirst($period['status']) ?></p>
         </div>
         <div class="flex items-center gap-2 print:hidden">
             <!-- PDF Downloads Dropdown -->
@@ -133,8 +133,7 @@ ob_start();
                         <th class="px-3 py-2 text-left font-semibold text-gray-600 dark:text-dark-muted uppercase">Dept</th>
                         <th class="px-3 py-2 text-right font-semibold text-gray-600 dark:text-dark-muted uppercase">Basic</th>
                         <th class="px-3 py-2 text-right font-semibold text-gray-600 dark:text-dark-muted uppercase">Transp</th>
-                        <th class="px-3 py-2 text-right font-semibold text-gray-600 dark:text-dark-muted uppercase">Pos. Allow</th>
-                        <th class="px-3 py-2 text-right font-semibold text-gray-600 dark:text-dark-muted uppercase">Other</th>
+                        <th class="px-3 py-2 text-right font-semibold text-gray-600 dark:text-dark-muted uppercase">Other Allow</th>
                         <th class="px-3 py-2 text-right font-semibold text-gray-600 dark:text-dark-muted uppercase">OT</th>
                         <th class="px-3 py-2 text-right font-semibold text-gray-600 dark:text-dark-muted uppercase">Gross</th>
                         <th class="px-3 py-2 text-right font-semibold text-red-600 uppercase">Tax</th>
@@ -152,7 +151,6 @@ ob_start();
                         <td class="px-3 py-2 text-gray-500"><?= e($r['department_name'] ?? '—') ?></td>
                         <td class="px-3 py-2 text-right"><?= number_format($r['basic_salary'], 2) ?></td>
                         <td class="px-3 py-2 text-right"><?= number_format($r['transport_allowance'], 2) ?></td>
-                        <td class="px-3 py-2 text-right"><?= number_format($r['position_allowance'], 2) ?></td>
                         <td class="px-3 py-2 text-right"><?= number_format($r['other_allowance'], 2) ?></td>
                         <td class="px-3 py-2 text-right"><?= number_format($r['overtime'] ?? 0, 2) ?></td>
                         <td class="px-3 py-2 text-right font-medium"><?= number_format($r['gross_salary'], 2) ?></td>
@@ -172,7 +170,6 @@ ob_start();
                         <td colspan="3" class="px-3 py-2 text-right uppercase text-gray-600">Totals</td>
                         <td class="px-3 py-2 text-right"><?= number_format($totals['basic_salary'], 2) ?></td>
                         <td class="px-3 py-2 text-right"><?= number_format($totals['transport_allowance'], 2) ?></td>
-                        <td class="px-3 py-2 text-right"><?= number_format($totals['position_allowance'], 2) ?></td>
                         <td class="px-3 py-2 text-right"><?= number_format($totals['other_allowance'], 2) ?></td>
                         <td class="px-3 py-2 text-right"><?= number_format($totals['overtime'], 2) ?></td>
                         <td class="px-3 py-2 text-right"><?= number_format($totals['gross_salary'], 2) ?></td>

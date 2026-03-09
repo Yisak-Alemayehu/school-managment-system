@@ -180,25 +180,25 @@ ob_start();
         <!-- Payroll Trend Chart -->
         <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
             <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Payroll Trend (Monthly)</h2>
-            <canvas id="payrollTrendChart" height="220"></canvas>
+            <div style="position:relative;height:220px;"><canvas id="payrollTrendChart"></canvas></div>
         </div>
 
         <!-- Department Salary Distribution -->
         <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
             <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Department Salary Distribution</h2>
-            <canvas id="deptSalaryChart" height="220"></canvas>
+            <div style="position:relative;height:220px;"><canvas id="deptSalaryChart"></canvas></div>
         </div>
 
         <!-- Attendance This Month -->
         <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
             <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Attendance This Month</h2>
-            <canvas id="attendanceChart" height="220"></canvas>
+            <div style="position:relative;height:220px;"><canvas id="attendanceChart"></canvas></div>
         </div>
 
         <!-- Leave Utilization -->
         <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-5">
             <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Leave Utilization (This Year)</h2>
-            <canvas id="leaveChart" height="220"></canvas>
+            <div style="position:relative;height:220px;"><canvas id="leaveChart"></canvas></div>
         </div>
     </div>
 

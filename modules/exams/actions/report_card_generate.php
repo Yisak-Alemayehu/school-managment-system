@@ -146,6 +146,7 @@ try {
         $r['rank'] = $rank;
         $prevPct = $r['percentage'];
     }
+    unset($r);
 
     // Save report cards
     foreach ($results as $r) {

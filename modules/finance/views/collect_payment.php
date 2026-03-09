@@ -8,13 +8,23 @@
 // Fetch active classes for filter
 $classes = db_fetch_all("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY sort_order");
 
-// Student search
-$search     = input('search');
-$classId    = input_int('class_id');
-$studentId  = input_int('student_id');
-$student    = null;
-$activeFees = [];
+// Student search / filters
+$search        = input('search');
+$classId       = input_int('class_id');
+$sectionId     = input_int('section_id');
+$balanceFilter = input('balance_filter'); // 'with_balance' | 'no_balance' | ''
+$studentId     = input_int('student_id');
+$page          = max(1, input_int('page') ?: 1);
+$perPage       = 15;
+$student       = null;
+$activeFees    = [];
 $recentPayments = [];
+
+// Sections for the selected class
+$sections = [];
+if ($classId) {
+    $sections = db_fetch_all("SELECT id, name FROM sections WHERE class_id = ? AND is_active = 1 ORDER BY name", [$classId]);
+}
 
 if ($studentId) {
     $student = db_fetch_one(
@@ -50,34 +60,72 @@ if ($studentId) {
     }
 }
 
-// Student search results
+// Student list (always shown when no student selected)
 $searchResults = [];
-if ($search && !$studentId) {
+$totalStudents = 0;
+$totalPages    = 1;
+if (!$studentId) {
     $where  = ["s.deleted_at IS NULL"];
     $params = [];
 
-    $where[]  = "(s.full_name LIKE ? OR s.admission_no LIKE ? OR s.phone LIKE ?)";
-    $params[] = "%$search%";
-    $params[] = "%$search%";
-    $params[] = "%$search%";
-
+    if ($search) {
+        $where[]  = "(s.full_name LIKE ? OR s.admission_no LIKE ? OR s.phone LIKE ?)";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+    }
     if ($classId) {
         $where[]  = "e.class_id = ?";
         $params[] = $classId;
     }
+    if ($sectionId) {
+        $where[]  = "e.section_id = ?";
+        $params[] = $sectionId;
+    }
 
     $whereClause = implode(' AND ', $where);
+
+    // Having clause for balance filter
+    $having = '';
+    if ($balanceFilter === 'with_balance') {
+        $having = 'HAVING total_balance > 0';
+    } elseif ($balanceFilter === 'no_balance') {
+        $having = 'HAVING total_balance = 0';
+    }
+
+    // Count total
+    $countRow = db_fetch_one(
+        "SELECT COUNT(*) AS cnt FROM (
+            SELECT s.id,
+                   COALESCE(SUM(CASE WHEN sf.is_active = 1 THEN sf.balance ELSE 0 END), 0) AS total_balance
+              FROM students s
+              LEFT JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
+              LEFT JOIN fin_student_fees sf ON s.id = sf.student_id
+             WHERE $whereClause
+             GROUP BY s.id
+             $having
+         ) sub",
+        $params
+    );
+    $totalStudents = (int)($countRow['cnt'] ?? 0);
+    $totalPages    = max(1, (int)ceil($totalStudents / $perPage));
+    $page          = min($page, $totalPages);
+    $offset        = ($page - 1) * $perPage;
+
     $searchResults = db_fetch_all(
-        "SELECT s.id, s.full_name, s.admission_no, s.phone, c.name AS class_name,
+        "SELECT s.id, s.full_name, s.admission_no, s.phone,
+                c.name AS class_name, sec.name AS section_name,
                 COALESCE(SUM(CASE WHEN sf.is_active = 1 THEN sf.balance ELSE 0 END), 0) AS total_balance
            FROM students s
            LEFT JOIN enrollments e ON s.id = e.student_id AND e.status = 'active'
            LEFT JOIN classes c ON e.class_id = c.id
+           LEFT JOIN sections sec ON e.section_id = sec.id
            LEFT JOIN fin_student_fees sf ON s.id = sf.student_id
           WHERE $whereClause
-          GROUP BY s.id, s.full_name, s.admission_no, s.phone, c.name
+          GROUP BY s.id, s.full_name, s.admission_no, s.phone, c.name, sec.name
+          $having
           ORDER BY s.full_name
-          LIMIT 50",
+          LIMIT $perPage OFFSET $offset",
         $params
     );
 }
@@ -107,43 +155,71 @@ ob_start();
         </a>
     </div>
 
-    <!-- Step 1: Search Student -->
+    <!-- Step 1: Search / Filter Students -->
     <?php if (!$student): ?>
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
         <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Step 1: Find Student</h2>
-        <form method="GET" action="<?= url('finance', 'collect-payment') ?>" class="flex flex-wrap gap-3">
-            <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search by name, student code, or phone…"
-                   class="flex-1 min-w-64 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" autofocus>
-            <select name="class_id" class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
-                <option value="">All Classes</option>
-                <?php foreach ($classes as $c): ?>
-                <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium inline-flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                Search
-            </button>
+        <form method="GET" action="<?= url('finance', 'collect-payment') ?>" id="studentFilterForm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+                <input type="text" name="search" value="<?= e($search) ?>" placeholder="Name, student code, or phone…"
+                       class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" autofocus>
+                <select name="class_id" id="classFilterSelect"
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
+                        onchange="this.form.section_id.value=''; this.form.submit();">
+                    <option value="">All Classes</option>
+                    <?php foreach ($classes as $c): ?>
+                    <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select name="section_id"
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    <option value="">All Sections</option>
+                    <?php foreach ($sections as $sec): ?>
+                    <option value="<?= $sec['id'] ?>" <?= $sectionId == $sec['id'] ? 'selected' : '' ?>><?= e($sec['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select name="balance_filter"
+                        class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    <option value="">All Students</option>
+                    <option value="with_balance" <?= $balanceFilter === 'with_balance' ? 'selected' : '' ?>>With Outstanding Balance</option>
+                    <option value="no_balance" <?= $balanceFilter === 'no_balance' ? 'selected' : '' ?>>No Outstanding Balance</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium inline-flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Search
+                </button>
+                <?php if ($search || $classId || $sectionId || $balanceFilter): ?>
+                <a href="<?= url('finance', 'collect-payment') ?>" class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 dark:text-dark-muted">Clear filters</a>
+                <?php endif; ?>
+                <span class="ml-auto text-xs text-gray-500 dark:text-dark-muted"><?= $totalStudents ?> student<?= $totalStudents !== 1 ? 's' : '' ?> found</span>
+            </div>
         </form>
 
-        <?php if ($search && !empty($searchResults)): ?>
+        <?php if (!empty($searchResults)): ?>
         <div class="mt-4 overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border responsive-table">
                 <thead class="bg-gray-50 dark:bg-dark-bg">
                     <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">#</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Student</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Code</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Outstanding Balance</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Class / Section</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Balance</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
-                    <?php foreach ($searchResults as $sr): ?>
+                    <?php foreach ($searchResults as $i => $sr): ?>
                     <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg">
+                        <td class="px-4 py-3 text-sm text-gray-400"><?= ($page - 1) * $perPage + $i + 1 ?></td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text" data-label="Student"><?= e($sr['full_name']) ?></td>
                         <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted" data-label="Code"><?= e($sr['admission_no']) ?></td>
-                        <td class="px-4 py-3 text-sm" data-label="Class"><?= e($sr['class_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm" data-label="Class">
+                            <?= e($sr['class_name'] ?? '—') ?>
+                            <?php if (!empty($sr['section_name'])): ?><span class="text-gray-400"> / <?= e($sr['section_name']) ?></span><?php endif; ?>
+                        </td>
                         <td class="px-4 py-3 text-sm font-semibold <?= $sr['total_balance'] > 0 ? 'text-red-600' : 'text-green-600' ?>" data-label="Balance">
                             <?= format_money($sr['total_balance']) ?>
                         </td>
@@ -158,8 +234,39 @@ ob_start();
                 </tbody>
             </table>
         </div>
+
+        <?php if ($totalPages > 1): ?>
+        <div class="mt-4 flex items-center justify-between flex-wrap gap-2">
+            <p class="text-xs text-gray-500 dark:text-dark-muted">
+                Showing <?= ($page - 1) * $perPage + 1 ?>–<?= min($page * $perPage, $totalStudents) ?> of <?= $totalStudents ?> students
+            </p>
+            <div class="flex items-center gap-1">
+                <?php
+                $qBase = array_filter(['search' => $search, 'class_id' => $classId ?: '', 'section_id' => $sectionId ?: '', 'balance_filter' => $balanceFilter]);
+                $buildPageUrl = fn(int $p) => url('finance', 'collect-payment') . '&' . http_build_query(array_merge($qBase, ['page' => $p]));
+                ?>
+                <?php if ($page > 1): ?>
+                <a href="<?= $buildPageUrl(1) ?>" class="px-2 py-1 text-xs rounded border border-gray-300 dark:border-dark-border hover:bg-gray-100 dark:hover:bg-dark-bg">&laquo;</a>
+                <a href="<?= $buildPageUrl($page - 1) ?>" class="px-2 py-1 text-xs rounded border border-gray-300 dark:border-dark-border hover:bg-gray-100 dark:hover:bg-dark-bg">&lsaquo;</a>
+                <?php endif; ?>
+                <?php for ($p = max(1, $page - 2); $p <= min($totalPages, $page + 2); $p++): ?>
+                <a href="<?= $buildPageUrl($p) ?>"
+                   class="px-2.5 py-1 text-xs rounded border <?= $p === $page ? 'bg-primary-600 text-white border-primary-600' : 'border-gray-300 dark:border-dark-border hover:bg-gray-100 dark:hover:bg-dark-bg' ?>">
+                    <?= $p ?>
+                </a>
+                <?php endfor; ?>
+                <?php if ($page < $totalPages): ?>
+                <a href="<?= $buildPageUrl($page + 1) ?>" class="px-2 py-1 text-xs rounded border border-gray-300 dark:border-dark-border hover:bg-gray-100 dark:hover:bg-dark-bg">&rsaquo;</a>
+                <a href="<?= $buildPageUrl($totalPages) ?>" class="px-2 py-1 text-xs rounded border border-gray-300 dark:border-dark-border hover:bg-gray-100 dark:hover:bg-dark-bg">&raquo;</a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <?php elseif ($search): ?>
         <div class="mt-4 p-4 bg-yellow-50 text-yellow-700 rounded-lg text-sm">No students found matching "<strong><?= e($search) ?></strong>".</div>
+        <?php elseif ($totalStudents === 0): ?>
+        <div class="mt-4 p-4 bg-gray-50 dark:bg-dark-bg text-gray-500 rounded-lg text-sm">No students found for the selected filters.</div>
         <?php endif; ?>
     </div>
     <?php endif; ?>
