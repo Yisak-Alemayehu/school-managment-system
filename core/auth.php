@@ -213,6 +213,10 @@ function auth_is_super_admin(): bool {
  */
 function auth_require(): void {
     if (!auth_check()) {
+        if (is_ajax_request()) {
+            json_response(['error' => 'Unauthorized'], 401);
+        }
+
         set_flash('error', 'Please log in to continue.');
         redirect('/auth/login');
     }

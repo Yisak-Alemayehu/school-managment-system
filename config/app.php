@@ -19,8 +19,14 @@ define('APP_DEBUG', APP_ENV === 'development');
 if (getenv('APP_URL')) {
     define('APP_URL', rtrim(getenv('APP_URL'), '/'));
 } else {
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    // Determine scheme, including support for reverse proxies / load balancers that
+    // set X-Forwarded-Proto or X-Forwarded-Ssl.
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on');
+    $scheme = $isHttps ? 'https' : 'http';
     $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
     // Detect if running in a subdirectory by looking at SCRIPT_NAME
     $scriptDir = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/\\');
     define('APP_URL', $scheme . '://' . $host . $scriptDir);

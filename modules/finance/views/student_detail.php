@@ -150,7 +150,7 @@ ob_start();
             </div>
             <div class="p-4 <?= $accountBalance >= 0 ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100' ?> rounded-lg border">
                 <p class="text-xs <?= $accountBalance >= 0 ? 'text-green-600' : 'text-red-600' ?> uppercase font-semibold">Student Account Balance</p>
-                <p class="text-2xl font-bold <?= $accountBalance >= 0 ? 'text-green-900' : 'text-red-900' ?> mt-1"><?= format_money($accountBalance) ?></p>
+                <p class="text-2xl font-bold <?= $accountBalance >= 0 ? 'text-green-900' : 'text-red-900' ?> mt-1"><?= $accountBalance ?></p>
             </div>
         </div>
     </div>

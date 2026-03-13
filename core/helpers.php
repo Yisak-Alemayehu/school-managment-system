@@ -101,8 +101,24 @@ function time_ago(string $datetime): string {
 // ── Currency ─────────────────────────────────────────────────
 
 function format_money($amount, bool $withSymbol = true): string {
-    $formatted = number_format((float) $amount, 2);
-    return $withSymbol ? CURRENCY_SYMBOL . ' ' . $formatted : $formatted;
+    // Ensure we always have a numeric value even if the input contains a currency symbol
+    $amount = preg_replace('/[^0-9.\-]/', '', (string) $amount);
+    $numeric = (float) $amount;
+
+    $formatted = number_format($numeric, 2);
+
+    if (!$withSymbol) {
+        return $formatted;
+    }
+
+    // Prevent numeric (or empty) currency symbols, as can happen if the live env sets it incorrectly
+    $symbol = defined('CURRENCY_SYMBOL') ? (string) CURRENCY_SYMBOL : '';
+    $symbol = trim($symbol);
+    if ($symbol === '' || preg_match('/^\d+$/', $symbol)) {
+        $symbol = 'Br';
+    }
+
+    return $symbol . ' ' . $formatted;
 }
 
 // ── Upload URL ───────────────────────────────────────────────
