@@ -678,7 +678,7 @@ $activeSession = get_active_session();
 $assignedClasses = [];
 if ($activeSession) {
     $assignedClasses = db_fetch_all(
-        "SELECT DISTINCT c.id, c.name as class_name, sec.name as section_name,
+        "SELECT DISTINCT c.id, c.name as class_name, sec.name as section_name, c.sort_order,
                 (SELECT COUNT(DISTINCT e.student_id) FROM enrollments e WHERE e.section_id = sec.id AND e.status = 'active') as student_count
          FROM class_teachers ct
          JOIN sections sec ON ct.section_id = sec.id
@@ -699,7 +699,7 @@ if ($activeSession) {
          JOIN subjects s ON t.subject_id = s.id
          JOIN sections sec ON t.section_id = sec.id
          JOIN classes c ON sec.class_id = c.id
-         WHERE t.teacher_id = ? AND t.day = ? AND t.session_id = ?
+         WHERE t.teacher_id = ? AND t.day_of_week = ? AND t.session_id = ?
          ORDER BY t.start_time",
         [$user['id'], $todayDay, $activeSession['id']]
     );

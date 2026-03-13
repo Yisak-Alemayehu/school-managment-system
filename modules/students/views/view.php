@@ -129,7 +129,7 @@ ob_start();
                     <div class="flex items-start justify-between p-3 bg-gray-50 dark:bg-dark-bg rounded-lg">
                         <div>
                             <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($g['full_name']) ?></p>
-                            <p class="text-xs text-gray-500 dark:text-dark-muted"><?= e(ucfirst($g['relationship'])) ?> <?= $g['is_primary'] ? '(Primary)' : '' ?></p>
+                            <p class="text-xs text-gray-500 dark:text-dark-muted"><?= e(ucfirst($g['relationship'] ?? '')) ?> <?= $g['is_primary'] ? '(Primary)' : '' ?></p>
                             <p class="text-xs text-gray-500 dark:text-dark-muted mt-1">
                                 <?= e($g['phone']) ?>
                                 <?= $g['email'] ? ' &bull; ' . e($g['email']) : '' ?>

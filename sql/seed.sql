@@ -211,27 +211,29 @@ INSERT IGNORE INTO `shifts` (`id`, `name`, `start_time`, `end_time`, `is_active`
 -- ============================================================
 -- SECTION 5: USERS — Admin (1) + 12 Teachers (2-13) + 5 Staff (14-18)
 -- ============================================================
--- Admin password: Admin@123   |   All others: Teacher@123
+-- All accounts password: password
 INSERT IGNORE INTO `users` (`id`,`username`,`email`,`password_hash`,`full_name`,`first_name`,`last_name`,`phone`,`is_active`,`status`,`force_password_change`) VALUES
-( 1, 'admin',      'admin@urjiberischool.com',       '$2y$12$LJ3m4yS6YE5Ks0FMwRNsNuXBeqJKlC9UVPlyuFJV5kBO2.WMfyRrm', 'System Administrator',  'System',     'Administrator', '0912000000', 1, 'active', 0),
-( 2, 'teacher1',   'tadesse.m@urjiberischool.com',   '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Tadesse Mekonnen',      'Tadesse',    'Mekonnen',      '0913000001', 1, 'active', 1),
-( 3, 'teacher2',   'almaz.b@urjiberischool.com',     '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Almaz Bekele',          'Almaz',      'Bekele',        '0913000002', 1, 'active', 1),
-( 4, 'teacher3',   'dereje.h@urjiberischool.com',    '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Dereje Haile',          'Dereje',     'Haile',         '0913000003', 1, 'active', 1),
-( 5, 'teacher4',   'tigist.w@urjiberischool.com',    '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Tigist Worku',          'Tigist',     'Worku',         '0913000004', 1, 'active', 1),
-( 6, 'teacher5',   'mulugeta.a@urjiberischool.com',  '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mulugeta Assefa',       'Mulugeta',   'Assefa',        '0913000005', 1, 'active', 1),
-( 7, 'teacher6',   'meron.g@urjiberischool.com',     '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Meron Getahun',         'Meron',      'Getahun',       '0913000006', 1, 'active', 1),
-( 8, 'teacher7',   'hailu.n@urjiberischool.com',     '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Hailu Negash',          'Hailu',      'Negash',        '0913000007', 1, 'active', 1),
-( 9, 'teacher8',   'ayelech.d@urjiberischool.com',   '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ayelech Desta',         'Ayelech',    'Desta',         '0913000008', 1, 'active', 1),
-(10, 'teacher9',   'tekle.b@urjiberischool.com',     '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Tekle Berhane',         'Tekle',      'Berhane',       '0913000009', 1, 'active', 1),
-(11, 'teacher10',  'girma.z@urjiberischool.com',     '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Girma Zeleke',          'Girma',      'Zeleke',        '0913000010', 1, 'active', 1),
-(12, 'teacher11',  'meseret.t@urjiberischool.com',   '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Meseret Tadesse',       'Meseret',    'Tadesse',       '0913000011', 1, 'active', 1),
-(13, 'teacher12',  'birhanu.al@urjiberischool.com',  '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Birhanu Alemayehu',     'Birhanu',    'Alemayehu',     '0913000012', 1, 'active', 1),
+( 1, 'admin',      'admin@urjiberischool.com',       '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator',  'System',     'Administrator', '0912000000', 1, 'active', 0),
+( 2, 'teacher1',   'tadesse.m@urjiberischool.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Tadesse Mekonnen',      'Tadesse',    'Mekonnen',      '0913000001', 1, 'active', 1),
+( 3, 'teacher2',   'almaz.b@urjiberischool.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Almaz Bekele',          'Almaz',      'Bekele',        '0913000002', 1, 'active', 1),
+( 4, 'teacher3',   'dereje.h@urjiberischool.com',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Dereje Haile',          'Dereje',     'Haile',         '0913000003', 1, 'active', 1),
+( 5, 'teacher4',   'tigist.w@urjiberischool.com',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Tigist Worku',          'Tigist',     'Worku',         '0913000004', 1, 'active', 1),
+( 6, 'teacher5',   'mulugeta.a@urjiberischool.com',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mulugeta Assefa',       'Mulugeta',   'Assefa',        '0913000005', 1, 'active', 1),
+( 7, 'teacher6',   'meron.g@urjiberischool.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Meron Getahun',         'Meron',      'Getahun',       '0913000006', 1, 'active', 1),
+( 8, 'teacher7',   'hailu.n@urjiberischool.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Hailu Negash',          'Hailu',      'Negash',        '0913000007', 1, 'active', 1),
+( 9, 'teacher8',   'ayelech.d@urjiberischool.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ayelech Desta',         'Ayelech',    'Desta',         '0913000008', 1, 'active', 1),
+(10, 'teacher9',   'tekle.b@urjiberischool.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Tekle Berhane',         'Tekle',      'Berhane',       '0913000009', 1, 'active', 1),
+(11, 'teacher10',  'girma.z@urjiberischool.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Girma Zeleke',          'Girma',      'Zeleke',        '0913000010', 1, 'active', 1),
+(12, 'teacher11',  'meseret.t@urjiberischool.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Meseret Tadesse',       'Meseret',    'Tadesse',       '0913000011', 1, 'active', 1),
+(13, 'teacher12',  'birhanu.al@urjiberischool.com',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Birhanu Alemayehu',     'Birhanu',    'Alemayehu',     '0913000012', 1, 'active', 1),
 -- Additional staff
-(14, 'accountant', 'abel.w@urjiberischool.com',      '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Abel Worku',            'Abel',       'Worku',         '0913000013', 1, 'active', 1),
-(15, 'registrar',  'selamawit.d@urjiberischool.com', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Selamawit Demissie',    'Selamawit',  'Demissie',      '0913000014', 1, 'active', 1),
-(16, 'librarian',  'fantaye.g@urjiberischool.com',   '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Fantaye Girma',         'Fantaye',    'Girma',         '0913000015', 1, 'active', 1),
-(17, 'guard1',     'kebede.t@urjiberischool.com',    '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Kebede Teshome',        'Kebede',     'Teshome',       '0913000016', 1, 'active', 1),
-(18, 'ittech',     'nahom.f@urjiberischool.com',     '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Nahom Fikre',           'Nahom',      'Fikre',         '0913000017', 1, 'active', 1);
+(14, 'accountant', 'abel.w@urjiberischool.com',      '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Abel Worku',            'Abel',       'Worku',         '0913000013', 1, 'active', 1),
+(15, 'registrar',  'selamawit.d@urjiberischool.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Selamawit Demissie',    'Selamawit',  'Demissie',      '0913000014', 1, 'active', 1),
+(16, 'librarian',  'fantaye.g@urjiberischool.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Fantaye Girma',         'Fantaye',    'Girma',         '0913000015', 1, 'active', 1),
+(17, 'guard1',     'kebede.t@urjiberischool.com',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Kebede Teshome',        'Kebede',     'Teshome',       '0913000016', 1, 'active', 1),
+(18, 'ittech',     'nahom.f@urjiberischool.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Nahom Fikre',           'Nahom',      'Fikre',         '0913000017', 1, 'active', 1),
+-- Demo student account
+(19, 'abebe',      'abebe@urjiberischool.com',        '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Abebe Girma',           'Abebe',      'Girma',         '0913000018', 1, 'active', 0);
 
 -- Assign roles
 INSERT IGNORE INTO `user_roles` (`user_id`, `role_id`) VALUES
@@ -242,7 +244,8 @@ INSERT IGNORE INTO `user_roles` (`user_id`, `role_id`) VALUES
 (15, 7),  -- registrar
 (16, 3),  -- librarian (teacher role for simplicity)
 (17, 3),  -- guard (basic role)
-(18, 3);  -- IT tech (basic role)
+(18, 3),  -- IT tech (basic role)
+(19, 4);  -- abebe → student
 
 -- ============================================================
 -- SECTION 6: ACADEMIC SESSION & TERMS

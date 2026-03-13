@@ -155,6 +155,57 @@
                 Urji Beri School Management System
             </p>
         </div>
+
+        <!-- Demo Accounts -->
+        <div class="mt-6">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="flex-1 h-px bg-gray-200 dark:bg-dark-border"></div>
+                <span class="text-xs text-gray-400 dark:text-dark-muted font-medium px-1">Demo Accounts</span>
+                <div class="flex-1 h-px bg-gray-200 dark:bg-dark-border"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="fillDemo('admin','password')"
+                        class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group">
+                    <span class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </span>
+                    <span class="text-xs font-semibold text-gray-700 dark:text-dark-text">Super Admin</span>
+                    <span class="text-[10px] text-gray-400 dark:text-dark-muted font-mono">admin</span>
+                </button>
+                <button type="button" onclick="fillDemo('teacher1','password')"
+                        class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group">
+                    <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    </span>
+                    <span class="text-xs font-semibold text-gray-700 dark:text-dark-text">Teacher</span>
+                    <span class="text-[10px] text-gray-400 dark:text-dark-muted font-mono">teacher1</span>
+                </button>
+                <button type="button" onclick="fillDemo('accountant','password')"
+                        class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group">
+                    <span class="w-7 h-7 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </span>
+                    <span class="text-xs font-semibold text-gray-700 dark:text-dark-text">Accountant</span>
+                    <span class="text-[10px] text-gray-400 dark:text-dark-muted font-mono">accountant</span>
+                </button>
+                <button type="button" onclick="fillDemo('registrar','password')"
+                        class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group">
+                    <span class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </span>
+                    <span class="text-xs font-semibold text-gray-700 dark:text-dark-text">Registrar</span>
+                    <span class="text-[10px] text-gray-400 dark:text-dark-muted font-mono">registrar</span>
+                </button>
+                <button type="button" onclick="fillDemo('abebe','password')"
+                        class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group">
+                    <span class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    </span>
+                    <span class="text-xs font-semibold text-gray-700 dark:text-dark-text">Student</span>
+                    <span class="text-[10px] text-gray-400 dark:text-dark-muted font-mono">abebe</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -177,6 +228,16 @@
             var isDark = html.classList.contains('dark');
             if (isDark) { html.classList.remove('dark'); document.cookie='theme=light;path=/;max-age='+(365*86400)+';SameSite=Lax'; }
             else { html.classList.add('dark'); document.cookie='theme=dark;path=/;max-age='+(365*86400)+';SameSite=Lax'; }
+        }
+        function fillDemo(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            // Make sure password is visible type resets to hidden
+            var pw = document.getElementById('password');
+            pw.type = 'password';
+            document.getElementById('eye-open').classList.remove('hidden');
+            document.getElementById('eye-closed').classList.add('hidden');
+            document.getElementById('username').focus();
         }
     </script>
 </body>
