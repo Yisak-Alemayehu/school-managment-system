@@ -71,7 +71,7 @@ ob_start();
                 <label class="cursor-pointer inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-dark-card2 border border-gray-200 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-border">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/></svg>
                     Attach Files
-                    <input type="file" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.webm,.ogg,.mp3,.wav" id="compose-file-input" class="hidden" onchange="showFile(this)">
+                    <input type="file" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.webm,.ogg,.mp3,.wav" id="compose-file-input" class="hidden">
                 </label>
                 <button type="button" id="compose-record-btn" class="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-dark-card2 border border-gray-200 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-border">
                     <span id="compose-record-icon">&#9679;</span>
@@ -194,6 +194,13 @@ ob_start();
 
     if (fileInput) {
         fileInput.addEventListener('change', updateFilePreview);
+    }
+
+    // Backward compatible helper used by older code (e.g., inline onchange="showFile(this)")
+    function showFile(input) {
+        if (input === fileInput) {
+            updateFilePreview();
+        }
     }
 
     // Audio recording
