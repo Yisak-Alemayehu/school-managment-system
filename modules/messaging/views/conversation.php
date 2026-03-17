@@ -182,8 +182,11 @@ ob_start();
 
             <label class="cursor-pointer text-gray-400 dark:text-gray-500 hover:text-primary-600 flex-shrink-0 pb-2" title="Attach file">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                <input type="file" name="attachments[]" multiple class="hidden" id="reply-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx">
+                <input type="file" name="attachments[]" multiple class="hidden" id="reply-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.webm,.ogg,.mp3,.wav">
             </label>
+            <button type="button" id="reply-record-btn" class="flex-shrink-0 p-2 text-gray-400 dark:text-dark-text hover:text-primary-600" title="Record voice message">
+                <span id="reply-record-icon" class="text-lg">⏺</span>
+            </button>
 
             <textarea name="body" rows="1" maxlength="5000" placeholder="Type a message… (optional if attaching file)"
                       class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 resize-none"
@@ -292,19 +295,79 @@ ob_start();
                             + '<p class="text-[10px] text-gray-500 dark:text-dark-muted mt-0.5 truncate max-w-[64px]">' + escHtml(file.name) + '</p>';
                     };
                     reader.readAsDataURL(file);
+                } else if (file.type.startsWith('audio/')) {
+                    var url = URL.createObjectURL(file);
+                    item.innerHTML = '<audio controls class="w-36 rounded-lg" src="' + url + '"></audio>'
+                        + '<p class="text-[10px] text-gray-500 dark:text-dark-muted mt-0.5 truncate max-w-[64px]">' + escHtml(file.name) + '</p>';
                 } else {
                     var ext = file.name.split('.').pop().toUpperCase();
                     var size = (file.size / 1024).toFixed(0) + ' KB';
                     item.innerHTML = '<div class="w-16 h-16 rounded-lg border border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg flex flex-col items-center justify-center">'
-                        + '<span class="text-xs font-bold text-gray-400 dark:text-gray-500">' + escHtml(ext) + '</span>'
-                        + '<span class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">' + size + '</span></div>'
+                        + '<span class="text-xs font-bold text-gray-400 dark:text-dark-text">' + escHtml(ext) + '</span>'
+                        + '<span class="text-[10px] text-gray-400 dark:text-dark-text mt-1">' + size + '</span></div>'
                         + '<p class="text-[10px] text-gray-500 dark:text-dark-muted mt-0.5 truncate max-w-[64px]">' + escHtml(file.name) + '</p>';
                 }
                 replyPreview.appendChild(item);
             });
         });
     }
+
+    // Voice recording for reply
+    var recordBtn = document.getElementById('reply-record-btn');
+    var recordIcon = document.getElementById('reply-record-icon');
+    var mediaRecorder = null;
+    var audioChunks = [];
+
+    function addFileToInput(file) {
+        if (!replyFileInput) return;
+        var dt = new DataTransfer();
+        Array.from(replyFileInput.files).forEach(function(f) { dt.items.add(f); });
+        dt.items.add(file);
+        replyFileInput.files = dt.files;
+        // Trigger preview update
+        replyFileInput.dispatchEvent(new Event('change'));
+    }
+
+    if (recordBtn) {
+        recordBtn.addEventListener('click', function() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                return;
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Audio recording is not supported on this browser.');
+                return;
+            }
+
+            recordBtn.classList.add('text-red-600');
+            recordIcon.textContent = '⏹';
+
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = function(e) {
+                    if (e.data && e.data.size) audioChunks.push(e.data);
+                };
+                mediaRecorder.onstop = function() {
+                    stream.getTracks().forEach(function(t) { t.stop(); });
+                    var blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    var file = new File([blob], 'voice_' + Date.now() + '.webm', { type: blob.type });
+                    addFileToInput(file);
+
+                    recordBtn.classList.remove('text-red-600');
+                    recordIcon.textContent = '⏺';
+                };
+                mediaRecorder.start();
+            }).catch(function() {
+                alert('Unable to access microphone. Please allow access.');
+                recordBtn.classList.remove('text-red-600');
+                recordIcon.textContent = '⏺';
+            });
+        });
+    }
 })();
+</script>
 </script>
 
 <!-- Image Lightbox Modal -->
