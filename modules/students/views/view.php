@@ -9,6 +9,8 @@ if (!$student) {
     redirect(url('students'));
 }
 
+require_once APP_ROOT . '/core/ethiopian_calendar.php';
+
 // Current enrollment
 $enrollment = db_fetch_one(
     "SELECT e.*, c.name as class_name, sec.name as section_name, acs.name as session_name
@@ -91,7 +93,7 @@ ob_start();
 
             <dl class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6 text-sm">
                 <div><dt class="text-gray-500 dark:text-dark-muted">Gender</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e(ucfirst($student['gender'])) ?></dd></div>
-                <div><dt class="text-gray-500 dark:text-dark-muted">Date of Birth</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= format_date($student['date_of_birth']) ?></dd></div>
+                <div><dt class="text-gray-500 dark:text-dark-muted">Date of Birth (EC)</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= $student['date_of_birth'] ? e(ec_format_display(gregorian_str_to_ec($student['date_of_birth']))) : 'N/A' ?></dd></div>
                 <div><dt class="text-gray-500 dark:text-dark-muted">Blood Group</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['blood_group'] ?: 'N/A') ?></dd></div>
                 <div><dt class="text-gray-500 dark:text-dark-muted">Phone</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['phone'] ?: 'N/A') ?></dd></div>
                 <div><dt class="text-gray-500 dark:text-dark-muted">Email</dt><dd class="font-medium text-gray-900 dark:text-dark-text"><?= e($student['email'] ?: 'N/A') ?></dd></div>

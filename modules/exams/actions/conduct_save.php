@@ -22,7 +22,7 @@ $conductIn = $_POST['conduct'] ?? [];
 $remarksIn = $_POST['remarks'] ?? [];
 
 if (!$termId || !$classId || !$sessionId || !is_array($conductIn)) {
-    flash('error', 'Invalid request — missing required fields.');
+    set_flash('error', 'Invalid request — missing required fields.');
     redirect(url('exams', 'enter-conduct'));
 }
 

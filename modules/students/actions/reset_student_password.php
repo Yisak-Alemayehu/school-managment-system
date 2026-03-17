@@ -47,9 +47,10 @@ if ($mode === 'single') {
 }
 
 // Bulk mode
-$classId    = (int)($_POST['class_id']    ?? 0);
-$sectionId  = (int)($_POST['section_id']  ?? 0);
-$passMode   = $_POST['bulk_password_mode'] ?? 'adm_no';
+$classId       = (int)($_POST['class_id']    ?? 0);
+$sectionId     = (int)($_POST['section_id']  ?? 0);
+$passMode      = $_POST['bulk_password_mode'] ?? 'adm_no';
+$customPassword = trim($_POST['custom_password'] ?? '');
 
 if (!$classId) {
     set_flash('error', 'Please select a class.');
@@ -79,11 +80,15 @@ $students = db_fetch_all(
 
 $count = 0;
 foreach ($students as $st) {
-    $plain = match ($passMode) {
-        'dob'    => $st['date_of_birth'] ? date('dmY', strtotime($st['date_of_birth'])) : $st['admission_no'],
-        'random' => substr(str_shuffle('abcdefghjkmnpqrstuvwxyz23456789'), 0, 8),
-        default  => $st['admission_no'],
-    };
+    if ($customPassword) {
+        $plain = $customPassword;
+    } else {
+        $plain = match ($passMode) {
+            'dob'    => $st['date_of_birth'] ? date('dmY', strtotime($st['date_of_birth'])) : $st['admission_no'],
+            'random' => substr(str_shuffle('abcdefghjkmnpqrstuvwxyz23456789'), 0, 8),
+            default  => $st['admission_no'],
+        };
+    }
     db_update('users',
         ['password_hash' => password_hash($plain, PASSWORD_BCRYPT, ['cost' => 12])],
         'id = ?',

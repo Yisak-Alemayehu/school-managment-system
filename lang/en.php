@@ -92,7 +92,7 @@ return [
     'shifts' => 'Shifts',
     'class_subjects' => 'Class Subjects',
     'elective_subjects' => 'Elective Subjects',
-    'class_teachers' => 'Class Teachers',
+    'class_teachers' => 'Homeroom Teachers',
     'subject_teachers' => 'Subject Teachers',
     'timetable' => 'Timetable',
     'promote_students' => 'Promote Students',

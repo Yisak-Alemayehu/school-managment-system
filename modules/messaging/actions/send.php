@@ -33,13 +33,14 @@ if (auth_has_role('student')) {
 
 // Validate
 $errors = [];
+$hasAttachment = !empty($_FILES['attachments']['name'][0]);
 if (!$recipientId) {
     $errors['recipient_id'] = 'Please select a recipient.';
 }
-if (empty($body)) {
-    $errors['body'] = 'Message cannot be empty.';
+if (empty($body) && !$hasAttachment) {
+    $errors['body'] = 'Message cannot be empty. Add text or attachments.';
 }
-if (mb_strlen($body) > 5000) {
+if ($body && mb_strlen($body) > 5000) {
     $errors['body'] = 'Message too long (max 5000 characters).';
 }
 if ($recipientId == $userId) {
@@ -114,22 +115,32 @@ try {
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/vnd.ms-excel',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'audio/webm', 'audio/ogg', 'audio/mpeg', 'audio/wav',
         ];
 
-        $fileCount = min($maxFiles, count($_FILES['attachments']['name']));
+        $fileCount = min(count($_FILES['attachments']['name']), $maxFiles);
         for ($i = 0; $i < $fileCount; $i++) {
-            if ($_FILES['attachments']['error'][$i] !== UPLOAD_ERR_OK) continue;
-            if ($_FILES['attachments']['size'][$i] > $maxFileSize) continue;
+            $tmpName = $_FILES['attachments']['tmp_name'][$i] ?? null;
+            $originalName = $_FILES['attachments']['name'][$i] ?? '';
+            $size = $_FILES['attachments']['size'][$i] ?? 0;
 
-            $tmpName = $_FILES['attachments']['tmp_name'][$i];
+            if (!$tmpName || $size <= 0) {
+                continue;
+            }
+            if ($size > $maxFileSize) {
+                continue;
+            }
+
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mime = finfo_file($finfo, $tmpName);
             finfo_close($finfo);
 
-            if (!in_array($mime, $allowedTypes)) continue;
+            if (!in_array($mime, $allowedTypes)) {
+                continue;
+            }
 
-            $ext = strtolower(pathinfo($_FILES['attachments']['name'][$i], PATHINFO_EXTENSION));
-            $safeExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx'];
+            $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+            $safeExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'webm', 'ogg', 'mp3', 'wav'];
             if (!in_array($ext, $safeExts)) $ext = 'bin';
 
             $filename = bin2hex(random_bytes(16)) . '.' . $ext;
@@ -140,7 +151,7 @@ try {
 
             $targetPath = $targetDir . '/' . $filename;
             if (move_uploaded_file($tmpName, $targetPath)) {
-                $finalSize = $_FILES['attachments']['size'][$i];
+                $finalSize = $size;
                 // Compress images
                 $imageTypes = ['image/jpeg', 'image/png', 'image/webp'];
                 if (in_array($mime, $imageTypes)) {
@@ -149,7 +160,7 @@ try {
                 }
                 db_insert('msg_attachments', [
                     'message_id' => $messageId,
-                    'file_name'  => $_FILES['attachments']['name'][$i],
+                    'file_name'  => $originalName,
                     'file_path'  => $subDir . '/' . $filename,
                     'file_size'  => $finalSize,
                     'mime_type'  => $mime,

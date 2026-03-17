@@ -1,6 +1,6 @@
 <?php
 /**
- * Students — Generate Username & Password
+ * Students ï¿½ Generate Username & Password
  * Generate login credentials by class or for an individual student.
  */
 
@@ -69,7 +69,7 @@ ob_start();
                 <input type="hidden" name="_mode" value="class">
                 <select name="class_id" onchange="this.form.submit()"
                         class="px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
-                    <option value="">Select Class…</option>
+                    <option value="">Select Classï¿½</option>
                     <?php foreach ($classes as $c): ?>
                         <option value="<?= $c['id'] ?>" <?= $classId == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
                     <?php endforeach; ?>
@@ -126,12 +126,17 @@ ob_start();
                     </label>
                     <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Password:
-                        <select name="password_mode" class="ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text rounded-md text-sm">
+                        <select id="passwordMode" name="password_mode" class="ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border dark:bg-dark-card dark:text-dark-text rounded-md text-sm">
                             <option value="adm_no">Admission No.</option>
                             <option value="dob">Date of Birth (DDMMYYYY)</option>
                             <option value="random">Random 8-char</option>
+                            <option value="custom">Custom</option>
                         </select>
                     </label>
+                    <div id="customPasswordSection" class="hidden">
+                        <input type="text" name="custom_password" id="customPassword" placeholder="Custom password"
+                               class="mt-2 ml-2 px-2 py-1 border border-gray-300 dark:border-dark-border rounded-md text-sm bg-white dark:bg-dark-card dark:text-dark-text">
+                    </div>
                     <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-dark-muted">
                         <input type="checkbox" name="overwrite" value="1">
                         Overwrite existing credentials
@@ -152,7 +157,7 @@ ob_start();
         <div id="mode-single" class="hidden">
             <form method="GET" action="<?= url('students', 'credentials') ?>" class="flex gap-3 mb-4">
                 <input type="hidden" name="_mode" value="single">
-                <input type="number" name="student_id" value="<?= e($singleId ?: '') ?>" placeholder="Student DB ID…"
+                <input type="number" name="student_id" value="<?= e($singleId ?: '') ?>" placeholder="Student DB IDï¿½"
                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                 <button type="submit" class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700">Find</button>
             </form>
@@ -201,6 +206,21 @@ function switchMode(mode) {
 // Restore active tab from URL hint
 var qs = new URLSearchParams(location.search);
 if (qs.get('_mode') === 'single' || qs.get('student_id')) switchMode('single');
+
+// Show/hide custom password input
+var passwordMode = document.getElementById('passwordMode');
+var customSection = document.getElementById('customPasswordSection');
+if (passwordMode && customSection) {
+    function updateCustomPassword() {
+        if (passwordMode.value === 'custom') {
+            customSection.classList.remove('hidden');
+        } else {
+            customSection.classList.add('hidden');
+        }
+    }
+    passwordMode.addEventListener('change', updateCustomPassword);
+    updateCustomPassword();
+}
 </script>
 
 <?php

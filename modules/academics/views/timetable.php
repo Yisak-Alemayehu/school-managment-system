@@ -119,48 +119,79 @@ ob_start();
     </div>
 
     <!-- Weekly Grid -->
-    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-x-auto">
-        <table class="w-full min-w-[800px]">
-            <thead class="bg-gray-50 dark:bg-dark-bg border-b">
-                <tr>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase w-28">Day</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Periods</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
-                <?php foreach ($days as $idx => $day): ?>
-                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
-                        <td class="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-dark-text align-top"><?= $dayLabels[$idx] ?></td>
-                        <td class="px-4 py-4">
-                            <?php if (empty($grid[$day])): ?>
-                                <span class="text-xs text-gray-400 dark:text-gray-500 italic">No slots scheduled</span>
-                            <?php else: ?>
-                                <div class="flex flex-wrap gap-2">
-                                    <?php foreach ($grid[$day] as $slot): ?>
-                                        <div class="relative group bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-xs min-w-[130px] shadow-sm">
-                                            <div class="font-semibold text-blue-900"><?= e($slot['subject_name']) ?></div>
-                                            <div class="text-blue-700 font-mono mt-0.5"><?= substr($slot['start_time'],0,5) ?> – <?= substr($slot['end_time'],0,5) ?></div>
-                                            <?php if (!empty($slot['teacher_name'])): ?>
-                                                <div class="text-blue-600 mt-0.5"><?= e($slot['teacher_name']) ?></div>
-                                            <?php endif; ?>
-                                            <?php if (!empty($slot['room'])): ?>
-                                                <div class="text-blue-500 mt-0.5">Room: <?= e($slot['room']) ?></div>
-                                            <?php endif; ?>
-                                            <form method="POST" action="<?= url('academics', 'timetable-save') ?>" class="absolute -top-2 -right-2 hidden group-hover:block">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="delete_id" value="<?= $slot['id'] ?>">
-                                                <button type="submit" onclick="return confirm('Remove this slot?')"
-                                                        class="w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 shadow">&times;</button>
-                                            </form>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        </td>
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border">
+        <div class="hidden sm:block overflow-x-auto">
+            <table class="w-full min-w-[800px]">
+                <thead class="bg-gray-50 dark:bg-dark-bg border-b">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase w-28">Day</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Periods</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
+                    <?php foreach ($days as $idx => $day): ?>
+                        <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                            <td class="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-dark-text align-top"><?= $dayLabels[$idx] ?></td>
+                            <td class="px-4 py-4">
+                                <?php if (empty($grid[$day])): ?>
+                                    <span class="text-xs text-gray-400 dark:text-gray-500 italic">No slots scheduled</span>
+                                <?php else: ?>
+                                    <div class="flex flex-wrap gap-2">
+                                        <?php foreach ($grid[$day] as $slot): ?>
+                                            <div class="relative group bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-xs min-w-[130px] shadow-sm">
+                                                <div class="font-semibold text-blue-900"><?= e($slot['subject_name']) ?></div>
+                                                <div class="text-blue-700 font-mono mt-0.5"><?= substr($slot['start_time'],0,5) ?> – <?= substr($slot['end_time'],0,5) ?></div>
+                                                <?php if (!empty($slot['teacher_name'])): ?>
+                                                    <div class="text-blue-600 mt-0.5"><?= e($slot['teacher_name']) ?></div>
+                                                <?php endif; ?>
+                                                <?php if (!empty($slot['room'])): ?>
+                                                    <div class="text-blue-500 mt-0.5">Room: <?= e($slot['room']) ?></div>
+                                                <?php endif; ?>
+                                                <form method="POST" action="<?= url('academics', 'timetable-save') ?>" class="absolute -top-2 -right-2 hidden group-hover:block">
+                                                    <?= csrf_field() ?>
+                                                    <input type="hidden" name="delete_id" value="<?= $slot['id'] ?>">
+                                                    <button type="submit" onclick="return confirm('Remove this slot?')"
+                                                            class="w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 shadow">&times;</button>
+                                                </form>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="sm:hidden p-4 space-y-3">
+            <?php foreach ($days as $idx => $day): ?>
+                <div class="border border-gray-200 dark:border-dark-border rounded-lg p-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-semibold text-gray-900 dark:text-dark-text"><?= $dayLabels[$idx] ?></span>
+                        <span class="text-xs text-gray-500 dark:text-dark-muted"><?= count($grid[$day]) ?> slot<?= count($grid[$day]) === 1 ? '' : 's' ?></span>
+                    </div>
+                    <?php if (empty($grid[$day])): ?>
+                        <div class="text-xs text-gray-400 dark:text-gray-500">No slots scheduled</div>
+                    <?php else: ?>
+                        <div class="space-y-2">
+                            <?php foreach ($grid[$day] as $slot): ?>
+                                <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-lg p-3">
+                                    <div class="text-sm font-semibold text-blue-900 dark:text-blue-200"><?= e($slot['subject_name']) ?></div>
+                                    <div class="text-xs text-blue-700 dark:text-blue-200 mt-0.5"><?= substr($slot['start_time'],0,5) ?> – <?= substr($slot['end_time'],0,5) ?></div>
+                                    <?php if (!empty($slot['teacher_name'])): ?>
+                                        <div class="text-xs text-blue-600 dark:text-blue-200 mt-0.5"><?= e($slot['teacher_name']) ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($slot['room'])): ?>
+                                        <div class="text-xs text-blue-500 dark:text-blue-200 mt-0.5">Room: <?= e($slot['room']) ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 

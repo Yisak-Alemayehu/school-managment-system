@@ -8,13 +8,14 @@ csrf_protect();
 $userId = auth_user_id();
 $convId = input_int('conversation_id');
 $body   = trim(input('body'));
+$hasAttachment = !empty($_FILES['attachments']['name'][0]);
 
-if (!$convId || empty($body)) {
-    set_flash('error', 'Invalid reply.');
+if (!$convId || (empty($body) && !$hasAttachment)) {
+    set_flash('error', 'Invalid reply. Provide a message or attach a file.');
     redirect('messaging', 'inbox');
 }
 
-if (mb_strlen($body) > 5000) {
+if ($body && mb_strlen($body) > 5000) {
     set_flash('error', 'Message too long (max 5000 characters).');
     redirect('messaging', 'conversation', $convId);
 }
@@ -91,6 +92,7 @@ try {
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/vnd.ms-excel',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'audio/webm', 'audio/ogg', 'audio/mpeg', 'audio/wav',
         ];
 
         $fileCount = min($maxFiles, count($_FILES['attachments']['name']));
@@ -106,7 +108,7 @@ try {
             if (!in_array($mime, $allowedTypes)) continue;
 
             $ext = strtolower(pathinfo($_FILES['attachments']['name'][$i], PATHINFO_EXTENSION));
-            $safeExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx'];
+            $safeExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'webm', 'ogg', 'mp3', 'wav'];
             if (!in_array($ext, $safeExts)) $ext = 'bin';
 
             $filename = bin2hex(random_bytes(16)) . '.' . $ext;

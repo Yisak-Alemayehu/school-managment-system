@@ -1,6 +1,6 @@
 <?php
 /**
- * Academics — Class Teacher Assignment View (Fixed)
+ * Academics ï¿½ Class Teacher Assignment View (Fixed)
  * Uses CONCAT(first_name, last_name), is_class_teacher=1, sub-nav.
  */
 
@@ -49,7 +49,7 @@ ob_start();
 
 <div class="max-w-5xl mx-auto">
 
-    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Assign Class Teachers</h1>
+    <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-6">Assign Homeroom Teachers</h1>
 
     <!-- Session selector -->
     <div class="flex flex-wrap items-end gap-4 mb-6">
@@ -66,7 +66,7 @@ ob_start();
 
     <!-- Add form -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
-        <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4"><?= 'Assign Class Teacher' ?></h2>
+        <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4">Assign Homeroom Teacher</h2>
         <form method="POST" action="<?= url('academics', 'class-teacher-save') ?>" class="flex flex-wrap items-end gap-4">
             <?= csrf_field() ?>
             <input type="hidden" name="session_id" value="<?= $filterSession ?>">
@@ -108,7 +108,7 @@ ob_start();
     <!-- Current assignments -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden overflow-x-auto">
         <div class="px-4 py-3 bg-gray-50 dark:bg-dark-bg border-b">
-            <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text">Current Class Teacher Assignments</h2>
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text">Current Homeroom Teacher Assignments</h2>
         </div>
         <?php if (empty($assignments)): ?>
             <div class="px-4 py-8 text-center text-gray-500 dark:text-dark-muted text-sm">No class teachers assigned for this session yet.</div>

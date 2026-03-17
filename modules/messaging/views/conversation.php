@@ -149,7 +149,7 @@ ob_start();
                         <?php if ($isImage): ?>
                         <a href="<?= upload_url($att['file_path']) ?>" onclick="openLightbox(this.href,'<?= e(addslashes($att['file_name'])) ?>');return false;" class="block cursor-pointer">
                             <img src="<?= upload_url($att['file_path']) ?>" alt="<?= e($att['file_name']) ?>"
-                                 class="max-w-[280px] max-h-[200px] rounded-lg object-cover border <?= $isMine ? 'border-primary-400' : 'border-gray-200 dark:border-dark-border' ?>" loading="lazy">
+                                 class="max-w-full max-h-[200px] rounded-lg object-contain border <?= $isMine ? 'border-primary-400' : 'border-gray-200 dark:border-dark-border' ?>" loading="lazy">
                         </a>
                         <?php else: ?>
                         <a href="<?= upload_url($att['file_path']) ?>" target="_blank"
@@ -185,7 +185,7 @@ ob_start();
                 <input type="file" name="attachments[]" multiple class="hidden" id="reply-file-input" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx">
             </label>
 
-            <textarea name="body" rows="1" required maxlength="5000" placeholder="Type a message…"
+            <textarea name="body" rows="1" maxlength="5000" placeholder="Type a message… (optional if attaching file)"
                       class="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 resize-none"
                       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.form.submit();}"
                       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';"></textarea>

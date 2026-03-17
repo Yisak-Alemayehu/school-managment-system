@@ -143,7 +143,7 @@ switch ($action) {
     // ── Class Teachers ───────────────────────────────────────
     case 'class-teachers':
         auth_require_permission('academics.manage');
-        $pageTitle = 'Class Teachers';
+        $pageTitle = 'Homeroom Teachers';
         require __DIR__ . '/views/class_teachers.php';
         break;
 

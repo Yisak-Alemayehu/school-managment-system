@@ -15,26 +15,106 @@ $defaultClassId = (int)($_POST['default_class_id'] ?? 0);
 $duplicateMode  = $_POST['duplicate_mode'] ?? 'skip';
 $sendCreds      = !empty($_POST['send_credentials']);
 
-$handle = fopen($tmpFile, 'r');
-if (!$handle) {
-    set_flash('error', 'Could not read the uploaded file.');
-    redirect(url('students', 'bulk-import'));
+// Determine file type (expect .xlsx)
+$fileName = $_FILES['csv_file']['name'] ?? '';
+$extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+/**
+ * Minimal XLSX reader for first sheet.
+ */
+function parse_xlsx(string $path): array {
+    if (!class_exists('ZipArchive')) return [];
+    $zip = new ZipArchive();
+    if ($zip->open($path) !== true) return [];
+
+    // Load shared strings
+    $sharedStrings = [];
+    if (($idx = $zip->locateName('xl/sharedStrings.xml')) !== false) {
+        $xml = simplexml_load_string($zip->getFromIndex($idx));
+        if ($xml && isset($xml->si)) {
+            foreach ($xml->si as $si) {
+                if (isset($si->t)) {
+                    $sharedStrings[] = (string)$si->t;
+                } elseif (isset($si->r)) {
+                    $text = '';
+                    foreach ($si->r as $r) { $text .= (string)$r->t; }
+                    $sharedStrings[] = $text;
+                } else {
+                    $sharedStrings[] = '';
+                }
+            }
+        }
+    }
+
+    // Load first worksheet
+    $sheetXml = $zip->getFromName('xl/worksheets/sheet1.xml');
+    if (!$sheetXml) return [];
+    $xml = simplexml_load_string($sheetXml);
+    if (!$xml || !isset($xml->sheetData->row)) return [];
+
+    $rows = [];
+    foreach ($xml->sheetData->row as $row) {
+        $cells = [];
+        $lastCol = 0;
+        foreach ($row->c as $cell) {
+            $ref = (string)$cell['r'];
+            $colLetters = preg_replace('/\d+$/', '', $ref);
+            $colIndex = xlsx_column_index($colLetters);
+            while (count($cells) < $colIndex) $cells[] = '';
+            $value = '';
+            if (isset($cell->v)) {
+                $value = (string)$cell->v;
+                if ((string)$cell['t'] === 's') {
+                    $value = $sharedStrings[(int)$value] ?? $value;
+                }
+            } elseif (isset($cell->is->t)) {
+                $value = (string)$cell->is->t;
+            }
+            $cells[$colIndex - 1] = $value;
+        }
+        $rows[] = $cells;
+    }
+
+    return $rows;
 }
 
-// Strip BOM
-$bom = fread($handle, 3);
-if ($bom !== "\xEF\xBB\xBF") {
-    rewind($handle);
+function xlsx_column_index(string $col): int {
+    $col = strtoupper($col);
+    $index = 0;
+    for ($i = 0; $i < strlen($col); $i++) {
+        $index = $index * 26 + (ord($col[$i]) - 64);
+    }
+    return $index;
 }
 
-$headers = fgetcsv($handle);
-if (!$headers) {
-    set_flash('error', 'The CSV file appears to be empty or invalid.');
+$rows = [];
+if ($extension === 'xlsx') {
+    $rows = parse_xlsx($tmpFile);
+} else {
+    $handle = fopen($tmpFile, 'r');
+    if (!$handle) {
+        set_flash('error', 'Could not read the uploaded file.');
+        redirect(url('students', 'bulk-import'));
+    }
+
+    // Strip BOM
+    $bom = fread($handle, 3);
+    if ($bom !== "\xEF\xBB\xBF") {
+        rewind($handle);
+    }
+
+    while (($row = fgetcsv($handle)) !== false) {
+        $rows[] = $row;
+    }
     fclose($handle);
+}
+
+if (empty($rows)) {
+    set_flash('error', 'The uploaded file appears to be empty or invalid.');
     redirect(url('students', 'bulk-import'));
 }
 
-$headers = array_map('trim', $headers);
+$headers = array_map('trim', $rows[0]);
 $map     = array_flip($headers);
 
 $col = fn(string $name, array $row) => isset($map[$name]) ? trim($row[$map[$name]] ?? '') : '';
@@ -43,7 +123,6 @@ $required = ['first_name', 'last_name', 'gender', 'date_of_birth'];
 $missing  = array_diff($required, $headers);
 if ($missing) {
     set_flash('error', 'Missing required columns: ' . implode(', ', $missing));
-    fclose($handle);
     redirect(url('students', 'bulk-import'));
 }
 
@@ -71,7 +150,7 @@ $makeAdmNo = function() use (&$counter) {
 $inserted = 0; $updated = 0; $skipped = 0; $rowErrors = [];
 $rowNum = 1;
 
-while (($row = fgetcsv($handle)) !== false) {
+foreach (array_slice($rows, 1) as $row) {
     $rowNum++;
     $row = array_map('trim', $row);
 
@@ -214,7 +293,6 @@ while (($row = fgetcsv($handle)) !== false) {
 
     $inserted++;
 }
-fclose($handle);
 
 $summary  = "<strong>Import complete.</strong><br>";
 $summary .= "Inserted: <strong>$inserted</strong> | Updated: <strong>$updated</strong> | Skipped: <strong>$skipped</strong>";

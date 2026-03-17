@@ -80,12 +80,18 @@ ob_start();
                 <?php endif; ?>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reset Password To</label>
-                    <select name="bulk_password_mode"
+                    <select id="bulkPasswordMode" name="bulk_password_mode"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="adm_no">Admission Number</option>
                         <option value="dob">Date of Birth (DDMMYYYY)</option>
                         <option value="random">Random 8-char</option>
+                        <option value="custom">Custom</option>
                     </select>
+                    <div id="bulkCustomPassword" class="hidden mt-2">
+                        <input type="text" name="custom_password" placeholder="Custom password"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                        <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Leave blank to use the selected mode.</p>
+                    </div>
                 </div>
             </div>
             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-xs text-yellow-800">
@@ -101,6 +107,23 @@ ob_start();
         </form>
     </div>
 </div>
+
+<script>
+(function() {
+    var mode = document.getElementById('bulkPasswordMode');
+    var custom = document.getElementById('bulkCustomPassword');
+    if (!mode || !custom) return;
+    function updateCustom() {
+        if (mode.value === 'custom') {
+            custom.classList.remove('hidden');
+        } else {
+            custom.classList.add('hidden');
+        }
+    }
+    mode.addEventListener('change', updateCustom);
+    updateCustom();
+})();
+</script>
 
 <?php
 $content = ob_get_clean();

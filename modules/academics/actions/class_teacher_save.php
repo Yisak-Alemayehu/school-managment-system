@@ -10,7 +10,7 @@ auth_require_permission('academics_manage');
 $deleteId = input_int('delete');
 if ($deleteId) {
     db_delete('class_teachers', 'id = ? AND is_class_teacher = 1', [$deleteId]);
-    set_flash('success', 'Class teacher assignment removed.');
+    set_flash('success', 'Homeroom teacher assignment removed.');
     redirect_back();
 }
 
@@ -36,7 +36,7 @@ if ($existing) {
     db_update('class_teachers', [
         'teacher_id' => $teacher_id,
     ], 'id = ?', [$existing['id']]);
-    set_flash('success', 'Class teacher updated for this section.');
+    set_flash('success', 'Homeroom teacher updated for this section.');
 } else {
     db_insert('class_teachers', [
         'class_id'         => $class_id,
@@ -46,9 +46,9 @@ if ($existing) {
         'subject_id'       => null,
         'is_class_teacher' => 1,
     ]);
-    set_flash('success', 'Class teacher assigned successfully.');
+    set_flash('success', 'Homeroom teacher assigned successfully.');
 }
 
-audit_log('class_teacher_assign', "Assigned teacher {$teacher_id} as class teacher for class {$class_id} section {$section_id}");
+audit_log('homeroom_teacher_assign', "Assigned teacher {$teacher_id} as homeroom teacher for class {$class_id} section {$section_id}");
 
 redirect('academics', 'class-teachers', ['session_id' => $session_id]);

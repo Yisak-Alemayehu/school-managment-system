@@ -9,6 +9,7 @@ $ids      = array_map('intval', $_POST['ids'] ?? []);
 $overwrite = !empty($_POST['overwrite']);
 $usernameFormat = $_POST['username_format'] ?? 'adm_no';
 $passwordMode   = $_POST['password_mode']   ?? 'adm_no';
+$customPassword = trim($_POST['custom_password'] ?? '');
 
 // Single student manual override
 $manualUsername = trim($_POST['manual_username'] ?? '');
@@ -68,6 +69,8 @@ foreach ($ids as $studentId) {
     // Build password
     if ($mode === 'single' && $manualPassword) {
         $plainPassword = $manualPassword;
+    } elseif ($customPassword) {
+        $plainPassword = $customPassword;
     } else {
         switch ($passwordMode) {
             case 'dob':

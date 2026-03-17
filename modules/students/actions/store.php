@@ -6,6 +6,7 @@
  */
 
 csrf_protect();
+require_once APP_ROOT . '/core/ethiopian_calendar.php';
 
 // ── Basic validation ─────────────────────────────────────────
 $errors = [];
@@ -14,7 +15,11 @@ $errors = [];
 if (!trim($_POST['first_name'] ?? ''))  $errors['first_name']  = 'First name is required.';
 if (!trim($_POST['last_name'] ?? ''))   $errors['last_name']   = 'Last name is required.';
 if (!in_array($_POST['gender'] ?? '', ['male', 'female'])) $errors['gender'] = 'Please select a gender.';
-if (!trim($_POST['date_of_birth'] ?? '')) $errors['date_of_birth'] = 'Date of birth is required.';
+if (!trim($_POST['date_of_birth_ec'] ?? '')) {
+    $errors['date_of_birth_ec'] = 'Date of birth is required.';
+} elseif (!ec_validate_date(trim($_POST['date_of_birth_ec']))) {
+    $errors['date_of_birth_ec'] = 'Please provide a valid Ethiopian date (DD/MM/YYYY).';
+}
 if (!trim($_POST['phone'] ?? ''))       $errors['phone']       = 'Phone number is required.';
 
 // Address (all mandatory)
@@ -135,7 +140,7 @@ try {
             'first_name'     => trim($_POST['first_name']),
             'last_name'      => trim($_POST['last_name']),
             'gender'         => $_POST['gender'],
-            'date_of_birth'  => $_POST['date_of_birth'],
+            'date_of_birth'  => ec_str_to_gregorian(trim($_POST['date_of_birth_ec'])),
             'blood_group'    => $_POST['blood_group'] ?: null,
             'religion'       => trim($_POST['religion'] ?? '') ?: null,
             'phone'          => trim($_POST['phone']),
@@ -230,7 +235,7 @@ try {
             'last_name'     => trim($_POST['last_name']),
             'phone'         => trim($_POST['phone']),
             'gender'        => $_POST['gender'],
-            'date_of_birth' => $_POST['date_of_birth'],
+            'date_of_birth' => ec_str_to_gregorian(trim($_POST['date_of_birth_ec'])),
             'address'       => $fullAddress,
             'avatar'        => $photoPath,
             'is_active'     => 1,

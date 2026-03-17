@@ -1,7 +1,7 @@
 <?php
 /**
  * Students — Bulk Import
- * Upload a CSV file to import multiple students at once.
+ * Upload an Excel (.xlsx) file to import multiple students at once.
  * Photos can be added later by editing individual student profiles.
  */
 
@@ -16,7 +16,7 @@ ob_start();
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            Download Sample Excel / CSV
+            Download Sample Excel (.xlsx)
         </a>
     </div>
 
@@ -36,7 +36,7 @@ ob_start();
     <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 space-y-2">
         <p class="font-semibold">Instructions</p>
         <ul class="list-disc list-inside space-y-1 text-xs">
-            <li>Download the sample CSV file above and fill in student data.</li>
+            <li>Download the sample Excel file above and fill in student data.</li>
             <li>Required columns: <code class="bg-blue-100 px-1 rounded">first_name, last_name, gender, date_of_birth, class_name, section_name</code></li>
             <li>Optional columns: <code class="bg-blue-100 px-1 rounded">admission_no, phone, email, religion, blood_group, guardian_name, guardian_phone, address</code></li>
             <li>Date format: <strong>M/D/YYYY</strong> (e.g. 3/15/2010) or YYYY-MM-DD — both are accepted.</li>
@@ -60,10 +60,10 @@ ob_start();
                 <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                 </svg>
-                <p class="text-sm text-gray-500 dark:text-dark-muted mb-1">Drag &amp; drop your CSV file here, or</p>
+                <p class="text-sm text-gray-500 dark:text-dark-muted mb-1">Drag &amp; drop your Excel (.xlsx) file here, or</p>
                 <label class="cursor-pointer text-primary-600 hover:text-primary-700 text-sm font-medium underline">
                     browse to upload
-                    <input type="file" name="csv_file" id="csv_file" accept=".csv,.xlsx,.xls" class="hidden" onchange="showFile(this)">
+                    <input type="file" name="csv_file" id="csv_file" accept=".xlsx" class="hidden" onchange="showFile(this)">
                 </label>
                 <p id="fileName" class="mt-2 text-xs text-gray-400 dark:text-gray-500"></p>
             </div>
@@ -71,10 +71,10 @@ ob_start();
             <!-- Options -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Default Class (if not in CSV)</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Default Class (if not in file)</label>
                     <select name="default_class_id"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
-                        <option value="">— from CSV column —</option>
+                        <option value="">— from file column —</option>
                         <?php
                         $classes = db_fetch_all("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY sort_order");
                         foreach ($classes as $c): ?>
@@ -108,7 +108,7 @@ ob_start();
     <!-- Column Reference -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
         <div class="px-4 py-3 border-b border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg">
-            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">CSV Column Reference</h3>
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-dark-text">Excel Column Reference</h3>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-xs">

@@ -345,7 +345,7 @@ ob_start();
             <tbody class="divide-y divide-gray-100 dark:divide-dark-border" id="resultTbody">
                 <?php foreach ($students as $i => $st): ?>
                 <?php $existing = $marksMap[$st['id']] ?? null; ?>
-                <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                <tr class="hover:bg-gray-50 dark:bg-dark-bg" data-row-index="<?= $i ?>">
                     <td class="px-3 py-2 text-gray-400 dark:text-gray-500"><?= $i + 1 ?></td>
                     <td class="px-3 py-2 font-medium text-gray-900 dark:text-dark-text">
                         <?= e($st['first_name'] . ' ' . $st['last_name']) ?>
@@ -378,6 +378,8 @@ ob_start();
             </tbody>
         </table>
         </div>
+
+        <div id="resultsPagination" class="flex items-center justify-between mt-4 text-sm text-gray-600 dark:text-gray-400"></div>
 
         <div class="flex justify-end gap-3 mt-5">
             <a href="<?= url('exams','enter-results') ?>&term_id=<?= $selTerm ?>&class_id=<?= $selClass ?>&section_id=<?= $selSection ?>&subject_id=<?= $selSubject ?>"
@@ -437,6 +439,55 @@ document.querySelectorAll('.marks-input').forEach(inp => {
         }
     });
 });
+
+// Pagination (client-side)
+(function() {
+    const perPage = 15;
+    const rows = Array.from(document.querySelectorAll('#resultTbody tr'));
+    const pagination = document.getElementById('resultsPagination');
+    if (!pagination || rows.length <= perPage) return;
+
+    const totalPages = Math.ceil(rows.length / perPage);
+    let currentPage = 1;
+
+    function renderPagination() {
+        pagination.innerHTML = '';
+        const info = document.createElement('div');
+        info.textContent = `Page ${currentPage} of ${totalPages}`;
+        const controls = document.createElement('div');
+        controls.className = 'flex items-center gap-2';
+
+        const prev = document.createElement('button');
+        prev.type = 'button';
+        prev.textContent = 'Previous';
+        prev.disabled = currentPage === 1;
+        prev.className = 'px-3 py-1 border rounded ' + (prev.disabled ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-white dark:bg-dark-card text-gray-700 hover:bg-gray-50 dark:hover:bg-dark-bg');
+        prev.addEventListener('click', () => { currentPage--; update(); });
+
+        const next = document.createElement('button');
+        next.type = 'button';
+        next.textContent = 'Next';
+        next.disabled = currentPage === totalPages;
+        next.className = 'px-3 py-1 border rounded ' + (next.disabled ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-white dark:bg-dark-card text-gray-700 hover:bg-gray-50 dark:hover:bg-dark-bg');
+        next.addEventListener('click', () => { currentPage++; update(); });
+
+        controls.appendChild(prev);
+        controls.appendChild(next);
+        pagination.appendChild(info);
+        pagination.appendChild(controls);
+    }
+
+    function update() {
+        const start = (currentPage - 1) * perPage;
+        const end = start + perPage;
+        rows.forEach((row, idx) => {
+            row.style.display = (idx >= start && idx < end) ? '' : 'none';
+        });
+        renderPagination();
+    }
+
+    update();
+})();
 </script>
 
 <?php

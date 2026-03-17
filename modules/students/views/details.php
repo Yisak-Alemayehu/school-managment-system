@@ -9,7 +9,9 @@ $classId       = input_int('class_id');
 $sectionId     = input_int('section_id');
 $statusFilter  = input('status') ?: 'active';
 $page          = max(1, input_int('page') ?: 1);
-$perPage       = 25;
+$perPage       = 15;
+
+require_once APP_ROOT . '/core/ethiopian_calendar.php';
 
 $classes  = db_fetch_all("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY sort_order");
 $sections = $classId
@@ -138,7 +140,7 @@ ob_start();
                         <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['section_name'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['roll_no'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-gray-600 dark:text-dark-muted capitalize"><?= e($st['gender']) ?></td>
-                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= $st['date_of_birth'] ? e(date('d M Y', strtotime($st['date_of_birth']))) : '—' ?></td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?php if ($st['date_of_birth']): ?><?= e(ec_format_display(gregorian_str_to_ec($st['date_of_birth']))) ?><?php else: ?>—<?php endif; ?></td>
                         <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['phone'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-gray-600 dark:text-dark-muted"><?= e($st['blood_group'] ?? '—') ?></td>
                         <td class="px-4 py-3">

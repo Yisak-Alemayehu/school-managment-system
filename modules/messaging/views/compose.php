@@ -55,21 +55,30 @@ ob_start();
         <!-- Message Body -->
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
-            <textarea name="body" rows="6" required maxlength="5000"
+            <textarea name="body" rows="6" maxlength="5000"
                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500 <?= !empty($errors['body']) ? 'border-red-300' : '' ?>"
-                      placeholder="Type your message…"><?= old('body') ?></textarea>
+                      placeholder="Type your message… (optional if sending attachment)"><?= old('body') ?></textarea>
             <?php if (!empty($errors['body'])): ?>
             <p class="mt-1 text-xs text-red-600"><?= e($errors['body']) ?></p>
             <?php endif; ?>
             <p class="mt-1 text-xs text-gray-400 dark:text-gray-500"><span id="char-count">0</span>/5000</p>
         </div>
 
-        <!-- File Attachments -->
+        <!-- File / Audio Attachments -->
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Attachments <span class="text-gray-400 dark:text-gray-500">(max 5 files, 10 MB each)</span></label>
-            <input type="file" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx" id="compose-file-input"
-                   class="w-full text-sm text-gray-500 dark:text-dark-muted file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
-            <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Allowed: Images, PDF, Word, Excel</p>
+            <div class="flex flex-wrap items-start gap-2">
+                <label class="cursor-pointer inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-dark-card2 border border-gray-200 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-border">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/></svg>
+                    Attach Files
+                    <input type="file" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.webm,.ogg,.mp3,.wav" id="compose-file-input" class="hidden" onchange="showFile(this)">
+                </label>
+                <button type="button" id="compose-record-btn" class="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-dark-card2 border border-gray-200 dark:border-dark-border rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-border">
+                    <span id="compose-record-icon">&#9679;</span>
+                    <span id="compose-record-label">Record Audio</span>
+                </button>
+            </div>
+            <p class="mt-2 text-xs text-gray-400 dark:text-gray-500">Allowed: Images, PDF, Word, Excel, Audio</p>
             <div id="compose-file-preview" class="mt-2 flex flex-wrap gap-2"></div>
         </div>
 
@@ -147,33 +156,98 @@ ob_start();
         }
     });
 
-    // File preview
+    // File & Audio preview + recording
     var fileInput = document.getElementById('compose-file-input');
     var previewBox = document.getElementById('compose-file-preview');
-    if (fileInput && previewBox) {
-        fileInput.addEventListener('change', function() {
-            previewBox.innerHTML = '';
-            Array.from(this.files).forEach(function(file) {
-                var item = document.createElement('div');
-                item.className = 'relative group';
-                if (file.type.startsWith('image/')) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        item.innerHTML = '<img src="' + e.target.result + '" class="w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-dark-border">'
-                            + '<p class="text-[10px] text-gray-500 dark:text-dark-muted mt-0.5 truncate max-w-[80px]">' + escHtml(file.name) + '</p>';
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    var ext = file.name.split('.').pop().toUpperCase();
-                    var size = (file.size / 1024).toFixed(0) + ' KB';
-                    item.innerHTML = '<div class="w-20 h-20 rounded-lg border border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg flex flex-col items-center justify-center">'
-                        + '<span class="text-xs font-bold text-gray-400 dark:text-gray-500">' + escHtml(ext) + '</span>'
-                        + '<span class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">' + size + '</span></div>'
+    var recordBtn  = document.getElementById('compose-record-btn');
+    var recordIcon = document.getElementById('compose-record-icon');
+    var recordLabel= document.getElementById('compose-record-label');
+
+    function updateFilePreview() {
+        if (!fileInput || !previewBox) return;
+        previewBox.innerHTML = '';
+        Array.from(fileInput.files).forEach(function(file) {
+            var item = document.createElement('div');
+            item.className = 'relative group';
+            if (file.type.startsWith('image/')) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    item.innerHTML = '<img src="' + e.target.result + '" class="w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-dark-border">'
                         + '<p class="text-[10px] text-gray-500 dark:text-dark-muted mt-0.5 truncate max-w-[80px]">' + escHtml(file.name) + '</p>';
-                }
-                previewBox.appendChild(item);
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type.startsWith('audio/')) {
+                var url = URL.createObjectURL(file);
+                item.innerHTML = '<audio controls class="w-40 rounded-lg" src="' + url + '"></audio>'
+                    + '<p class="text-[10px] text-gray-500 dark:text-dark-muted mt-1 truncate max-w-[120px]">' + escHtml(file.name) + '</p>';
+            } else {
+                var ext = file.name.split('.').pop().toUpperCase();
+                var size = (file.size / 1024).toFixed(0) + ' KB';
+                item.innerHTML = '<div class="w-20 h-20 rounded-lg border border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-bg flex flex-col items-center justify-center">'
+                    + '<span class="text-xs font-bold text-gray-400 dark:text-gray-500">' + escHtml(ext) + '</span>'
+                    + '<span class="text-[10px] text-gray-400 dark:text-dark-muted mt-1">' + size + '</span></div>'
+                    + '<p class="text-[10px] text-gray-500 dark:text-dark-muted mt-0.5 truncate max-w-[80px]">' + escHtml(file.name) + '</p>';
+            }
+            previewBox.appendChild(item);
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', updateFilePreview);
+    }
+
+    // Audio recording
+    if (recordBtn) {
+        var mediaRecorder = null;
+        var audioChunks = [];
+        recordBtn.addEventListener('click', function() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                return;
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Audio recording is not supported on this browser.');
+                return;
+            }
+
+            recordBtn.classList.add('bg-red-100', 'text-red-700');
+            recordIcon.textContent = '■';
+            recordLabel.textContent = 'Stop Recording';
+
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = function(e) {
+                    if (e.data && e.data.size) audioChunks.push(e.data);
+                };
+                mediaRecorder.onstop = function() {
+                    stream.getTracks().forEach(t => t.stop());
+                    var blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    var file = new File([blob], 'recording_' + Date.now() + '.webm', { type: blob.type });
+                    addFileToInput(file);
+                    updateFilePreview();
+
+                    recordBtn.classList.remove('bg-red-100', 'text-red-700');
+                    recordIcon.textContent = '●';
+                    recordLabel.textContent = 'Record Audio';
+                };
+                mediaRecorder.start();
+            }).catch(function() {
+                alert('Unable to access microphone. Please allow access.');
+                recordBtn.classList.remove('bg-red-100', 'text-red-700');
+                recordIcon.textContent = '●';
+                recordLabel.textContent = 'Record Audio';
             });
         });
+
+        function addFileToInput(file) {
+            if (!fileInput) return;
+            var dt = new DataTransfer();
+            Array.from(fileInput.files).forEach(f => dt.items.add(f));
+            dt.items.add(file);
+            fileInput.files = dt.files;
+        }
     }
 
     function escHtml(t) {

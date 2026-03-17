@@ -11,7 +11,10 @@ $sections = db_fetch_all("SELECT id, name, class_id FROM sections WHERE is_activ
 $session  = get_active_session();
 $sessions = db_fetch_all("SELECT id, name FROM academic_sessions ORDER BY start_date DESC LIMIT 5");
 
+require_once APP_ROOT . '/core/ethiopian_calendar.php';
+
 ob_start();
+partial('ethiopian_datepicker');
 ?>
 
 <div class="max-w-4xl mx-auto">
@@ -81,10 +84,24 @@ ob_start();
                 </div>
 
                 <div>
-                    <label for="date_of_birth" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth <span class="text-red-500">*</span></label>
-                    <input type="date" id="date_of_birth" name="date_of_birth" value="<?= e(old('date_of_birth')) ?>" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
-                    <?php if ($err = get_validation_error('date_of_birth')): ?><p class="mt-1 text-xs text-red-600"><?= e($err) ?></p><?php endif; ?>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date of Birth (EC) <span class="text-red-500">*</span></label>
+                    <div x-data="ecDatePicker({ value: '<?= e(old('date_of_birth_ec')) ?>', name: 'date_of_birth_ec', required: true })">
+                        <div class="flex gap-2">
+                            <select x-model="day" @change="updateValue()" class="w-16 px-2 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
+                                <option value="">Day</option>
+                                <?php for ($d = 1; $d <= 30; $d++): ?><option value="<?= $d ?>"><?= $d ?></option><?php endfor; ?>
+                            </select>
+                            <select x-model="month" @change="updateValue()" class="flex-1 px-2 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text">
+                                <option value="">Month</option>
+                                <?php foreach (ec_month_names() as $mnum => $mdata): ?>
+                                    <option value="<?= $mnum ?>"><?= e($mdata['en']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input type="number" x-model="year" @change="updateValue()" placeholder="Year" class="w-24 px-2 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" min="1900" max="2100">
+                        </div>
+                        <input type="hidden" :name="fieldName" :value="formatted" :required="isRequired">
+                    </div>
+                    <?php if ($err = get_validation_error('date_of_birth_ec')): ?><p class="mt-1 text-xs text-red-600"><?= e($err) ?></p><?php endif; ?>
                 </div>
 
                 <div>
