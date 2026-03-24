@@ -140,12 +140,15 @@ ob_start();
 
                 <div class="lg:col-span-4">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subjects <span class="text-red-500">*</span></label>
-                    <select name="subject_ids[]" multiple required class="w-full h-36 px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500" id="subjectSelect">
+                    <div class="max-h-56 overflow-y-auto rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card p-3" id="subjectContainer">
                         <?php foreach ($subjects as $sub): ?>
-                            <option value="<?= $sub['id'] ?>"><?= e($sub['name']) ?> (<?= e($sub['code']) ?>)</option>
+                            <label class="flex items-center gap-2 text-xs text-gray-700 dark:text-dark-text mb-1">
+                                <input type="checkbox" name="subject_ids[]" value="<?= $sub['id'] ?>" class="subject-checkbox form-checkbox h-4 w-4 text-primary-600 border-gray-300 dark:border-dark-border">
+                                <?= e($sub['name']) ?> (<?= e($sub['code']) ?>)
+                            </label>
                         <?php endforeach; ?>
-                    </select>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Select one or more subjects.</p>
+                    </div>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Check one or more subjects.</p>
                 </div>
 
                 <div class="lg:col-span-4">
@@ -223,12 +226,11 @@ ob_start();
 
 <script>
 const assignedSectionsBySubject = <?= json_encode($assignedSectionsBySubject) ?>;
-const subjectSelect = document.getElementById('subjectSelect');
+const subjectCheckboxes = Array.from(document.querySelectorAll('input[name="subject_ids[]"]'));
 const sectionCheckboxes = Array.from(document.querySelectorAll('input[name="section_ids[]"]'));
 
 function updateSectionAvailability() {
-    if (!subjectSelect) return;
-    const selectedSubjectIds = Array.from(subjectSelect.selectedOptions).map(o => o.value);
+    const selectedSubjectIds = subjectCheckboxes.filter(cb => cb.checked).map(cb => cb.value);
     const blocked = new Set();
     selectedSubjectIds.forEach(subId => {
         const list = assignedSectionsBySubject[subId] || [];
@@ -270,10 +272,8 @@ function filterSTSections(classId) {
     }
 }
 
-if (subjectSelect) {
-    subjectSelect.addEventListener('change', updateSectionAvailability);
-    updateSectionAvailability();
-}
+subjectCheckboxes.forEach(cb => cb.addEventListener('change', updateSectionAvailability));
+updateSectionAvailability();
 
 // Ensure section select is filtered on load for edit form
 const classSelect = document.getElementById('stClassSelect');
