@@ -147,39 +147,41 @@
     </style>
     <link rel="stylesheet" href="<?= url('/assets/css/app.css') ?>?v=<?= filemtime(APP_ROOT . '/public/assets/css/app.css') ?>">
 </head>
-<body class="h-full bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-dark-text transition-colors">
-    <?php if (auth_check()): ?>
-    <div class="flex h-full" id="app">
-        <!-- Mobile sidebar overlay -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
-        
-        <!-- Sidebar -->
-        <?php partial('sidebar'); ?>
-        
-        <!-- Main content -->
-        <div class="flex-1 flex flex-col min-h-screen lg:ml-64">
-            <!-- Top header -->
-            <?php partial('header'); ?>
+<body class="min-h-screen flex flex-col bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-dark-text transition-colors">
+    <div class="flex-1">
+        <?php if (auth_check()): ?>
+        <div class="flex h-full" id="app">
+            <!-- Mobile sidebar overlay -->
+            <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
             
-            <!-- Flash messages -->
-            <?php partial('flash'); ?>
+            <!-- Sidebar -->
+            <?php partial('sidebar'); ?>
             
-            <!-- Page content -->
-            <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto animate-fade-in">
-                <?= $content ?? '' ?>
-            </main>
-            
-            <!-- Mobile bottom navigation -->
-            <?php partial('mobile_nav'); ?>
+            <!-- Main content -->
+            <div class="flex-1 flex flex-col min-h-screen lg:ml-64">
+                <!-- Top header -->
+                <?php partial('header'); ?>
+                
+                <!-- Flash messages -->
+                <?php partial('flash'); ?>
+                
+                <!-- Page content -->
+                <main class="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto animate-fade-in">
+                    <?= $content ?? '' ?>
+                </main>
+                
+                <!-- Mobile bottom navigation -->
+                <?php partial('mobile_nav'); ?>
+            </div>
         </div>
+        <?php else: ?>
+            <?= $content ?? '' ?>
+        <?php endif; ?>
     </div>
-    <?php else: ?>
-        <?= $content ?? '' ?>
-    <?php endif; ?>
-    
+
     <!-- Copyright footer -->
     <footer class="w-full border-t border-gray-200 dark:border-dark-border py-3 text-center text-xs text-gray-500 dark:text-dark-muted">
-        &copy; <?= date('Y') ?>  Developed by <a href="https://yisak.dev" target="_blank" rel="noopener noreferrer" class="text-primary-600 dark:text-primary-300 hover:underline">Yisak A. Alemayehu</a>.
+        &copy; <?= date('Y') ?> Developed by <a href="https://yisak.dev" target="_blank" rel="noopener noreferrer" class="text-primary-600 dark:text-primary-300 hover:underline">Yisak A. Alemayehu</a>.
     </footer>
 
     <!-- PWA offline indicator -->

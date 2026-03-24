@@ -179,6 +179,30 @@ ob_start();
         <?php endif; ?>
     </div>
 
+    <?php
+    // Build grouped teacher summaries for aggregation + expand/collapse details
+    $teacherSummaries = [];
+    foreach ($assignments as $a) {
+        $teacherId = $a['teacher_id'];
+        if (!isset($teacherSummaries[$teacherId])) {
+            $teacherSummaries[$teacherId] = [
+                'teacher_name' => $a['teacher_name'],
+                'subjects'     => [],
+                'classes'      => [],
+                'sections'     => [],
+                'assignments'  => [],
+            ];
+        }
+
+        $teacherSummaries[$teacherId]['assignments'][] = $a;
+        $teacherSummaries[$teacherId]['subjects'][$a['subject_id']] = $a['subject_name'] . ' (' . $a['subject_code'] . ')';
+        $teacherSummaries[$teacherId]['classes'][$a['class_id']] = $a['class_name'];
+        if ($a['section_id']) {
+            $teacherSummaries[$teacherId]['sections'][$a['section_id']] = $a['section_name'];
+        }
+    }
+    ?>
+
     <!-- List -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border overflow-hidden">
       <div class="overflow-x-auto">
@@ -186,36 +210,56 @@ ob_start();
             <thead class="bg-gray-50 dark:bg-dark-bg border-b">
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Teacher</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Subject</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Class</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Section</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Subjects Count</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Classes Count</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Sections Count</th>
                     <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
-                <?php if (empty($assignments)): ?>
+                <?php if (empty($teacherSummaries)): ?>
                     <tr><td colspan="5" class="px-4 py-6 text-center text-sm text-gray-500 dark:text-dark-muted">No subject teacher assignments for this session.</td></tr>
                 <?php endif; ?>
-                <?php foreach ($assignments as $a): ?>
+
+                <?php foreach ($teacherSummaries as $teacherId => $teacher): ?>
                     <tr class="hover:bg-gray-50 dark:bg-dark-bg">
-                        <td data-label="Teacher" class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($a['teacher_name']) ?></td>
-                        <td data-label="Subject" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($a['subject_name']) ?> <span class="text-xs text-gray-400 dark:text-gray-500">(<?= e($a['subject_code']) ?>)</span></td>
-                        <td data-label="Class" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= e($a['class_name']) ?></td>
-                        <td data-label="Section" class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted"><?= $a['section_name'] ? e($a['section_name']) : '<span class="text-gray-400 dark:text-gray-500">All</span>' ?></td>
-                        <td data-label="Actions" class="px-4 py-3 text-right flex items-center justify-end gap-1">
-                            <a href="<?= url('academics', 'subject-teachers') ?>&edit=<?= $a['id'] ?>" class="p-2 text-gray-400 dark:text-gray-500 hover:text-yellow-600 rounded" title="Edit">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            </a>
-                            <form method="POST" action="<?= url('academics', 'subject-teacher-delete') ?>" class="inline" onsubmit="return confirm('Remove this assignment?')">
-                                <?= csrf_field() ?>
-                                <input type="hidden" name="id" value="<?= $a['id'] ?>">
-                                <button type="submit" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 rounded" title="Remove">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                </button>
-                            </form>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($teacher['teacher_name']) ?></td>
+                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted"><?= count($teacher['subjects']) ?></td>
+                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted"><?= count($teacher['classes']) ?></td>
+                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted"><?= count($teacher['sections']) ?></td>
+                        <td class="px-4 py-3 text-right">
+                            <button type="button" id="toggleBtn-<?= $teacherId ?>" onclick="toggleTeacherDetails(<?= $teacherId ?>)" class="px-3 py-1 text-xs font-medium rounded-lg border border-primary-700 text-primary-700 hover:bg-primary-700 hover:text-white transition">View More</button>
+                        </td>
+                    </tr>
+                    <tr id="details-<?= $teacherId ?>" class="hidden bg-gray-50 dark:bg-dark-bg">
+                        <td colspan="5" class="px-4 py-4">
+                            <div class="rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card p-3">
+                                <div class="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Detailed assignments</div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead class="bg-gray-100 dark:bg-dark-bg border-b">
+                                            <tr>
+                                                <th class="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Subject</th>
+                                                <th class="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Class</th>
+                                                <th class="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-dark-muted uppercase">Section</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
+                                            <?php foreach ($teacher['assignments'] as $entry): ?>
+                                                <tr class="hover:bg-gray-50 dark:bg-dark-bg">
+                                                    <td class="px-2 py-1 text-sm text-gray-700 dark:text-gray-300"><?= e($entry['subject_name'] . ' (' . $entry['subject_code'] . ')') ?></td>
+                                                    <td class="px-2 py-1 text-sm text-gray-700 dark:text-gray-300"><?= e($entry['class_name']) ?></td>
+                                                    <td class="px-2 py-1 text-sm text-gray-700 dark:text-gray-300"><?= $entry['section_name'] ? e($entry['section_name']) : '<span class="text-gray-400 dark:text-dark-muted">All</span>' ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
+
             </tbody>
         </table>
       </div>
@@ -275,6 +319,21 @@ function filterSTSections(classId) {
 subjectCheckboxes.forEach(cb => cb.addEventListener('change', updateSectionAvailability));
 updateSectionAvailability();
 
+function toggleTeacherDetails(teacherId) {
+    const detailRow = document.getElementById('details-' + teacherId);
+    const toggleBtn = document.getElementById('toggleBtn-' + teacherId);
+    if (!detailRow || !toggleBtn) return;
+
+    const isExpanded = !detailRow.classList.contains('hidden');
+    if (isExpanded) {
+        detailRow.classList.add('hidden');
+        toggleBtn.textContent = 'View More';
+    } else {
+        detailRow.classList.remove('hidden');
+        toggleBtn.textContent = 'View Less';
+    }
+}
+
 // Ensure section select is filtered on load for edit form
 const classSelect = document.getElementById('stClassSelect');
 if (classSelect) {
@@ -286,3 +345,4 @@ if (classSelect) {
 <?php
 $content = ob_get_clean();
 require APP_ROOT . '/templates/layout.php';
+
