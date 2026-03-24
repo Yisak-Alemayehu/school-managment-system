@@ -177,6 +177,11 @@
         <?= $content ?? '' ?>
     <?php endif; ?>
     
+    <!-- Copyright footer -->
+    <footer class="w-full border-t border-gray-200 dark:border-dark-border py-3 text-center text-xs text-gray-500 dark:text-dark-muted">
+        &copy; <?= date('Y') ?>  Developed by <a href="https://yisak.dev" target="_blank" rel="noopener noreferrer" class="text-primary-600 dark:text-primary-300 hover:underline">Yisak A. Alemayehu</a>.
+    </footer>
+
     <!-- PWA offline indicator -->
     <?= pwa_status_indicator() ?>
     
