@@ -222,16 +222,18 @@ ob_start();
                 <?php endif; ?>
 
                 <?php foreach ($teacherSummaries as $teacherId => $teacher): ?>
-                    <tr class="hover:bg-gray-50 dark:bg-dark-bg">
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($teacher['teacher_name']) ?></td>
-                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted"><?= count($teacher['subjects']) ?></td>
-                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted"><?= count($teacher['classes']) ?></td>
-                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted"><?= count($teacher['sections']) ?></td>
-                        <td class="px-4 py-3 text-right">
-                            <button type="button" id="toggleBtn-<?= $teacherId ?>" onclick="toggleTeacherDetails(<?= $teacherId ?>)" class="px-3 py-1 text-xs font-medium rounded-lg border border-primary-700 text-primary-700 hover:bg-primary-700 hover:text-white transition">View More</button>
+                    <tr class="summary-row hover:bg-gray-50 dark:bg-dark-bg" data-teacher-id="<?= $teacherId ?>">
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-dark-text" data-label="Teacher"><?= e($teacher['teacher_name']) ?></td>
+                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted" data-label="Subjects Count"><?= count($teacher['subjects']) ?></td>
+                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted" data-label="Classes Count"><?= count($teacher['classes']) ?></td>
+                        <td class="px-4 py-3 text-center text-sm text-gray-600 dark:text-dark-muted" data-label="Sections Count"><?= count($teacher['sections']) ?></td>
+                        <td class="px-4 py-3 text-right" data-label="Actions">
+                            <div class="flex justify-end items-center w-full">
+                                <button type="button" id="toggleBtn-<?= $teacherId ?>" aria-controls="details-<?= $teacherId ?>" aria-expanded="false" class="toggle-details px-3 py-2 sm:py-1 text-sm sm:text-xs font-medium rounded-lg border border-primary-700 text-primary-700 hover:bg-primary-700 hover:text-white transition">View More</button>
+                            </div>
                         </td>
                     </tr>
-                    <tr id="details-<?= $teacherId ?>" class="hidden bg-gray-50 dark:bg-dark-bg">
+                    <tr id="details-<?= $teacherId ?>" class="details-row hidden bg-gray-50 dark:bg-dark-bg">
                         <td colspan="5" class="px-4 py-4">
                             <div class="rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card p-3">
                                 <div class="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Detailed assignments</div>
@@ -319,20 +321,10 @@ function filterSTSections(classId) {
 subjectCheckboxes.forEach(cb => cb.addEventListener('change', updateSectionAvailability));
 updateSectionAvailability();
 
-function toggleTeacherDetails(teacherId) {
-    const detailRow = document.getElementById('details-' + teacherId);
-    const toggleBtn = document.getElementById('toggleBtn-' + teacherId);
-    if (!detailRow || !toggleBtn) return;
-
-    const isExpanded = !detailRow.classList.contains('hidden');
-    if (isExpanded) {
-        detailRow.classList.add('hidden');
-        toggleBtn.textContent = 'View More';
-    } else {
-        detailRow.classList.remove('hidden');
-        toggleBtn.textContent = 'View Less';
-    }
-}
+// Collapse all details on load and on resize to keep behavior consistent
+// (the new handlers below use `collapseAll`)
+collapseAll();
+window.addEventListener('resize', function () { collapseAll(); });
 
 // Ensure section select is filtered on load for edit form
 const classSelect = document.getElementById('stClassSelect');
@@ -340,6 +332,215 @@ if (classSelect) {
     filterSTSections(classSelect.value);
     classSelect.addEventListener('change', () => filterSTSections(classSelect.value));
 }
+</script>
+
+<script>
+// Robust expand/collapse handling for teacher details (works on mobile & desktop)
+document.addEventListener('DOMContentLoaded', function () {
+    const MOBILE_Q = window.matchMedia('(max-width: 767px)');
+
+    function isMobile() {
+        return MOBILE_Q.matches;
+    }
+
+    function getDetailRowEl(id) {
+        return document.getElementById('details-' + id);
+    }
+
+    function getToggleBtn(id) {
+        return document.getElementById('toggleBtn-' + id);
+    }
+
+    function setDetailOpen(id, open) {
+        const row = getDetailRowEl(id);
+        const btn = getToggleBtn(id);
+        if (!row || !btn) return;
+
+        // Set display based on layout
+        if (open) {
+            // remove Tailwind's 'hidden' which uses !important
+            console.log('Opening details for', id, 'before:', {
+                classes: row.className,
+                inlineDisplay: row.style.display,
+                computedDisplay: window.getComputedStyle(row).display,
+                offsetHeight: row.offsetHeight
+            });
+            row.classList.remove('hidden');
+            // try reliable display switching
+            row.style.display = isMobile() ? 'block' : 'table-row';
+            // fallback: if still computed none, force block
+            if (window.getComputedStyle(row).display === 'none') {
+                row.style.display = 'block';
+            }
+            row.style.visibility = 'visible';
+            row.style.opacity = '1';
+            row.classList.add('expanded');
+            btn.textContent = 'View Less';
+            btn.setAttribute('aria-expanded', 'true');
+            // ensure visible on small screens
+            setTimeout(() => {
+                try { row.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+                console.log('Opened details for', id, 'after:', {
+                    classes: row.className,
+                    inlineDisplay: row.style.display,
+                    computedDisplay: window.getComputedStyle(row).display,
+                    offsetHeight: row.offsetHeight
+                });
+            }, 120);
+        } else {
+            // hide reliably
+            row.style.display = 'none';
+            row.classList.add('hidden');
+            row.style.visibility = 'hidden';
+            row.style.opacity = '0';
+            row.classList.remove('expanded');
+            btn.textContent = 'View More';
+            btn.setAttribute('aria-expanded', 'false');
+            console.log('Closed details for', id);
+        }
+    }
+
+    function collapseAll() {
+        document.querySelectorAll('tr[id^="details-"]').forEach(r => {
+            r.style.display = 'none';
+            r.classList.add('hidden');
+            r.classList.remove('expanded');
+        });
+        document.querySelectorAll('button[id^="toggleBtn-"]').forEach(b => {
+            b.textContent = 'View More';
+            b.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    // Initialize: hide all details (use inline styles for reliability)
+    collapseAll();
+
+    // Mobile-only renderer: build card UI from table rows to avoid table/tr layout issues on small screens
+    function renderMobileCards() {
+        if (!isMobile()) return;
+        const table = document.querySelector('.responsive-table');
+        if (!table) return;
+        const parent = table.parentElement;
+        if (!parent) return;
+        // don't re-render if already rendered
+        if (document.querySelector('.mobile-teacher-cards')) return;
+
+        const cardsContainer = document.createElement('div');
+        cardsContainer.className = 'mobile-teacher-cards space-y-4 px-2';
+
+        const summaryRows = Array.from(table.querySelectorAll('tr.summary-row'));
+        summaryRows.forEach(sr => {
+            const teacherId = sr.dataset.teacherId;
+            const nameCell = sr.querySelector('td[data-label="Teacher"]') || sr.querySelector('td');
+            const name = nameCell ? nameCell.textContent.trim() : '';
+            const subjects = (sr.querySelector('td[data-label="Subjects Count"]') || {}).textContent ? sr.querySelector('td[data-label="Subjects Count"]').textContent.trim() : '';
+            const classesCount = (sr.querySelector('td[data-label="Classes Count"]') || {}).textContent ? sr.querySelector('td[data-label="Classes Count"]').textContent.trim() : '';
+            const sectionsCount = (sr.querySelector('td[data-label="Sections Count"]') || {}).textContent ? sr.querySelector('td[data-label="Sections Count"]').textContent.trim() : '';
+
+            const detailsRow = document.getElementById('details-' + teacherId);
+            const detailsHtml = detailsRow ? detailsRow.querySelector('td').innerHTML : '';
+
+            const card = document.createElement('div');
+            card.className = 'teacher-card bg-white dark:bg-dark-card rounded-lg border border-gray-200 dark:border-dark-border p-3';
+            card.innerHTML = '<div class="flex items-start justify-between"><div><div class="text-sm font-medium text-gray-900 dark:text-dark-text">' +
+                name + '</div><div class="text-xs text-gray-500 dark:text-dark-muted mt-1">Subjects: ' + subjects + ' · Classes: ' + classesCount + ' · Sections: ' + sectionsCount + '</div></div>' +
+                '<div><button data-tid="' + teacherId + '" class="mobile-toggle inline-flex items-center px-3 py-2 text-sm font-medium rounded border border-primary-700 text-primary-700">View More</button></div></div>' +
+                '<div class="mobile-details mt-3 hidden">' + detailsHtml + '</div>';
+
+            cardsContainer.appendChild(card);
+        });
+
+        parent.parentElement.insertBefore(cardsContainer, parent);
+        // hide original table on mobile
+        table.style.display = 'none';
+
+        // wire toggles
+        cardsContainer.addEventListener('click', function (e) {
+            const btn = e.target.closest('.mobile-toggle');
+            if (!btn) return;
+            const details = btn.closest('.teacher-card') ? btn.closest('.teacher-card').querySelector('.mobile-details') : null;
+            if (!details) return;
+            const isHidden = details.classList.contains('hidden');
+            // collapse others
+            cardsContainer.querySelectorAll('.mobile-details').forEach(d => {
+                if (d !== details) { d.classList.add('hidden'); d.style.display = 'none'; const b = d.parentElement.querySelector('.mobile-toggle'); if (b) b.textContent = 'View More'; }
+            });
+            if (isHidden) {
+                details.classList.remove('hidden');
+                details.style.display = 'block';
+                btn.textContent = 'View Less';
+                setTimeout(() => { try { details.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }, 80);
+            } else {
+                details.classList.add('hidden');
+                details.style.display = 'none';
+                btn.textContent = 'View More';
+            }
+        });
+    }
+
+    // render mobile cards on load and when crossing breakpoint
+    if (isMobile()) renderMobileCards();
+    MOBILE_Q.addEventListener('change', function () {
+        if (MOBILE_Q.matches) {
+            renderMobileCards();
+        } else {
+            // remove mobile cards and show table again
+            const cards = document.querySelector('.mobile-teacher-cards');
+            const table = document.querySelector('.responsive-table');
+            if (cards) cards.remove();
+            if (table) table.style.display = '';
+            collapseAll();
+        }
+    });
+
+    // Event delegation on parent container to avoid multiple listeners
+    const tableParent = document.querySelector('.responsive-table') && document.querySelector('.responsive-table').parentElement;
+    if (!tableParent) return;
+
+    // Prevent double events from touch + click
+    let recentlyHandled = false;
+    function lock() {
+        recentlyHandled = true;
+        setTimeout(() => { recentlyHandled = false; }, 350);
+    }
+
+    tableParent.addEventListener('click', function (ev) {
+        if (recentlyHandled) return;
+        const btn = ev.target.closest('.toggle-details');
+        if (btn) {
+            const id = btn.id.replace('toggleBtn-', '');
+            const row = getDetailRowEl(id);
+            const currentlyOpen = row && row.style.display !== 'none';
+            if (!currentlyOpen) collapseAll();
+            setDetailOpen(id, !currentlyOpen);
+            lock();
+            ev.preventDefault();
+            ev.stopPropagation();
+            return;
+        }
+
+        const summary = ev.target.closest('tr.summary-row');
+        if (summary && !ev.target.closest('.toggle-details')) {
+            const id = summary.dataset.teacherId;
+            if (!id) return;
+            const row = getDetailRowEl(id);
+            const currentlyOpen = row && row.style.display !== 'none';
+            if (!currentlyOpen) collapseAll();
+            setDetailOpen(id, !currentlyOpen);
+            lock();
+        }
+    }, { passive: false });
+
+    // Ensure layout toggles adapt on resize (switch between table-row and block)
+    window.addEventListener('resize', function () {
+        // If any detail is open, refresh its display style
+        document.querySelectorAll('tr[id^="details-"]').forEach(r => {
+            if (r.classList.contains('expanded')) {
+                r.style.display = isMobile() ? 'block' : 'table-row';
+            }
+        });
+    });
+});
 </script>
 
 <?php

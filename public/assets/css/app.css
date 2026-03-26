@@ -34,6 +34,47 @@
     .dark .responsive-table tbody td::before {
         color: #94a3b8;
     }
+
+    .responsive-table tbody tr.details-row {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        margin-top: -0.5rem;
+        margin-bottom: 4.5rem; /* Prevent overlap with sticky nav */
+        padding: 0;
+        position: relative;
+        z-index: 20;
+    }
+
+    .responsive-table tbody tr.details-row td {
+        display: block !important;
+        width: 100%;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    .responsive-table tbody tr.details-row td::before {
+        content: none !important;
+    }
+
+    .responsive-table tbody tr.details-row .rounded-lg {
+        margin: 0;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        padding: 1.25rem !important;
+        margin-bottom: 1rem;
+    }
+
+    .toggle-details {
+        min-width: 80px;
+        min-height: 44px;
+        padding: 0.75rem 0.9rem;
+        touch-action: manipulation;
+    }
+
+    .summary-row td {
+        cursor: pointer;
+    }
 }
 
 /* ── Print Styles ──────────────────────────────────────────── */
