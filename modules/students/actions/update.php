@@ -57,6 +57,13 @@ if (!empty($errors)) {
     redirect(url('students', 'edit', $id));
 }
 
+// ── Status validation ───────────────────────────────────────
+$allowedStatuses = ['active','inactive','graduated','transferred','expelled'];
+$statusInput = trim((string)($_POST['status'] ?? ''));
+if ($statusInput === '' || !in_array($statusInput, $allowedStatuses, true)) {
+    $statusInput = $student['status'];
+}
+
 // ── Build address ────────────────────────────────────────────
 $addressParts = array_filter([
     trim($_POST['address'] ?? ''),
@@ -101,8 +108,14 @@ $updateData = [
     'woreda'         => trim($_POST['woreda']),
     'house_number'   => $houseNumber,
     'medical_notes'  => trim($_POST['medical_conditions'] ?? '') ?: null,
-    'status'         => $_POST['status'] ?? $student['status'],
+    'status'         => $statusInput,
 ];
+
+// ── Temporary logging for debugging status updates ──────────
+$logPath = APP_ROOT . '/logs/status_update.log';
+$logEntry = sprintf("[%s] student_id=%s POST=%s updateData=%s\n", date('Y-m-d H:i:s'), var_export($id, true), json_encode($_POST, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE), json_encode($updateData, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE));
+@file_put_contents($logPath, $logEntry, FILE_APPEND | LOCK_EX);
+
 
 if ($photoPath) {
     $updateData['photo'] = $photoPath;
