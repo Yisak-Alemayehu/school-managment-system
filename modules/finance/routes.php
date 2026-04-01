@@ -52,6 +52,12 @@ switch ($action) {
         else { redirect(url('finance', 'students')); }
         break;
 
+    case 'refund':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/refund.php'; }
+        else { redirect(url('finance', 'students')); }
+        break;
+
     // ══════════════════════════════════════════════════════════
     // GROUPING
     // ══════════════════════════════════════════════════════════
@@ -93,6 +99,18 @@ switch ($action) {
         else { redirect(url('finance', 'groups')); }
         break;
 
+    case 'group-update':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/group_update.php'; }
+        else { redirect(url('finance', 'groups')); }
+        break;
+
+    case 'group-delete':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/group_delete.php'; }
+        else { redirect(url('finance', 'groups')); }
+        break;
+
     // ══════════════════════════════════════════════════════════
     // COLLECT PAYMENT
     // ══════════════════════════════════════════════════════════
@@ -106,6 +124,18 @@ switch ($action) {
         auth_require_permission('finance.manage');
         if (is_post()) { require __DIR__ . '/actions/collect_payment_save.php'; }
         else { redirect(url('finance', 'collect-payment')); }
+        break;
+
+    case 'collect-supplementary-payment':
+        auth_require_permission('finance.manage');
+        $pageTitle = 'Collect Supplementary Payment';
+        require __DIR__ . '/views/collect_supplementary_payment.php';
+        break;
+
+    case 'collect-supplementary-payment-save':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/collect_supplementary_payment_save.php'; }
+        else { redirect(url('finance', 'collect-supplementary-payment')); }
         break;
 
     case 'payment-attachment':
@@ -143,6 +173,18 @@ switch ($action) {
         else { redirect(url('finance', 'fee-due')); }
         break;
 
+    case 'fee-update':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/fee_update.php'; }
+        else { redirect(url('finance', 'fee-due')); }
+        break;
+
+    case 'fee-toggle':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/fee_toggle.php'; }
+        else { redirect(url('finance', 'fee-due')); }
+        break;
+
     case 'fee-detail':
         auth_require_permission('finance.view');
         $id = route_id() ?: input_int('id');
@@ -160,6 +202,18 @@ switch ($action) {
     case 'supplementary-fee-save':
         auth_require_permission('finance.manage');
         if (is_post()) { require __DIR__ . '/actions/supplementary_fee_save.php'; }
+        else { redirect(url('finance', 'supplementary-fees')); }
+        break;
+
+    case 'supplementary-fee-update':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/supplementary_fee_update.php'; }
+        else { redirect(url('finance', 'supplementary-fees')); }
+        break;
+
+    case 'supplementary-fee-toggle':
+        auth_require_permission('finance.manage');
+        if (is_post()) { require __DIR__ . '/actions/supplementary_fee_toggle.php'; }
         else { redirect(url('finance', 'supplementary-fees')); }
         break;
 
@@ -202,6 +256,8 @@ switch ($action) {
         break;
 
     default:
-        redirect(url('finance', 'students'));
+        auth_require_permission('finance.view');
+        $pageTitle = 'Finance — Dashboard';
+        require __DIR__ . '/views/dashboard.php';
         break;
 }

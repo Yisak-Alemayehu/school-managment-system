@@ -73,11 +73,12 @@ ob_start();
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Total Collected</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Status</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Created</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($sfees)): ?>
-                    <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No supplementary fees defined.</td></tr>
+                    <tr><td colspan="8" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No supplementary fees defined.</td></tr>
                     <?php else: ?>
                     <?php foreach ($sfees as $sf): ?>
                     <tr class="hover:bg-gray-50 dark:bg-dark-bg transition-colors">
@@ -92,6 +93,26 @@ ob_start();
                             </span>
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Created"><?= format_date($sf['created_at']) ?></td>
+                        <td class="px-4 py-3 text-sm" data-label="Actions">
+                            <div class="flex items-center gap-1 flex-wrap">
+                                <a href="<?= url('finance', 'collect-supplementary-payment') ?>&sfee_id=<?= $sf['id'] ?>"
+                                   class="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg hover:bg-green-100 font-medium border border-green-200">
+                                    Collect
+                                </a>
+                                <button type="button" onclick="openEditSupFee(<?= e(json_encode($sf)) ?>)"
+                                        class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-lg hover:bg-blue-100 font-medium border border-blue-200">
+                                    Edit
+                                </button>
+                                <form method="POST" action="<?= url('finance', 'supplementary-fee-toggle') ?>" class="inline" onsubmit="return confirm('Toggle active status?')">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="supplementary_fee_id" value="<?= $sf['id'] ?>">
+                                    <button type="submit"
+                                            class="px-2 py-1 text-xs rounded-lg font-medium border <?= $sf['is_active'] ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' ?>">
+                                        <?= $sf['is_active'] ? 'Deactivate' : 'Activate' ?>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>
@@ -144,6 +165,59 @@ ob_start();
         </form>
     </div>
 </div>
+
+<!-- Edit Supplementary Fee Modal -->
+<div id="editSupFeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div class="bg-white dark:bg-dark-card rounded-xl w-full max-w-md p-6 shadow-xl">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Edit Supplementary Fee</h2>
+        <form method="POST" action="<?= url('finance', 'supplementary-fee-update') ?>" id="editSupFeeForm">
+            <?= csrf_field() ?>
+            <input type="hidden" name="supplementary_fee_id" id="editSupFeeId">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description *</label>
+                    <input type="text" name="description" id="editSupFeeDesc" required maxlength="255"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount *</label>
+                    <input type="number" name="amount" id="editSupFeeAmount" step="0.01" min="0" required
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Currency</label>
+                    <select name="currency" id="editSupFeeCurrency" class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                        <option value="ETB">ETB (Birr)</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="flex items-center gap-2 text-sm">
+                        <input type="checkbox" name="is_active" value="1" id="editSupFeeActive"
+                               class="rounded border-gray-300 dark:border-dark-border text-primary-600 focus:ring-primary-500">
+                        Active
+                    </label>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Update</button>
+                <button type="button" onclick="document.getElementById('editSupFeeModal').classList.add('hidden')"
+                        class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 font-medium">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditSupFee(sf) {
+    document.getElementById('editSupFeeId').value = sf.id;
+    document.getElementById('editSupFeeDesc').value = sf.description;
+    document.getElementById('editSupFeeAmount').value = sf.amount;
+    document.getElementById('editSupFeeCurrency').value = sf.currency;
+    document.getElementById('editSupFeeActive').checked = !!parseInt(sf.is_active);
+    document.getElementById('editSupFeeModal').classList.remove('hidden');
+}
+</script>
 
 <?php
 $content = ob_get_clean();

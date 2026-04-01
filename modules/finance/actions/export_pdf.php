@@ -85,50 +85,72 @@ if ($type === 'report' && isset($_SESSION['_report_data'])) {
     }
 }
 
-// Output as printable HTML
+// Output as proper PDF using FPDF
+require_once APP_ROOT . '/vendor/setasign/fpdf/fpdf.php';
+
 $safeName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $title);
-header('Content-Type: text/html; charset=utf-8');
-?>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title><?= e($title) ?></title>
-    <style>
-        @media print { @page { size: landscape; margin: 1cm; } }
-        body { font-family: Arial, sans-serif; font-size: 11px; margin: 20px; color: #333; }
-        h1 { text-align: center; font-size: 16px; margin-bottom: 4px; }
-        .meta { text-align: center; font-size: 10px; color: #666; margin-bottom: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; }
-        th { background: #f5f5f5; font-weight: bold; font-size: 10px; text-transform: uppercase; }
-        tr:nth-child(even) { background: #fafafa; }
-        .no-print { margin-bottom: 12px; text-align: center; }
-        @media print { .no-print { display: none; } }
-        .btn { padding: 8px 20px; background: #074DD9; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn:hover { background: #0640b8; }
-    </style>
-</head>
-<body>
-    <div class="no-print">
-        <button class="btn" onclick="window.print()">Print / Save as PDF</button>
-        <button class="btn" onclick="window.close()" style="background:#6b7280">Close</button>
-    </div>
-    <h1><?= e($title) ?></h1>
-    <div class="meta">Generated: <?= date('Y-m-d H:i:s') ?> | Total Records: <?= count($rows) ?></div>
-    <table>
-        <thead><tr><th>#</th><?php foreach ($headers as $h): ?><th><?= e($h) ?></th><?php endforeach; ?></tr></thead>
-        <tbody>
-            <?php if (empty($rows)): ?>
-            <tr><td colspan="<?= count($headers) + 1 ?>" style="text-align:center;padding:20px">No records found.</td></tr>
-            <?php else: ?>
-            <?php foreach ($rows as $i => $row): ?>
-            <tr><td><?= $i + 1 ?></td><?php foreach ($row as $cell): ?><td><?= e($cell) ?></td><?php endforeach; ?></tr>
-            <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
-</body>
-</html>
-<?php
+
+$pdf = new FPDF('L', 'mm', 'A4');
+$pdf->AddPage();
+$pdf->SetAutoPageBreak(true, 15);
+
+// Title
+$pdf->SetFont('Arial', 'B', 14);
+$pdf->Cell(0, 10, $title, 0, 1, 'C');
+
+// Meta
+$pdf->SetFont('Arial', '', 8);
+$pdf->SetTextColor(100, 100, 100);
+$pdf->Cell(0, 5, 'Generated: ' . date('Y-m-d H:i:s') . ' | Total Records: ' . count($rows), 0, 1, 'C');
+$pdf->Ln(4);
+
+// Calculate column widths
+$pageWidth = $pdf->GetPageWidth() - 20; // margins
+$colCount = count($headers) + 1; // +1 for #
+$colW = $pageWidth / $colCount;
+
+// Header row
+$pdf->SetFont('Arial', 'B', 7);
+$pdf->SetFillColor(240, 240, 240);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->Cell($colW * 0.4, 7, '#', 1, 0, 'L', true);
+foreach ($headers as $h) {
+    $pdf->Cell($colW * ($colCount / ($colCount - 0.6)) * (1 / $colCount) * ($colCount - 0.6), 7, $h, 1, 0, 'L', true);
+}
+$pdf->Ln();
+
+// Data rows
+$pdf->SetFont('Arial', '', 7);
+$pdf->SetFillColor(250, 250, 250);
+if (empty($rows)) {
+    $pdf->Cell($pageWidth, 10, 'No records found.', 1, 1, 'C');
+} else {
+    foreach ($rows as $i => $row) {
+        $fill = ($i % 2 === 1);
+        $pdf->Cell($colW * 0.4, 6, $i + 1, 1, 0, 'L', $fill);
+        foreach ($row as $cell) {
+            $pdf->Cell($colW * ($colCount / ($colCount - 0.6)) * (1 / $colCount) * ($colCount - 0.6), 6, mb_substr((string)$cell, 0, 40), 1, 0, 'L', $fill);
+        }
+        $pdf->Ln();
+
+        // Add page break if near bottom
+        if ($pdf->GetY() > $pdf->GetPageHeight() - 20) {
+            $pdf->AddPage();
+            // Re-print header
+            $pdf->SetFont('Arial', 'B', 7);
+            $pdf->SetFillColor(240, 240, 240);
+            $pdf->Cell($colW * 0.4, 7, '#', 1, 0, 'L', true);
+            foreach ($headers as $h) {
+                $pdf->Cell($colW * ($colCount / ($colCount - 0.6)) * (1 / $colCount) * ($colCount - 0.6), 7, $h, 1, 0, 'L', true);
+            }
+            $pdf->Ln();
+            $pdf->SetFont('Arial', '', 7);
+            $pdf->SetFillColor(250, 250, 250);
+        }
+    }
+}
+
+header('Content-Type: application/pdf');
+header('Content-Disposition: inline; filename="' . $safeName . '.pdf"');
+$pdf->Output('D', $safeName . '.pdf');
 exit;

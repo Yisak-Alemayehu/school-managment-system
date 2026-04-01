@@ -21,6 +21,11 @@ if (!$sf) {
     redirect(url('finance', 'student-detail', $studentId));
 }
 
+// Overpayment guard: cap amount to outstanding balance
+if ($amount > $sf['balance']) {
+    $amount = (float) $sf['balance'];
+}
+
 $fee = db_fetch_one("SELECT description FROM fin_fees WHERE id = ?", [$sf['fee_id']]);
 $user = auth_user();
 $newBalance = $sf['balance'] - $amount;

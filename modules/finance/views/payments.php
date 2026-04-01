@@ -142,11 +142,12 @@ ob_start();
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Channel</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Receipt #</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Processed By</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($rows)): ?>
-                    <tr><td colspan="9" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No payment records found.</td></tr>
+                    <tr><td colspan="10" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No payment records found.</td></tr>
                     <?php else: ?>
                     <?php foreach ($rows as $r): ?>
                     <tr class="hover:bg-gray-50 dark:bg-dark-bg transition-colors">
@@ -161,6 +162,13 @@ ob_start();
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Channel"><?= ucfirst(e($r['channel'] ?? '—')) ?></td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Receipt"><?= e($r['receipt_no'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="By"><?= e($r['processed_by_name'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm" data-label="Actions">
+                            <a href="<?= url('finance', 'payment-attachment', $r['id']) ?>" target="_blank"
+                               class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-lg hover:bg-indigo-100 font-medium border border-indigo-200" title="Print Receipt">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                Print
+                            </a>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>

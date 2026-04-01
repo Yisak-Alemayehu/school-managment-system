@@ -46,6 +46,23 @@ ob_start();
 
     <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text"><?= e($group['name']) ?></h1>
 
+    <!-- Group Action Buttons -->
+    <div class="flex flex-wrap gap-2">
+        <button onclick="document.getElementById('editGroupModal').classList.remove('hidden')"
+                class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 font-medium inline-flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Edit Group
+        </button>
+        <form method="POST" action="<?= url('finance', 'group-delete') ?>" class="inline" onsubmit="return confirm('Delete this group and all its members? This cannot be undone.')">
+            <?= csrf_field() ?>
+            <input type="hidden" name="group_id" value="<?= $id ?>">
+            <button type="submit" class="px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 font-medium inline-flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Delete Group
+            </button>
+        </form>
+    </div>
+
     <!-- Tab Nav -->
     <div class="flex flex-wrap gap-1 border-b border-gray-200 dark:border-dark-border">
         <?php
@@ -338,6 +355,40 @@ function toggleAll(source, name) {
     checkboxes.forEach(function(cb) { cb.checked = source.checked; });
 }
 </script>
+
+<!-- Edit Group Modal -->
+<div id="editGroupModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Edit Group</h3>
+        <form method="POST" action="<?= url('finance', 'group-update') ?>">
+            <?= csrf_field() ?>
+            <input type="hidden" name="group_id" value="<?= $id ?>">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Group Name *</label>
+                    <input type="text" name="name" value="<?= e($group['name']) ?>" required maxlength="100"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                    <textarea name="description" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"><?= e($group['description'] ?? '') ?></textarea>
+                </div>
+                <div>
+                    <label class="flex items-center gap-2 text-sm">
+                        <input type="checkbox" name="is_active" value="1" <?= $group['is_active'] ? 'checked' : '' ?>
+                               class="rounded border-gray-300 dark:border-dark-border text-primary-600 focus:ring-primary-500">
+                        Active
+                    </label>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" onclick="document.getElementById('editGroupModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <?php
 $content = ob_get_clean();

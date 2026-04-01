@@ -351,7 +351,19 @@ ob_start();
                             </span>
                         </td>
                         <td class="px-4 py-3 text-sm" data-label="Actions">
-                            <a href="<?= url('finance', 'fee-detail', $f['id']) ?>" class="text-primary-600 hover:text-primary-800 text-sm font-medium">View</a>
+                            <div class="flex items-center gap-1 flex-wrap">
+                                <a href="<?= url('finance', 'fee-detail', $f['id']) ?>" class="px-2 py-1 bg-gray-50 text-gray-700 text-xs rounded-lg hover:bg-gray-100 font-medium border border-gray-200">View</a>
+                                <button type="button" onclick="openEditFee(<?= e(json_encode($f)) ?>)"
+                                        class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-lg hover:bg-blue-100 font-medium border border-blue-200">Edit</button>
+                                <form method="POST" action="<?= url('finance', 'fee-toggle') ?>" class="inline" onsubmit="return confirm('Toggle active status?')">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="fee_id" value="<?= $f['id'] ?>">
+                                    <button type="submit"
+                                            class="px-2 py-1 text-xs rounded-lg font-medium border <?= $f['is_active'] ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' ?>">
+                                        <?= $f['is_active'] ? 'Deactivate' : 'Activate' ?>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -410,6 +422,100 @@ function removeVaryingRow(btn) {
             row.querySelector('span').textContent = (i + 1) + '.';
         });
     }
+}
+</script>
+
+<!-- Edit Fee Modal -->
+<div id="editFeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div class="bg-white dark:bg-dark-card rounded-xl w-full max-w-lg p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Edit Fee</h2>
+        <form method="POST" action="<?= url('finance', 'fee-update') ?>" id="editFeeForm">
+            <?= csrf_field() ?>
+            <input type="hidden" name="fee_id" id="editFeeId">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description *</label>
+                    <input type="text" name="description" id="editFeeDesc" required maxlength="255"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount *</label>
+                        <input type="number" name="amount" id="editFeeAmount" step="0.01" min="0" required
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Currency</label>
+                        <select name="currency" id="editFeeCurrency"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                            <option value="ETB">ETB (Birr)</option>
+                            <option value="USD">USD</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fee Type</label>
+                    <select name="fee_type" id="editFeeType"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                        <option value="1">Recurrent</option>
+                        <option value="0">One-Time</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Effective Date</label>
+                        <input type="date" name="effective_date" id="editFeeEffDate"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
+                        <input type="date" name="end_date" id="editFeeEndDate"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assign to Classes</label>
+                    <select name="class_ids[]" id="editFeeClasses" multiple
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
+                            style="min-height: 80px;">
+                        <?php foreach ($classes as $c): ?>
+                            <option value="<?= $c['id'] ?>"><?= e($c['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label class="flex items-center gap-2 text-sm">
+                        <input type="checkbox" name="is_active" value="1" id="editFeeActive"
+                               class="rounded border-gray-300 dark:border-dark-border text-primary-600 focus:ring-primary-500">
+                        Active
+                    </label>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 font-medium">Update</button>
+                <button type="button" onclick="document.getElementById('editFeeModal').classList.add('hidden')"
+                        class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200 font-medium">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditFee(f) {
+    document.getElementById('editFeeId').value = f.id;
+    document.getElementById('editFeeDesc').value = f.description;
+    document.getElementById('editFeeAmount').value = f.amount;
+    document.getElementById('editFeeCurrency').value = f.currency;
+    document.getElementById('editFeeType').value = f.fee_type;
+    document.getElementById('editFeeEffDate').value = f.effective_date || '';
+    document.getElementById('editFeeEndDate').value = f.end_date || '';
+    document.getElementById('editFeeActive').checked = !!parseInt(f.is_active);
+
+    // Set class selections from class_names (comma-separated display, not IDs — clear all)
+    var sel = document.getElementById('editFeeClasses');
+    for (var i = 0; i < sel.options.length; i++) { sel.options[i].selected = false; }
+
+    document.getElementById('editFeeModal').classList.remove('hidden');
 }
 </script>
 

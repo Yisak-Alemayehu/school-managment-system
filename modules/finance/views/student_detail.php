@@ -88,6 +88,11 @@ ob_start();
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
             Adjust Balance
         </button>
+        <button onclick="document.getElementById('refundModal').classList.remove('hidden')"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+            Refund
+        </button>
     </div>
 
     <!-- Student Information -->
@@ -263,11 +268,12 @@ ob_start();
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Balance After</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Channel</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Reference</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($transactions)): ?>
-                    <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No transactions found.</td></tr>
+                    <tr><td colspan="8" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No transactions found.</td></tr>
                     <?php else: foreach ($transactions as $tx):
                         $typeBadge = match($tx['type']) {
                             'payment'      => 'bg-green-100 text-green-700',
@@ -289,6 +295,17 @@ ob_start();
                         <td class="px-4 py-3 text-sm" data-label="Balance After"><?= $tx['balance_after'] !== null ? format_money($tx['balance_after']) : '—' ?></td>
                         <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted" data-label="Channel"><?= e($tx['channel'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-sm text-gray-500 dark:text-dark-muted" data-label="Reference"><?= e($tx['reference'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm" data-label="Actions">
+                            <?php if ($tx['type'] === 'payment'): ?>
+                            <a href="<?= url('finance', 'payment-attachment', $tx['id']) ?>" target="_blank"
+                               class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-700 text-xs rounded-lg hover:bg-indigo-100 font-medium border border-indigo-200">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                Print
+                            </a>
+                            <?php else: ?>
+                            <span class="text-gray-300">—</span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; endif; ?>
                 </tbody>
@@ -393,6 +410,44 @@ ob_start();
             <div class="flex justify-end gap-3 mt-6">
                 <button type="button" onclick="this.closest('#adjustModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm hover:bg-yellow-700 font-medium">Adjust</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Refund Modal -->
+<div id="refundModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div class="bg-white dark:bg-dark-card rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Process Refund</h3>
+        <form method="POST" action="<?= url('finance', 'refund') ?>">
+            <?= csrf_field() ?>
+            <input type="hidden" name="student_id" value="<?= $id ?>">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Fee *</label>
+                    <select name="student_fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                        <option value="">— Select Fee —</option>
+                        <?php foreach ($activeFeeList as $af): ?>
+                        <option value="<?= $af['id'] ?>"><?= e($af['description']) ?> — Paid: <?= format_money($af['amount'] - $af['balance']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Refund Amount *</label>
+                    <input type="number" name="amount" step="0.01" min="0.01" required
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text"
+                           placeholder="Amount to refund">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reason *</label>
+                    <input type="text" name="reason" required maxlength="255"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text"
+                           placeholder="Reason for refund">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="button" onclick="document.getElementById('refundModal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 dark:bg-dark-card2 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-200">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 font-medium">Process Refund</button>
             </div>
         </form>
     </div>
