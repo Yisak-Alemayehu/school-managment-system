@@ -18,6 +18,23 @@ if (!$fee) {
     redirect(url('finance', 'student-detail', $studentId));
 }
 
+// Credit-hour fee: multiply amount by student's total credit hours
+$assignedAmount = $fee['amount'];
+if ($fee['is_credit_hour']) {
+    $creditHours = (int) db_fetch_value(
+        "SELECT COALESCE(SUM(sub.credit_hours), 0)
+           FROM enrollments e
+           JOIN subjects sub ON sub.class_id = e.class_id
+          WHERE e.student_id = ? AND e.status = 'active'",
+        [$studentId]
+    );
+    if ($creditHours === 0) {
+        set_flash('error', 'Cannot assign credit-hour fee: student has 0 enrolled credit hours.');
+        redirect(url('finance', 'student-detail', $studentId));
+    }
+    $assignedAmount = $fee['amount'] * $creditHours;
+}
+
 // Check if already assigned
 $existing = db_fetch_one(
     "SELECT id FROM fin_student_fees WHERE student_id = ? AND fee_id = ? AND is_active = 1",
@@ -35,9 +52,9 @@ try {
     $sfId = db_insert('fin_student_fees', [
         'student_id'  => $studentId,
         'fee_id'      => $feeId,
-        'amount'      => $fee['amount'],
+        'amount'      => $assignedAmount,
         'currency'    => $fee['currency'],
-        'balance'     => $fee['amount'],
+        'balance'     => $assignedAmount,
         'is_active'   => 1,
         'assigned_by' => $user['id'],
     ]);
@@ -47,10 +64,10 @@ try {
         'student_id'     => $studentId,
         'student_fee_id' => $sfId,
         'type'           => 'fee_assigned',
-        'amount'         => $fee['amount'],
+        'amount'         => $assignedAmount,
         'currency'       => $fee['currency'],
         'balance_before' => 0,
-        'balance_after'  => $fee['amount'],
+        'balance_after'  => $assignedAmount,
         'description'    => 'Fee assigned: ' . $fee['description'],
         'processed_by'   => $user['id'],
     ]);

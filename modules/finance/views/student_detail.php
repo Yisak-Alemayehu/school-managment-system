@@ -329,12 +329,13 @@ ob_start();
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Fee *</label>
-                    <select name="fee_id" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    <select name="fee_id" id="assignFeeSelect" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                         <option value="">— Select Fee —</option>
                         <?php foreach ($allFees as $f): ?>
                         <option value="<?= $f['id'] ?>"><?= e($f['description']) ?> (<?= format_money($f['amount']) ?>)</option>
                         <?php endforeach; ?>
                     </select>
+                    <p id="creditHourNote" class="hidden mt-1 text-xs text-amber-600 dark:text-amber-400">This is a credit-hour fee. The final amount will be multiplied by the student's enrolled credit hours.</p>
                 </div>
             </div>
             <div class="flex justify-end gap-3 mt-6">
@@ -344,6 +345,23 @@ ob_start();
         </form>
     </div>
 </div>
+<script>
+(function(){
+    var fees = <?= json_encode(array_column($allFees, null, 'id'), JSON_HEX_TAG) ?>;
+    var sel = document.getElementById('assignFeeSelect');
+    var note = document.getElementById('creditHourNote');
+    if (sel && note) {
+        sel.addEventListener('change', function(){
+            var f = fees[this.value];
+            if (f && parseInt(f.is_credit_hour)) {
+                note.classList.remove('hidden');
+            } else {
+                note.classList.add('hidden');
+            }
+        });
+    }
+})();
+</script>
 
 <!-- Remove Fee Modal -->
 <div id="removeFeeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">

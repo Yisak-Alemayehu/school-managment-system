@@ -13,6 +13,11 @@ ob_start();
 <div class="space-y-4">
     <h1 class="text-xl font-bold text-gray-900 dark:text-dark-text">Penalty Report</h1>
 
+    <form method="POST" action="<?= url('finance', 'apply-penalties') ?>" class="inline" onsubmit="return confirm('Apply penalties to all overdue student fees now?')">
+        <?= csrf_field() ?>
+        <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 font-medium">Apply Penalties Now</button>
+    </form>
+
     <form method="POST" action="<?= url('finance', 'report-generate') ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="report_type" value="penalty">

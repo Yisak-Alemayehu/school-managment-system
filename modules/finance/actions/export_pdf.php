@@ -98,59 +98,55 @@ $pdf->SetAutoPageBreak(true, 15);
 $pdf->SetFont('Arial', 'B', 14);
 $pdf->Cell(0, 10, $title, 0, 1, 'C');
 
-// Meta
-$pdf->SetFont('Arial', '', 8);
+// Meta line
+$pdf->SetFont('Arial', '', 9);
 $pdf->SetTextColor(100, 100, 100);
 $pdf->Cell(0, 5, 'Generated: ' . date('Y-m-d H:i:s') . ' | Total Records: ' . count($rows), 0, 1, 'C');
 $pdf->Ln(4);
 
-// Calculate column widths
-$pageWidth = $pdf->GetPageWidth() - 20; // margins
-$colCount = count($headers) + 1; // +1 for #
-$colW = $pageWidth / $colCount;
+// Column widths: # = 10mm, rest split equally
+$numW = 10;
+$dataW = (count($headers) > 0) ? ($pdf->GetPageWidth() - 20 - $numW) / count($headers) : 0;
 
-// Header row
-$pdf->SetFont('Arial', 'B', 7);
-$pdf->SetFillColor(240, 240, 240);
-$pdf->SetTextColor(0, 0, 0);
-$pdf->Cell($colW * 0.4, 7, '#', 1, 0, 'L', true);
-foreach ($headers as $h) {
-    $pdf->Cell($colW * ($colCount / ($colCount - 0.6)) * (1 / $colCount) * ($colCount - 0.6), 7, $h, 1, 0, 'L', true);
-}
-$pdf->Ln();
+// Helper to print header row
+$printHeader = function () use ($pdf, $headers, $numW, $dataW) {
+    $pdf->SetFont('Arial', 'B', 7);
+    $pdf->SetFillColor(240, 240, 240);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell($numW, 7, '#', 1, 0, 'L', true);
+    foreach ($headers as $idx => $h) {
+        $ln = ($idx === count($headers) - 1) ? 1 : 0;
+        $pdf->Cell($dataW, 7, $h, 1, $ln, 'L', true);
+    }
+};
+
+$printHeader();
 
 // Data rows
 $pdf->SetFont('Arial', '', 7);
-$pdf->SetFillColor(250, 250, 250);
 if (empty($rows)) {
-    $pdf->Cell($pageWidth, 10, 'No records found.', 1, 1, 'C');
+    $pdf->Cell($pdf->GetPageWidth() - 20, 10, 'No records found.', 1, 1, 'C');
 } else {
     foreach ($rows as $i => $row) {
         $fill = ($i % 2 === 1);
-        $pdf->Cell($colW * 0.4, 6, $i + 1, 1, 0, 'L', $fill);
-        foreach ($row as $cell) {
-            $pdf->Cell($colW * ($colCount / ($colCount - 0.6)) * (1 / $colCount) * ($colCount - 0.6), 6, mb_substr((string)$cell, 0, 40), 1, 0, 'L', $fill);
+        if ($fill) {
+            $pdf->SetFillColor(250, 250, 250);
         }
-        $pdf->Ln();
+        $pdf->Cell($numW, 6, $i + 1, 1, 0, 'L', $fill);
+        foreach (array_values($row) as $ci => $cell) {
+            $ln = ($ci === count($row) - 1) ? 1 : 0;
+            $text = mb_strimwidth((string)$cell, 0, 40, '...');
+            $pdf->Cell($dataW, 6, $text, 1, $ln, 'L', $fill);
+        }
 
-        // Add page break if near bottom
+        // Page break if near bottom — reprint header on new page
         if ($pdf->GetY() > $pdf->GetPageHeight() - 20) {
             $pdf->AddPage();
-            // Re-print header
-            $pdf->SetFont('Arial', 'B', 7);
-            $pdf->SetFillColor(240, 240, 240);
-            $pdf->Cell($colW * 0.4, 7, '#', 1, 0, 'L', true);
-            foreach ($headers as $h) {
-                $pdf->Cell($colW * ($colCount / ($colCount - 0.6)) * (1 / $colCount) * ($colCount - 0.6), 7, $h, 1, 0, 'L', true);
-            }
-            $pdf->Ln();
+            $printHeader();
             $pdf->SetFont('Arial', '', 7);
-            $pdf->SetFillColor(250, 250, 250);
         }
     }
 }
 
-header('Content-Type: application/pdf');
-header('Content-Disposition: inline; filename="' . $safeName . '.pdf"');
-$pdf->Output('D', $safeName . '.pdf');
+$pdf->Output('I', $safeName . '.pdf');
 exit;

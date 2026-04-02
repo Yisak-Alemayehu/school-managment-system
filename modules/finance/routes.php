@@ -255,6 +255,11 @@ switch ($action) {
         require __DIR__ . '/actions/export_excel.php';
         break;
 
+    case 'apply-penalties':
+        auth_require_permission('finance.manage');
+        require __DIR__ . '/actions/apply_penalties.php';
+        break;
+
     default:
         auth_require_permission('finance.view');
         $pageTitle = 'Finance — Dashboard';

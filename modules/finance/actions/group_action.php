@@ -37,6 +37,20 @@ try {
             $fee = db_fetch_one("SELECT * FROM fin_fees WHERE id = ? AND is_active = 1", [$feeId]);
             if (!$fee) continue;
 
+            // Credit-hour fee: multiply by student's credit hours
+            $assignedAmount = $fee['amount'];
+            if ($fee['is_credit_hour']) {
+                $creditHours = (int) db_fetch_value(
+                    "SELECT COALESCE(SUM(sub.credit_hours), 0)
+                       FROM enrollments e
+                       JOIN subjects sub ON sub.class_id = e.class_id
+                      WHERE e.student_id = ? AND e.status = 'active'",
+                    [$sid]
+                );
+                if ($creditHours === 0) { $skipped++; continue; }
+                $assignedAmount = $fee['amount'] * $creditHours;
+            }
+
             $existing = db_fetch_one(
                 "SELECT id FROM fin_student_fees WHERE student_id = ? AND fee_id = ? AND is_active = 1",
                 [$sid, $feeId]
@@ -46,9 +60,9 @@ try {
             $sfId = db_insert('fin_student_fees', [
                 'student_id'  => $sid,
                 'fee_id'      => $feeId,
-                'amount'      => $fee['amount'],
+                'amount'      => $assignedAmount,
                 'currency'    => $fee['currency'],
-                'balance'     => $fee['amount'],
+                'balance'     => $assignedAmount,
                 'is_active'   => 1,
                 'assigned_by' => $user['id'],
             ]);
@@ -56,10 +70,10 @@ try {
                 'student_id'     => $sid,
                 'student_fee_id' => $sfId,
                 'type'           => 'fee_assigned',
-                'amount'         => $fee['amount'],
+                'amount'         => $assignedAmount,
                 'currency'       => $fee['currency'],
                 'balance_before' => 0,
-                'balance_after'  => $fee['amount'],
+                'balance_after'  => $assignedAmount,
                 'description'    => 'Fee assigned via group action: ' . $fee['description'],
                 'processed_by'   => $user['id'],
             ]);
