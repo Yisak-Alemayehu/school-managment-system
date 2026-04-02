@@ -1053,6 +1053,7 @@ CREATE TABLE `fin_transactions` (
     `channel_transaction_id` VARCHAR(200) DEFAULT NULL,
     `payer_phone` VARCHAR(20) DEFAULT NULL,
     `receipt_no` VARCHAR(100) DEFAULT NULL,
+    `batch_receipt_no` VARCHAR(100) DEFAULT NULL,
     `reference` VARCHAR(255) DEFAULT NULL,
     `notes` TEXT DEFAULT NULL,
     `print_count` INT UNSIGNED NOT NULL DEFAULT 0,

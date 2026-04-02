@@ -325,30 +325,51 @@ ob_start();
             <?= csrf_field() ?>
             <input type="hidden" name="student_id" value="<?= $student['id'] ?>">
 
+            <!-- Multi-fee table -->
+            <div class="overflow-x-auto mb-6">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+                    <thead class="bg-gray-50 dark:bg-dark-bg">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase w-10">
+                                <input type="checkbox" id="checkAllFees" class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Fee Description</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Balance</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Amount to Pay</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
+                        <?php foreach ($activeFees as $af): ?>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-dark-bg fee-row">
+                            <td class="px-4 py-3">
+                                <input type="checkbox" name="fees[<?= $af['sf_id'] ?>][selected]" value="1"
+                                       class="fee-checkbox w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                       data-sf-id="<?= $af['sf_id'] ?>">
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900 dark:text-dark-text"><?= e($af['description']) ?></td>
+                            <td class="px-4 py-3 text-sm font-semibold text-red-600"><?= format_money($af['balance']) ?></td>
+                            <td class="px-4 py-3">
+                                <input type="number" name="fees[<?= $af['sf_id'] ?>][amount]" step="0.01" min="0.01"
+                                       value="<?= number_format((float)$af['balance'], 2, '.', '') ?>"
+                                       data-balance="<?= $af['balance'] ?>"
+                                       class="fee-amount w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
+                                       data-sf-id="<?= $af['sf_id'] ?>" disabled>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot class="bg-gray-50 dark:bg-dark-bg">
+                        <tr>
+                            <td colspan="3" class="px-4 py-3 text-sm font-bold text-gray-900 dark:text-dark-text text-right">Total:</td>
+                            <td class="px-4 py-3 text-sm font-bold text-gray-900 dark:text-dark-text" id="batchTotal">0.00 ETB</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Left: Fee selection and amount -->
+                <!-- Left: Channel and reference -->
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Fee *</label>
-                        <select name="student_fee_id" id="feeSelect" required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
-                            <option value="">— Select Fee —</option>
-                            <?php foreach ($activeFees as $af): ?>
-                            <option value="<?= $af['sf_id'] ?>" data-balance="<?= $af['balance'] ?>" data-currency="<?= e($af['currency']) ?>">
-                                <?= e($af['description']) ?> — Balance: <?= format_money($af['balance']) ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Amount *</label>
-                        <input type="number" name="amount" id="paymentAmount" step="0.01" min="0.01" required
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
-                               placeholder="Enter amount">
-                        <p class="mt-1 text-xs text-gray-500 dark:text-dark-muted" id="balanceHint"></p>
-                    </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Method *</label>
                         <select name="channel" id="paymentChannel" required
@@ -358,6 +379,13 @@ ob_start();
                             <option value="<?= $key ?>"><?= e($label) ?></option>
                             <?php endforeach; ?>
                         </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reference</label>
+                        <input type="text" name="reference"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
+                               placeholder="Optional reference">
                     </div>
                 </div>
 
@@ -414,16 +442,6 @@ ob_start();
                             <input type="text" name="bank_transaction_id"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
                                    placeholder="Transaction reference">
-                        </div>
-                    </div>
-
-                    <!-- Other method fields -->
-                    <div id="otherFields" class="hidden space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Reference / Receipt Number</label>
-                            <input type="text" name="reference"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
-                                   placeholder="Optional reference">
                         </div>
                     </div>
 
@@ -511,85 +529,131 @@ ob_start();
 <!-- JavaScript for dynamic form behavior -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const feeSelect = document.getElementById('feeSelect');
-    const amountInput = document.getElementById('paymentAmount');
-    const channelSelect = document.getElementById('paymentChannel');
-    const balanceHint = document.getElementById('balanceHint');
-    const teleBirrFields = document.getElementById('teleBirrFields');
-    const bankFields = document.getElementById('bankFields');
-    const otherFields = document.getElementById('otherFields');
-    const manualConfirm = document.getElementById('manualConfirm');
-    const confirmCheck = document.getElementById('confirmPaidCheck');
-    const submitBtn = document.getElementById('submitPaymentBtn');
-    const teleBirrTxId = document.getElementById('teleBirrTxId');
+    var channelSelect = document.getElementById('paymentChannel');
+    var teleBirrFields = document.getElementById('teleBirrFields');
+    var bankFields = document.getElementById('bankFields');
+    var manualConfirm = document.getElementById('manualConfirm');
+    var confirmCheck = document.getElementById('confirmPaidCheck');
+    var submitBtn = document.getElementById('submitPaymentBtn');
+    var teleBirrTxId = document.getElementById('teleBirrTxId');
+    var checkAllFees = document.getElementById('checkAllFees');
+    var batchTotalEl = document.getElementById('batchTotal');
+    var checkboxes = document.querySelectorAll('.fee-checkbox');
+    var amountInputs = document.querySelectorAll('.fee-amount');
 
-    if (!feeSelect) return;
+    if (!channelSelect || !checkboxes.length) return;
 
-    // Update max amount when fee is selected
-    feeSelect.addEventListener('change', function() {
-        const opt = this.options[this.selectedIndex];
-        const balance = parseFloat(opt.dataset.balance || 0);
-        if (balance > 0) {
-            amountInput.max = balance;
-            amountInput.value = balance;
-            balanceHint.textContent = 'Outstanding balance: ' + balance.toFixed(2) + ' ' + (opt.dataset.currency || 'ETB');
-        } else {
-            amountInput.max = '';
-            amountInput.value = '';
-            balanceHint.textContent = '';
-        }
-        validateForm();
+    // Check/uncheck all
+    if (checkAllFees) {
+        checkAllFees.addEventListener('change', function() {
+            checkboxes.forEach(function(cb) {
+                cb.checked = checkAllFees.checked;
+                var sfId = cb.dataset.sfId;
+                var amtInput = document.querySelector('.fee-amount[data-sf-id="' + sfId + '"]');
+                if (amtInput) amtInput.disabled = !cb.checked;
+            });
+            updateTotal();
+            validateForm();
+        });
+    }
+
+    // Individual checkbox toggle
+    checkboxes.forEach(function(cb) {
+        cb.addEventListener('change', function() {
+            var sfId = cb.dataset.sfId;
+            var amtInput = document.querySelector('.fee-amount[data-sf-id="' + sfId + '"]');
+            if (amtInput) amtInput.disabled = !cb.checked;
+            updateTotal();
+            validateForm();
+        });
     });
+
+    // Amount input change
+    amountInputs.forEach(function(inp) {
+        inp.addEventListener('input', function() {
+            updateTotal();
+            validateForm();
+        });
+    });
+
+    // Update running total
+    function updateTotal() {
+        var total = 0;
+        checkboxes.forEach(function(cb) {
+            if (cb.checked) {
+                var sfId = cb.dataset.sfId;
+                var amtInput = document.querySelector('.fee-amount[data-sf-id="' + sfId + '"]');
+                if (amtInput) total += parseFloat(amtInput.value) || 0;
+            }
+        });
+        if (batchTotalEl) batchTotalEl.textContent = total.toFixed(2) + ' ETB';
+    }
 
     // Show/hide fields based on payment method
     channelSelect.addEventListener('change', function() {
-        const channel = this.value;
-
+        var channel = this.value;
         teleBirrFields.classList.add('hidden');
         bankFields.classList.add('hidden');
-        otherFields.classList.add('hidden');
         manualConfirm.classList.add('hidden');
-
-        teleBirrTxId.removeAttribute('required');
+        if (teleBirrTxId) teleBirrTxId.removeAttribute('required');
 
         if (channel === 'telebirr') {
             teleBirrFields.classList.remove('hidden');
-            teleBirrTxId.setAttribute('required', 'required');
-            // TeleBirr = auto-paid, no confirmation needed
+            if (teleBirrTxId) teleBirrTxId.setAttribute('required', 'required');
             if (confirmCheck) confirmCheck.checked = true;
-        } else if (['bank_transfer', 'bank_deposit'].includes(channel)) {
+        } else if (channel === 'bank_transfer' || channel === 'bank_deposit') {
             bankFields.classList.remove('hidden');
             manualConfirm.classList.remove('hidden');
             if (confirmCheck) confirmCheck.checked = false;
         } else if (channel) {
-            otherFields.classList.remove('hidden');
             manualConfirm.classList.remove('hidden');
             if (confirmCheck) confirmCheck.checked = false;
         }
-
         validateForm();
     });
 
-    // Validate form for submit
+    // Validate form for submit button
     function validateForm() {
-        const hasFee = feeSelect.value !== '';
-        const hasAmount = amountInput.value && parseFloat(amountInput.value) > 0;
-        const hasChannel = channelSelect.value !== '';
-        const isTeleBirr = channelSelect.value === 'telebirr';
-        const isConfirmed = isTeleBirr || (confirmCheck && confirmCheck.checked);
-
-        submitBtn.disabled = !(hasFee && hasAmount && hasChannel && isConfirmed);
+        var anyChecked = false;
+        checkboxes.forEach(function(cb) {
+            if (cb.checked) {
+                var sfId = cb.dataset.sfId;
+                var amtInput = document.querySelector('.fee-amount[data-sf-id="' + sfId + '"]');
+                if (amtInput && parseFloat(amtInput.value) > 0) anyChecked = true;
+            }
+        });
+        var hasChannel = channelSelect.value !== '';
+        var isTeleBirr = channelSelect.value === 'telebirr';
+        var isConfirmed = isTeleBirr || (confirmCheck && confirmCheck.checked);
+        submitBtn.disabled = !(anyChecked && hasChannel && isConfirmed);
     }
 
-    amountInput.addEventListener('input', validateForm);
     if (confirmCheck) confirmCheck.addEventListener('change', validateForm);
 
-    // Confirm before submit
+    // Overpayment warning on submit
     document.getElementById('collectPaymentForm').addEventListener('submit', function(e) {
-        const amount = parseFloat(amountInput.value);
-        const channel = channelSelect.options[channelSelect.selectedIndex].text;
-        if (!confirm('Record payment of ' + amount.toFixed(2) + ' ETB via ' + channel + '?')) {
-            e.preventDefault();
+        var totalOverpay = 0;
+        var overpayCount = 0;
+        checkboxes.forEach(function(cb) {
+            if (cb.checked) {
+                var sfId = cb.dataset.sfId;
+                var amtInput = document.querySelector('.fee-amount[data-sf-id="' + sfId + '"]');
+                if (amtInput) {
+                    var amt = parseFloat(amtInput.value) || 0;
+                    var bal = parseFloat(amtInput.dataset.balance) || 0;
+                    if (amt > bal) {
+                        totalOverpay += (amt - bal);
+                        overpayCount++;
+                    }
+                }
+            }
+        });
+
+        if (totalOverpay > 0) {
+            if (!confirm('Total overpayment of ' + totalOverpay.toFixed(2) + ' ETB across ' + overpayCount + ' fee(s) will be credited to the student\'s wallet. Continue?')) {
+                e.preventDefault();
+                return false;
+            }
         }
     });
 });

@@ -126,6 +126,12 @@ switch ($action) {
         else { redirect(url('finance', 'collect-payment')); }
         break;
 
+    case 'collect-payment-batch-receipt':
+        auth_require_permission('finance.view');
+        $pageTitle = 'Batch Payment Receipt';
+        require __DIR__ . '/views/collect_payment_batch_receipt.php';
+        break;
+
     case 'collect-supplementary-payment':
         auth_require_permission('finance.manage');
         $pageTitle = 'Collect Supplementary Payment';

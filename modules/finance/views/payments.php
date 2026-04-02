@@ -141,13 +141,14 @@ ob_start();
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Amount</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Channel</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Receipt #</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Batch #</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Processed By</th>
                         <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-dark-muted uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-dark-border">
                     <?php if (empty($rows)): ?>
-                    <tr><td colspan="10" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No payment records found.</td></tr>
+                    <tr><td colspan="11" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No payment records found.</td></tr>
                     <?php else: ?>
                     <?php foreach ($rows as $r): ?>
                     <tr class="hover:bg-gray-50 dark:bg-dark-bg transition-colors">
@@ -161,6 +162,13 @@ ob_start();
                         <td class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-dark-text" data-label="Amount"><?= format_money($r['amount']) ?></td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Channel"><?= ucfirst(e($r['channel'] ?? '—')) ?></td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Receipt"><?= e($r['receipt_no'] ?? '—') ?></td>
+                        <td class="px-4 py-3 text-sm" data-label="Batch">
+                            <?php if (!empty($r['batch_receipt_no'])): ?>
+                                <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs rounded font-mono"><?= e($r['batch_receipt_no']) ?></span>
+                            <?php else: ?>
+                                —
+                            <?php endif; ?>
+                        </td>
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="By"><?= e($r['processed_by_name'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Actions">
                             <a href="<?= url('finance', 'payment-attachment', $r['id']) ?>" target="_blank"
