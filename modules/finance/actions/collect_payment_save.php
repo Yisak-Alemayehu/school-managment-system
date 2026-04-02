@@ -12,6 +12,7 @@ $channel      = input('channel');
 $notes        = input('notes');
 $confirmPaid  = input_int('confirm_paid');
 $feesInput    = input_array('fees');
+$adjustedTotal = input('adjusted_total');
 
 // Validate required fields
 if (!$studentId || !$channel || empty($feesInput)) {
@@ -65,6 +66,36 @@ if ($isTeleBirr) {
 }
 
 $user = auth_user();
+
+// Handle total adjustment — proportionally scale per-fee amounts
+$adjustmentExtra = 0;
+if ($adjustedTotal !== null && $adjustedTotal !== '') {
+    $adjVal = (float)$adjustedTotal;
+    if ($adjVal <= 0) {
+        set_flash('error', 'Adjusted total must be greater than zero.');
+        redirect(url('finance', 'collect-payment') . '&student_id=' . $studentId);
+    }
+    $feeSum = array_sum($selectedFees);
+    if ($feeSum > 0 && abs($adjVal - $feeSum) > 0.005) {
+        if ($adjVal < $feeSum) {
+            // Proportionally reduce each fee amount
+            $ratio = $adjVal / $feeSum;
+            foreach ($selectedFees as $sfId => $amt) {
+                $selectedFees[$sfId] = round($amt * $ratio, 2);
+            }
+            // Fix rounding: adjust the last fee to hit the exact total
+            $newSum = array_sum($selectedFees);
+            $rounding = round($adjVal - $newSum, 2);
+            if (abs($rounding) > 0) {
+                $lastKey = array_key_last($selectedFees);
+                $selectedFees[$lastKey] += $rounding;
+            }
+        } else {
+            // Extra amount goes to wallet credit
+            $adjustmentExtra = round($adjVal - $feeSum, 2);
+        }
+    }
+}
 
 // Generate batch receipt number
 $batchReceiptNo = 'BRCP-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
@@ -172,25 +203,39 @@ try {
         redirect(url('finance', 'collect-payment') . '&student_id=' . $studentId);
     }
 
+    // Credit adjustment extra to student wallet (when cashier increased total)
+    if ($adjustmentExtra > 0) {
+        $currency = 'ETB';
+        // Use currency from last processed fee if available
+        foreach ($selectedFees as $sfId => $amt) {
+            $sfRow = db_fetch_one("SELECT currency FROM fin_student_fees WHERE id = ?", [$sfId]);
+            if ($sfRow) { $currency = $sfRow['currency']; break; }
+        }
+        db_insert('fin_transactions', [
+            'student_id'       => $studentId,
+            'student_fee_id'   => null,
+            'type'             => 'adjustment',
+            'amount'           => $adjustmentExtra,
+            'currency'         => $currency,
+            'description'      => 'Extra payment credit (total adjustment)',
+            'channel'          => $channel,
+            'receipt_no'       => null,
+            'batch_receipt_no' => $batchReceiptNo,
+            'processed_by'     => $user['id'],
+        ]);
+        $totalPaid += $adjustmentExtra;
+    }
+
     db_commit();
 
-    // Store batch receipt data in session
+    // Store batch receipt number in session for initial redirect
     $_SESSION['_batch_receipt'] = [
-        'student_id'       => $studentId,
-        'student_name'     => $student['full_name'],
-        'admission_no'     => $student['admission_no'],
-        'class_name'       => $student['class_name'] ?? '—',
         'batch_receipt_no' => $batchReceiptNo,
-        'date'             => date('Y-m-d H:i:s'),
-        'channel'          => $channel,
-        'fees'             => $processedFees,
-        'total_paid'       => $totalPaid,
-        'processed_by'     => $user['full_name'],
     ];
 
     $count = count($processedFees);
     set_flash('success', "Payment recorded for {$count} fee(s). Batch Receipt: {$batchReceiptNo}");
-    redirect(url('finance', 'collect-payment-batch-receipt'));
+    redirect(url('finance', 'collect-payment-batch-receipt') . '&batch=' . urlencode($batchReceiptNo));
 
 } catch (Throwable $e) {
     db_rollback();

@@ -164,7 +164,9 @@ ob_start();
                         <td class="px-4 py-3 text-sm text-gray-600 dark:text-dark-muted" data-label="Receipt"><?= e($r['receipt_no'] ?? '—') ?></td>
                         <td class="px-4 py-3 text-sm" data-label="Batch">
                             <?php if (!empty($r['batch_receipt_no'])): ?>
-                                <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs rounded font-mono"><?= e($r['batch_receipt_no']) ?></span>
+                                <a href="<?= url('finance', 'collect-payment-batch-receipt') ?>&batch=<?= urlencode($r['batch_receipt_no']) ?>"
+                                   class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-xs rounded font-mono hover:bg-blue-100 dark:hover:bg-blue-900/40"
+                                   title="View Batch Receipt"><?= e($r['batch_receipt_no']) ?></a>
                             <?php else: ?>
                                 —
                             <?php endif; ?>

@@ -132,6 +132,11 @@ switch ($action) {
         require __DIR__ . '/views/collect_payment_batch_receipt.php';
         break;
 
+    case 'batch-payment-attachment':
+        auth_require_permission('finance.view');
+        require __DIR__ . '/actions/batch_payment_attachment.php';
+        break;
+
     case 'collect-supplementary-payment':
         auth_require_permission('finance.manage');
         $pageTitle = 'Collect Supplementary Payment';

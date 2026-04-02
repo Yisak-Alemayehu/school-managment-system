@@ -360,11 +360,36 @@ ob_start();
                     </tbody>
                     <tfoot class="bg-gray-50 dark:bg-dark-bg">
                         <tr>
-                            <td colspan="3" class="px-4 py-3 text-sm font-bold text-gray-900 dark:text-dark-text text-right">Total:</td>
+                            <td colspan="3" class="px-4 py-3 text-sm font-bold text-gray-900 dark:text-dark-text text-right">Subtotal:</td>
                             <td class="px-4 py-3 text-sm font-bold text-gray-900 dark:text-dark-text" id="batchTotal">0.00 ETB</td>
                         </tr>
                     </tfoot>
                 </table>
+            </div>
+
+            <!-- Total Adjustment -->
+            <div id="totalAdjustSection" class="hidden mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div class="flex items-center gap-2 mb-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="enableAdjust" class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        <span class="text-sm font-medium text-blue-800 dark:text-blue-300">Adjust total amount</span>
+                    </label>
+                </div>
+                <div id="adjustFields" class="hidden mt-3 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1">
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Adjusted Total (ETB)</label>
+                            <input type="number" name="adjusted_total" id="adjustedTotal" step="0.01" min="0.01"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500"
+                                   placeholder="Enter new total">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Difference</label>
+                            <p id="adjustDiff" class="px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-dark-card2 rounded-lg">—</p>
+                        </div>
+                    </div>
+                    <p id="adjustNote" class="text-xs text-gray-500 dark:text-gray-400"></p>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -541,7 +566,17 @@ document.addEventListener('DOMContentLoaded', function() {
     var checkboxes = document.querySelectorAll('.fee-checkbox');
     var amountInputs = document.querySelectorAll('.fee-amount');
 
+    // Adjustment elements
+    var totalAdjustSection = document.getElementById('totalAdjustSection');
+    var enableAdjust = document.getElementById('enableAdjust');
+    var adjustFields = document.getElementById('adjustFields');
+    var adjustedTotalInput = document.getElementById('adjustedTotal');
+    var adjustDiffEl = document.getElementById('adjustDiff');
+    var adjustNoteEl = document.getElementById('adjustNote');
+
     if (!channelSelect || !checkboxes.length) return;
+
+    var currentSubtotal = 0;
 
     // Check/uncheck all
     if (checkAllFees) {
@@ -586,7 +621,66 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (amtInput) total += parseFloat(amtInput.value) || 0;
             }
         });
+        currentSubtotal = total;
         if (batchTotalEl) batchTotalEl.textContent = total.toFixed(2) + ' ETB';
+
+        // Show/hide adjustment section
+        if (totalAdjustSection) {
+            if (total > 0) {
+                totalAdjustSection.classList.remove('hidden');
+            } else {
+                totalAdjustSection.classList.add('hidden');
+            }
+        }
+        updateAdjustDiff();
+    }
+
+    // Enable/disable adjustment
+    if (enableAdjust) {
+        enableAdjust.addEventListener('change', function() {
+            if (this.checked) {
+                adjustFields.classList.remove('hidden');
+                if (adjustedTotalInput && !adjustedTotalInput.value) {
+                    adjustedTotalInput.value = currentSubtotal.toFixed(2);
+                }
+            } else {
+                adjustFields.classList.add('hidden');
+                if (adjustedTotalInput) adjustedTotalInput.value = '';
+            }
+            updateAdjustDiff();
+            validateForm();
+        });
+    }
+
+    // Adjusted total input change
+    if (adjustedTotalInput) {
+        adjustedTotalInput.addEventListener('input', function() {
+            updateAdjustDiff();
+            validateForm();
+        });
+    }
+
+    function updateAdjustDiff() {
+        if (!adjustDiffEl || !adjustNoteEl || !enableAdjust || !enableAdjust.checked) {
+            if (adjustDiffEl) adjustDiffEl.textContent = '—';
+            if (adjustNoteEl) adjustNoteEl.textContent = '';
+            return;
+        }
+        var adjVal = parseFloat(adjustedTotalInput.value) || 0;
+        var diff = adjVal - currentSubtotal;
+        if (Math.abs(diff) < 0.005) {
+            adjustDiffEl.textContent = 'No change';
+            adjustDiffEl.className = 'px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-dark-card2 rounded-lg';
+            adjustNoteEl.textContent = '';
+        } else if (diff > 0) {
+            adjustDiffEl.textContent = '+' + diff.toFixed(2) + ' ETB';
+            adjustDiffEl.className = 'px-3 py-2 text-sm font-semibold text-green-700 bg-green-50 rounded-lg';
+            adjustNoteEl.textContent = 'Extra ' + diff.toFixed(2) + ' ETB will be credited to the student\'s wallet.';
+        } else {
+            adjustDiffEl.textContent = diff.toFixed(2) + ' ETB';
+            adjustDiffEl.className = 'px-3 py-2 text-sm font-semibold text-red-700 bg-red-50 rounded-lg';
+            adjustNoteEl.textContent = 'Each fee amount will be proportionally reduced to fit the adjusted total.';
+        }
     }
 
     // Show/hide fields based on payment method
@@ -625,32 +719,60 @@ document.addEventListener('DOMContentLoaded', function() {
         var hasChannel = channelSelect.value !== '';
         var isTeleBirr = channelSelect.value === 'telebirr';
         var isConfirmed = isTeleBirr || (confirmCheck && confirmCheck.checked);
-        submitBtn.disabled = !(anyChecked && hasChannel && isConfirmed);
+
+        // If adjustment enabled, make sure adjusted total > 0
+        var adjOk = true;
+        if (enableAdjust && enableAdjust.checked && adjustedTotalInput) {
+            var adjVal = parseFloat(adjustedTotalInput.value) || 0;
+            if (adjVal <= 0) adjOk = false;
+        }
+
+        submitBtn.disabled = !(anyChecked && hasChannel && isConfirmed && adjOk);
     }
 
     if (confirmCheck) confirmCheck.addEventListener('change', validateForm);
 
     // Overpayment warning on submit
     document.getElementById('collectPaymentForm').addEventListener('submit', function(e) {
-        var totalOverpay = 0;
-        var overpayCount = 0;
-        checkboxes.forEach(function(cb) {
-            if (cb.checked) {
-                var sfId = cb.dataset.sfId;
-                var amtInput = document.querySelector('.fee-amount[data-sf-id="' + sfId + '"]');
-                if (amtInput) {
-                    var amt = parseFloat(amtInput.value) || 0;
-                    var bal = parseFloat(amtInput.dataset.balance) || 0;
-                    if (amt > bal) {
-                        totalOverpay += (amt - bal);
-                        overpayCount++;
+        var warnings = [];
+
+        // Check per-fee overpayments (only if no adjustment)
+        var isAdjusted = enableAdjust && enableAdjust.checked && adjustedTotalInput && adjustedTotalInput.value;
+        if (!isAdjusted) {
+            var totalOverpay = 0;
+            var overpayCount = 0;
+            checkboxes.forEach(function(cb) {
+                if (cb.checked) {
+                    var sfId = cb.dataset.sfId;
+                    var amtInput = document.querySelector('.fee-amount[data-sf-id="' + sfId + '"]');
+                    if (amtInput) {
+                        var amt = parseFloat(amtInput.value) || 0;
+                        var bal = parseFloat(amtInput.dataset.balance) || 0;
+                        if (amt > bal) {
+                            totalOverpay += (amt - bal);
+                            overpayCount++;
+                        }
                     }
                 }
+            });
+            if (totalOverpay > 0) {
+                warnings.push('Total overpayment of ' + totalOverpay.toFixed(2) + ' ETB across ' + overpayCount + ' fee(s) will be credited to the student\'s wallet.');
             }
-        });
+        }
 
-        if (totalOverpay > 0) {
-            if (!confirm('Total overpayment of ' + totalOverpay.toFixed(2) + ' ETB across ' + overpayCount + ' fee(s) will be credited to the student\'s wallet. Continue?')) {
+        // Check adjustment
+        if (isAdjusted) {
+            var adjVal = parseFloat(adjustedTotalInput.value) || 0;
+            var diff = adjVal - currentSubtotal;
+            if (diff > 0) {
+                warnings.push('Extra ' + diff.toFixed(2) + ' ETB will be credited to the student\'s wallet.');
+            } else if (diff < 0) {
+                warnings.push('Fee amounts will be proportionally reduced by ' + Math.abs(diff).toFixed(2) + ' ETB total.');
+            }
+        }
+
+        if (warnings.length > 0) {
+            if (!confirm(warnings.join('\n\n') + '\n\nContinue?')) {
                 e.preventDefault();
                 return false;
             }
