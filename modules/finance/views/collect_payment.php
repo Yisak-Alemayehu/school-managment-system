@@ -47,6 +47,15 @@ if ($studentId) {
             [$studentId]
         );
 
+        // Wallet credit from overpayments
+        $walletCredit = (float) db_fetch_value(
+            "SELECT COALESCE(SUM(amount), 0) FROM fin_transactions WHERE student_id = ? AND type = 'adjustment' AND amount > 0", [$studentId]
+        );
+        $walletDebit = (float) db_fetch_value(
+            "SELECT COALESCE(ABS(SUM(amount)), 0) FROM fin_transactions WHERE student_id = ? AND type = 'adjustment' AND amount < 0", [$studentId]
+        );
+        $walletBalance = $walletCredit - $walletDebit;
+
         $recentPayments = db_fetch_all(
             "SELECT t.*, f.description AS fee_desc
                FROM fin_transactions t
@@ -305,6 +314,15 @@ ob_start();
                     <p class="text-xs text-gray-500 dark:text-dark-muted uppercase font-semibold">Class</p>
                     <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($student['class_name'] ?? '—') ?></p>
                 </div>
+                <?php if ($walletBalance > 0): ?>
+                <div class="sm:col-span-3 mt-1">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-sm font-semibold text-purple-700 dark:text-purple-300">Wallet Credit: <?= format_money($walletBalance) ?></span>
+                        <span class="text-xs text-purple-500">(from overpayments)</span>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

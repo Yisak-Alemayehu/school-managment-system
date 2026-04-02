@@ -31,6 +31,16 @@ $accountBalance = (float) db_fetch_value(
     "SELECT COALESCE(SUM(balance), 0) FROM fin_student_fees WHERE student_id = ? AND is_active = 1", [$id]
 );
 
+// Wallet credit (overpayments + extra adjustments credited to wallet)
+$walletCredit = (float) db_fetch_value(
+    "SELECT COALESCE(SUM(amount), 0) FROM fin_transactions WHERE student_id = ? AND type = 'adjustment' AND amount > 0", [$id]
+);
+// Deduct any wallet debits
+$walletDebit = (float) db_fetch_value(
+    "SELECT COALESCE(ABS(SUM(amount)), 0) FROM fin_transactions WHERE student_id = ? AND type = 'adjustment' AND amount < 0", [$id]
+);
+$walletBalance = $walletCredit - $walletDebit;
+
 // Available fees for assignment
 $allFees = db_fetch_all(
     "SELECT id, description, amount, currency FROM fin_fees WHERE is_active = 1 ORDER BY description"
@@ -148,14 +158,21 @@ ob_start();
     <!-- Payment Summary -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
         <h2 class="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">Payment Summary</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <p class="text-xs text-blue-600 uppercase font-semibold">Total Active Fees</p>
                 <p class="text-2xl font-bold text-blue-900 mt-1"><?= $activeFees ?></p>
             </div>
             <div class="p-4 <?= $accountBalance >= 0 ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100' ?> rounded-lg border">
-                <p class="text-xs <?= $accountBalance >= 0 ? 'text-green-600' : 'text-red-600' ?> uppercase font-semibold">Student Account Balance</p>
-                <p class="text-2xl font-bold <?= $accountBalance >= 0 ? 'text-green-900' : 'text-red-900' ?> mt-1"><?= $accountBalance ?></p>
+                <p class="text-xs <?= $accountBalance >= 0 ? 'text-green-600' : 'text-red-600' ?> uppercase font-semibold">Outstanding Balance</p>
+                <p class="text-2xl font-bold <?= $accountBalance >= 0 ? 'text-green-900' : 'text-red-900' ?> mt-1"><?= format_money($accountBalance) ?></p>
+            </div>
+            <div class="p-4 <?= $walletBalance > 0 ? 'bg-purple-50 border-purple-100' : 'bg-gray-50 border-gray-100' ?> rounded-lg border">
+                <p class="text-xs <?= $walletBalance > 0 ? 'text-purple-600' : 'text-gray-500' ?> uppercase font-semibold">Wallet Credit (Overpaid)</p>
+                <p class="text-2xl font-bold <?= $walletBalance > 0 ? 'text-purple-900' : 'text-gray-500' ?> mt-1"><?= format_money($walletBalance) ?></p>
+                <?php if ($walletBalance > 0): ?>
+                <p class="text-xs text-purple-600 mt-1">Available from overpayments</p>
+                <?php endif; ?>
             </div>
         </div>
     </div>

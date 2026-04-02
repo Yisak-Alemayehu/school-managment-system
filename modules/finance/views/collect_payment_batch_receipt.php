@@ -62,6 +62,16 @@ foreach ($txRows as $r) {
     $totalPaid += abs((float)$r['amount']);
 }
 
+// Check for wallet credits (adjustment transactions in this batch)
+$batchAdjustments = db_fetch_all(
+    "SELECT amount, description FROM fin_transactions WHERE batch_receipt_no = ? AND type = 'adjustment' AND amount > 0 ORDER BY id ASC",
+    [$batchNo]
+);
+$totalWalletCredit = 0;
+foreach ($batchAdjustments as $adj) {
+    $totalWalletCredit += (float)$adj['amount'];
+}
+
 ob_start();
 ?>
 
@@ -157,6 +167,19 @@ ob_start();
                 </tr>
             </tfoot>
         </table>
+
+        <?php if ($totalWalletCredit > 0): ?>
+        <!-- Overpayment / Wallet Credit Notice -->
+        <div class="p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg mb-4">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>
+                    <p class="text-sm font-semibold text-purple-700 dark:text-purple-300">Overpayment Credit: <?= format_money($totalWalletCredit) ?></p>
+                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-0.5">This amount has been credited to the student's wallet.</p>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Footer -->
         <div class="text-center text-xs text-gray-400 dark:text-gray-500 mt-4 pt-4 border-t border-gray-200 dark:border-dark-border">
