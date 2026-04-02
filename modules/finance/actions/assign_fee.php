@@ -72,8 +72,70 @@ try {
         'processed_by'   => $user['id'],
     ]);
 
+    // Auto-deduct wallet credit (from overpayments) against the new fee
+    $walletCredit = (float) db_fetch_value(
+        "SELECT COALESCE(SUM(amount), 0) FROM fin_transactions WHERE student_id = ? AND type = 'adjustment' AND amount > 0",
+        [$studentId]
+    );
+    $walletDebit = (float) db_fetch_value(
+        "SELECT COALESCE(ABS(SUM(amount)), 0) FROM fin_transactions WHERE student_id = ? AND type = 'adjustment' AND amount < 0",
+        [$studentId]
+    );
+    $walletBalance = $walletCredit - $walletDebit;
+    $walletApplied = 0;
+
+    if ($walletBalance > 0.005 && $assignedAmount > 0) {
+        $walletApplied = min($walletBalance, $assignedAmount);
+        $newFeeBalance = $assignedAmount - $walletApplied;
+
+        // Reduce the fee balance
+        db_update('fin_student_fees', [
+            'balance' => $newFeeBalance,
+        ], 'id = ?', [$sfId]);
+
+        // Record wallet debit (negative adjustment)
+        db_insert('fin_transactions', [
+            'student_id'     => $studentId,
+            'student_fee_id' => $sfId,
+            'type'           => 'adjustment',
+            'amount'         => -$walletApplied,
+            'currency'       => $fee['currency'],
+            'description'    => 'Wallet credit applied to: ' . $fee['description'],
+            'processed_by'   => $user['id'],
+        ]);
+
+        // Record the payment against the fee
+        $receiptNo = 'RCP-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+        db_insert('fin_transactions', [
+            'student_id'      => $studentId,
+            'student_fee_id'  => $sfId,
+            'type'            => 'payment',
+            'amount'          => -$walletApplied,
+            'currency'        => $fee['currency'],
+            'balance_before'  => $assignedAmount,
+            'balance_after'   => $newFeeBalance,
+            'description'     => 'Auto-paid from wallet credit: ' . $fee['description'],
+            'channel'         => 'wallet',
+            'receipt_no'      => $receiptNo,
+            'print_count'     => 0,
+            'processed_by'    => $user['id'],
+        ]);
+    }
+
     db_commit();
-    set_flash('success', 'Fee assigned successfully.');
+
+    if ($walletApplied > 0) {
+        $remaining = $assignedAmount - $walletApplied;
+        $msg = 'Fee assigned. ' . format_money($walletApplied) . ' auto-deducted from wallet credit.';
+        if ($remaining > 0) {
+            $msg .= ' Remaining balance: ' . format_money($remaining) . '.';
+        } else {
+            $msg .= ' Fee fully paid from wallet.';
+        }
+        set_flash('success', $msg);
+    } else {
+        set_flash('success', 'Fee assigned successfully.');
+    }
 } catch (Throwable $e) {
     db_rollback();
     error_log('Assign fee error: ' . $e->getMessage());
