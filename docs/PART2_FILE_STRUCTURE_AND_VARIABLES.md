@@ -1,4 +1,4 @@
-# Urji Beri School Management System — Pre-Development Documentation
+# School Management System — Pre-Development Documentation
 
 ## PART 2: COMPLETE FILE & FOLDER STRUCTURE + VARIABLE DOCUMENTATION
 
@@ -11,22 +11,22 @@
 # TABLE OF CONTENTS — PART 2
 
 3. [Complete File and Folder Structure](#3-complete-file-and-folder-structure)
-   - 3.1 Root-Level Structure
-   - 3.2 Configuration Files
-   - 3.3 Core Library Files
-   - 3.4 Module Files (All 11 Modules)
-   - 3.5 Template Files
-   - 3.6 Public / Static Files
-   - 3.7 SQL / Migration Files
-   - 3.8 Cron Job Files
-   - 3.9 Storage & Utility Files
+    - 3.1 Root-Level Structure
+    - 3.2 Configuration Files
+    - 3.3 Core Library Files
+    - 3.4 Module Files (All 11 Modules)
+    - 3.5 Template Files
+    - 3.6 Public / Static Files
+    - 3.7 SQL / Migration Files
+    - 3.8 Cron Job Files
+    - 3.9 Storage & Utility Files
 4. [Complete Variable Documentation](#4-complete-variable-documentation)
-   - 4.1 Environment Variables (.env)
-   - 4.2 Configuration Constants
-   - 4.3 Core Library Variables & Functions
-   - 4.4 Session Variables
-   - 4.5 Module Action Variables
-   - 4.6 Module View Variables
+    - 4.1 Environment Variables (.env)
+    - 4.2 Configuration Constants
+    - 4.3 Core Library Variables & Functions
+    - 4.4 Session Variables
+    - 4.5 Module Action Variables
+    - 4.6 Module View Variables
 
 ---
 
@@ -35,7 +35,7 @@
 ## 3.1 Root-Level Structure
 
 ```
-urjiberischool system 2026/
+school-management-system 2026/
 ├── .env                           ← Environment variables (secrets, credentials)
 ├── README.md                      ← Project readme
 ├── config/                        ← Application configuration constants
@@ -248,20 +248,20 @@ modules/academics/
 │   ├── term_save.php
 │   └── timetable_save.php
 └── views/
-    ├── classes.php
-    ├── class_subjects.php
-    ├── class_teachers.php
-    ├── elective_subjects.php
-    ├── mediums.php
-    ├── promote.php
-    ├── sections.php
-    ├── sessions.php
-    ├── shifts.php
-    ├── streams.php
-    ├── subjects.php
-    ├── subject_teachers.php
-    ├── terms.php
-    └── timetable.php
+     ├── classes.php
+     ├── class_subjects.php
+     ├── class_teachers.php
+     ├── elective_subjects.php
+     ├── mediums.php
+     ├── promote.php
+     ├── sections.php
+     ├── sessions.php
+     ├── shifts.php
+     ├── streams.php
+     ├── subjects.php
+     ├── subject_teachers.php
+     ├── terms.php
+     └── timetable.php
 ```
 
 **File Details — Academics Module:**
@@ -319,10 +319,10 @@ modules/attendance/
 ├── actions/
 │   └── save.php
 └── views/
-    ├── report.php
-    ├── student.php
-    ├── take.php
-    └── view.php
+     ├── report.php
+     ├── student.php
+     ├── take.php
+     └── view.php
 ```
 
 | File | Purpose | Responsibilities | Dependencies |
@@ -346,11 +346,11 @@ modules/auth/
 │   ├── reset_password.php
 │   └── update_profile.php
 └── views/
-    ├── change_password.php
-    ├── forgot_password.php
-    ├── login.php
-    ├── profile.php
-    └── reset_password.php
+     ├── change_password.php
+     ├── forgot_password.php
+     ├── login.php
+     ├── profile.php
+     └── reset_password.php
 ```
 
 | File | Purpose | Responsibilities | Dependencies |
@@ -361,7 +361,7 @@ modules/auth/
 | `actions/reset_password.php` | Process password reset | Validate token + new password, call `auth_reset_password()`, redirect to login | `csrf_protect()`, `validate()`, `input()`, `auth_reset_password()` |
 | `actions/change_password.php` | Process password change | Verify current password, hash new password with bcrypt cost 12, update user record | `auth_require()`, `csrf_protect()`, `validate()`, `input()`, `auth_user()`, `db_fetch_one()`, `password_verify()`, `password_hash()`, `db_update()`, `audit_log()` |
 | `actions/update_profile.php` | Process profile update | Validate name/email/phone, check email uniqueness, handle avatar upload w/ old avatar deletion, update session data | `auth_require()`, `csrf_protect()`, `validate()`, `input()`, `auth_user()`, `handle_upload()`, `delete_upload()`, `db_update()`, `db_fetch_one()`, `audit_log()` |
-| `views/login.php` | Login page (standalone layout) | Render username/password form with school branding, CSRF field | `csrf_field()`, `old()`, `get_flash()`, `APP_NAME` |
+| `views/login.php` | Login page (standalone layout) | Render username/password form with branding, CSRF field | `csrf_field()`, `old()`, `get_flash()`, `APP_NAME` |
 | `views/forgot_password.php` | Forgot password page (standalone) | Render email input form | `csrf_field()`, `get_flash()`, `APP_NAME` |
 | `views/reset_password.php` | Password reset page (standalone) | Render new password + confirm fields with token hidden | `csrf_field()`, `get_flash()` |
 | `views/change_password.php` | Password change page (authenticated) | Render current + new + confirm fields | `csrf_field()`, `auth_user()`, `get_error()` |
@@ -379,14 +379,14 @@ modules/communication/
 │   ├── notification_read.php
 │   └── notification_read_all.php
 └── views/
-    ├── announcements.php
-    ├── announcement_form.php
-    ├── announcement_view.php
-    ├── compose.php
-    ├── inbox.php
-    ├── message_view.php
-    ├── notifications.php
-    └── sent.php
+     ├── announcements.php
+     ├── announcement_form.php
+     ├── announcement_view.php
+     ├── compose.php
+     ├── inbox.php
+     ├── message_view.php
+     ├── notifications.php
+     └── sent.php
 ```
 
 | File | Purpose | Responsibilities |
@@ -412,7 +412,7 @@ modules/communication/
 modules/dashboard/
 ├── routes.php
 └── views/
-    └── index.php
+     └── index.php
 ```
 
 | File | Purpose | Responsibilities |
@@ -438,21 +438,21 @@ modules/exams/
 │   ├── report_card_generate.php
 │   └── results_save.php
 └── views/
-    ├── assessment_add.php
-    ├── assignments.php
-    ├── assignment_form.php
-    ├── assignment_view.php
-    ├── enter_conduct.php
-    ├── enter_results.php
-    ├── exams.php
-    ├── exam_schedule.php
-    ├── grade_scale.php
-    ├── marks.php
-    ├── report_cards.php
-    ├── report_card_print.php
-    ├── result_analysis.php
-    ├── result_cards.php
-    └── roster.php
+     ├── assessment_add.php
+     ├── assignments.php
+     ├── assignment_form.php
+     ├── assignment_view.php
+     ├── enter_conduct.php
+     ├── enter_results.php
+     ├── exams.php
+     ├── exam_schedule.php
+     ├── grade_scale.php
+     ├── marks.php
+     ├── report_cards.php
+     ├── report_card_print.php
+     ├── result_analysis.php
+     ├── result_cards.php
+     └── roster.php
 ```
 
 | File | Purpose | Responsibilities |
@@ -509,31 +509,31 @@ modules/finance/
 │   ├── payment_initiate.php
 │   └── payment_save.php
 └── views/
-    ├── discounts.php
-    ├── discount_form.php
-    ├── fee_categories.php
-    ├── fee_report.php
-    ├── fee_structures.php
-    ├── fee_structure_form.php
-    ├── fm_assign_fees.php
-    ├── fm_dashboard.php
-    ├── fm_fee_form.php
-    ├── fm_fee_view.php
-    ├── fm_generate_invoice.php
-    ├── fm_groups.php
-    ├── fm_group_form.php
-    ├── fm_group_members.php
-    ├── fm_manage_fees.php
-    ├── fm_payment.php
-    ├── fm_reports.php
-    ├── invoices.php
-    ├── invoice_form.php
-    ├── invoice_print.php
-    ├── invoice_view.php
-    ├── payments.php
-    ├── payment_form.php
-    ├── payment_receipt.php
-    └── pay_online.php
+     ├── discounts.php
+     ├── discount_form.php
+     ├── fee_categories.php
+     ├── fee_report.php
+     ├── fee_structures.php
+     ├── fee_structure_form.php
+     ├── fm_assign_fees.php
+     ├── fm_dashboard.php
+     ├── fm_fee_form.php
+     ├── fm_fee_view.php
+     ├── fm_generate_invoice.php
+     ├── fm_groups.php
+     ├── fm_group_form.php
+     ├── fm_group_members.php
+     ├── fm_manage_fees.php
+     ├── fm_payment.php
+     ├── fm_reports.php
+     ├── invoices.php
+     ├── invoice_form.php
+     ├── invoice_print.php
+     ├── invoice_view.php
+     ├── payments.php
+     ├── payment_form.php
+     ├── payment_receipt.php
+     └── pay_online.php
 ```
 
 *(36 routes — the largest module in the system)*
@@ -546,9 +546,9 @@ modules/settings/
 ├── actions/
 │   └── general_save.php
 └── views/
-    ├── audit_logs.php
-    ├── backup.php
-    └── general.php
+     ├── audit_logs.php
+     ├── backup.php
+     └── general.php
 ```
 
 | File | Purpose | Responsibilities |
@@ -576,17 +576,17 @@ modules/students/
 │   ├── store.php
 │   └── update.php
 └── views/
-    ├── bulk_import.php
-    ├── create.php
-    ├── credentials.php
-    ├── details.php
-    ├── edit.php
-    ├── id_cards.php
-    ├── index.php
-    ├── promote.php
-    ├── reset_password.php
-    ├── roll_numbers.php
-    └── view.php
+     ├── bulk_import.php
+     ├── create.php
+     ├── credentials.php
+     ├── details.php
+     ├── edit.php
+     ├── id_cards.php
+     ├── index.php
+     ├── promote.php
+     ├── reset_password.php
+     ├── roll_numbers.php
+     └── view.php
 ```
 
 | File | Purpose | Responsibilities |
@@ -602,7 +602,7 @@ modules/students/
 | `actions/reset_student_password.php` | Reset student user password | Generate new password hash, update user record |
 | `actions/sample_csv.php` | Download sample CSV template | Output CSV header row as downloadable file |
 | `actions/save_roll_numbers.php` | Assign roll numbers | Update `roll_number` on `enrollments` or `students` for each student in section |
-| `views/create.php` | Student admission form (412 lines) | Full form: personal info, photo upload, Ethiopian address fields, dynamic guardian forms |
+| `views/create.php` | Student admission form (412 lines) | Full form: personal info, photo upload, address fields, dynamic guardian forms |
 | `views/edit.php` | Edit student form (419 lines) | Pre-filled edit form with existing photo preview, guardian editing |
 | `views/index.php` | Student listing | Paginated table with search + class/section/status filters |
 | `views/view.php` | Student profile | Read-only profile: info, enrollment, guardian details |
@@ -625,10 +625,10 @@ modules/users/
 │   ├── toggle_status.php
 │   └── update.php
 └── views/
-    ├── create.php
-    ├── edit.php
-    ├── index.php
-    └── view.php
+     ├── create.php
+     ├── edit.php
+     ├── index.php
+     └── view.php
 ```
 
 | File | Purpose | Responsibilities |
@@ -652,11 +652,11 @@ templates/
 │   ├── 403.php
 │   └── 404.php
 └── partials/
-    ├── academics_nav.php
-    ├── flash.php
-    ├── header.php
-    ├── mobile_nav.php
-    └── sidebar.php
+     ├── academics_nav.php
+     ├── flash.php
+     ├── header.php
+     ├── mobile_nav.php
+     └── sidebar.php
 ```
 
 | File | Purpose | Responsibilities |
@@ -664,7 +664,7 @@ templates/
 | `layout.php` | Master page layout | HTML skeleton with `<head>` (Tailwind CDN, Font Awesome, CSRF meta, PWA meta), includes header, sidebar, mobile nav, flash messages, injects `$content` from view, includes footer + PWA registration script |
 | `errors/403.php` | Forbidden error page | Display "Access Denied" message with link back to dashboard |
 | `errors/404.php` | Not Found error page | Display "Page Not Found" message with link back to home |
-| `partials/header.php` | Top navigation bar | School logo, school name, notification bell with unread count, user avatar dropdown (profile, change password, logout) |
+| `partials/header.php` | Top navigation bar | Logo, system name, notification bell with unread count, user avatar dropdown (profile, change password, logout) |
 | `partials/sidebar.php` | Left sidebar navigation | Permission-gated menu links for all modules, active state highlighting, collapsible sections |
 | `partials/mobile_nav.php` | Mobile bottom navigation | Responsive mobile menu bar (dashboard, students, attendance, more) |
 | `partials/flash.php` | Flash message display | Render success/error/warning/info alerts from session flash data, auto-dismiss after 5 seconds |
@@ -680,20 +680,20 @@ public/
 ├── service-worker.js
 ├── offline.html
 └── assets/
-    ├── css/
-    │   └── app.css
-    ├── js/
-    │   └── app.js
-    └── icons/
-        ├── icon-72.svg
-        └── icon.php
+     ├── css/
+     │   └── app.css
+     ├── js/
+     │   └── app.js
+     └── icons/
+          ├── icon-72.svg
+          └── icon.php
 ```
 
 | File | Purpose | Responsibilities |
 |------|---------|-----------------|
 | `index.php` | Front controller / application entry point | Define `APP_ROOT`, load `.env`, load all config files, load all core libraries, set security headers, init session, generate CSRF token, dispatch router |
 | `uploads.php` | Secure file proxy | Serve uploaded files from outside document root; validate path (no directory traversal), check MIME type against allowlist, set cache headers |
-| `manifest.webmanifest` | PWA manifest | Define app name ("Urji Beri School SMS"), icons, start URL, display mode (standalone), theme color (#1e40af), shortcuts (Dashboard, Students, Attendance) |
+| `manifest.webmanifest` | PWA manifest | Define app name, icons, start URL, display mode (standalone), theme color, shortcuts (Dashboard, Students, Attendance) |
 | `service-worker.js` | PWA service worker | Cache app shell files on install, serve from cache with network fallback, show offline.html when network unavailable |
 | `offline.html` | Offline fallback page | Simple HTML page shown when app is offline and no cached page is available |
 | `assets/css/app.css` | Custom application styles | Additional CSS beyond Tailwind utilities (custom components, print styles, animations) |
@@ -743,15 +743,15 @@ sql/
 | `007_communication.sql` | Migration: Communication tables | `announcements`, `messages`, `notifications` |
 | `008_system.sql` | Migration: System tables | `audit_logs`, `settings` |
 | `009_seed_data.sql` | Seed: Default data | 7 roles, ~50 permissions, admin user, session, classes, subjects, grade scale, fee categories, payment gateways, settings |
-| `010_schema_fix.sql` | Fix: Missing columns | Add `full_name`, `is_active` to `users`, `classes`, `sections`, `subjects`, `students`, `guardians` |
-| `011_academics_extended.sql` | Migration: Extended academics | `mediums`, `streams`, `shifts`, `student_elective_subjects`; alter `classes` add FK columns |
+| `010_schema_fix.sql` | Fix: Missing columns | Add `full_name`, `is_active` to various tables |
+| `011_academics_extended.sql` | Migration: Extended academics | `mediums`, `streams`, `shifts`, `student_elective_subjects` |
 | `012_results_module.sql` | Migration: Results | `assessments`, `student_results` |
 | `013_student_conduct.sql` | Migration: Conduct | `student_conduct` |
-| `014_fix_assessment_unique.sql` | Fix: Deduplicate assessments | Heal duplicate data, add unique key to `assessments` |
-| `015_fee_management.sql` | Migration: Advanced fees | `fees`, `recurrence_configs`, `penalty_configs`, `student_groups`, `student_group_members`, `fee_assignments`, `fee_exemptions`, `student_fee_charges`, `penalty_charges`, `finance_audit_log` |
+| `014_fix_assessment_unique.sql` | Fix: Deduplicate assessments | Heal duplicate data, add unique key |
+| `015_fee_management.sql` | Migration: Advanced fees | `fees`, `recurrence_configs`, `penalty_configs`, `student_groups`, `student_group_members`, `fee_assignments` |
 | `016_fee_management_permissions.sql` | Seed: Fee permissions | 12 `fee_management.*` permissions, role assignments |
 | `017_fee_management_seed.sql` | Seed: Fee sample data | Sample fees, recurrence, penalties, groups, assignments |
-| `018_rbac_demo_users.sql` | Seed: Demo users | 6 demo users with all roles, ~25 missing permissions, complete role matrices |
+| `018_rbac_demo_users.sql` | Seed: Demo users | 6 demo users with all roles |
 | `run_migration.php` | PHP migration runner | Executes SQL migration files against the database |
 | `check_seed.php` | PHP seed verification | Checks all expected seed data exists |
 | `seed_2026_2027.php` | PHP seed for 2026/2027 | Creates academic session for new school year |
@@ -766,8 +766,8 @@ cron/
 
 | File | Purpose | Schedule | Responsibilities |
 |------|---------|----------|-----------------|
-| `fm_penalty_job.php` | Calculate late payment penalties | Daily (recommended) | Find overdue `student_fee_charges`, apply penalty rules from `penalty_configs`, insert `penalty_charges`, update charge amounts |
-| `fm_recurrence_job.php` | Generate recurring fee charges | Monthly (recommended) | Find active `recurrence_configs`, calculate next due date, generate new `student_fee_charges` for applicable students |
+| `fm_penalty_job.php` | Calculate late payment penalties | Daily (recommended) | Find overdue charges, apply penalty rules, insert penalty charges, update amounts |
+| `fm_recurrence_job.php` | Generate recurring fee charges | Monthly (recommended) | Find active recurrence configs, calculate next due date, generate new charges for applicable students |
 
 ## 3.9 Storage & Utility Files
 
@@ -778,7 +778,7 @@ storage/
 
 uploads/
 └── students/
-    └── 2026/                   ← Student photos organized by year/month
+     └── 2026/                   ← Student photos organized by year/month
 
 sampleCSV/
 └── students_import_sample.csv  ← CSV template for bulk student import
@@ -801,17 +801,17 @@ docs/
 | Variable Name | Data Type | Default Value | Description | Scope | Used By |
 |--------------|-----------|---------------|-------------|-------|---------|
 | `APP_ENV` | string | `production` | Application environment (`development` / `production`) | Environment | `config/app.php` → `APP_ENV` constant |
-| `APP_URL` | string | Auto-detected | Full application base URL (e.g., `https://school.example.com`) | Environment | `config/app.php` → `APP_URL` constant |
+| `APP_URL` | string | Auto-detected | Full application base URL (e.g., `https://example.com`) | Environment | `config/app.php` → `APP_URL` constant |
 | `DB_HOST` | string | `localhost` | MySQL server hostname | Environment | `config/database.php` → `DB_HOST` constant |
 | `DB_PORT` | string | `3306` | MySQL server port | Environment | `config/database.php` → `DB_PORT` constant |
-| `DB_NAME` | string | `urjiberi_school` | MySQL database name | Environment | `config/database.php` → `DB_NAME` constant |
+| `DB_NAME` | string | `school_system` | MySQL database name | Environment | `config/database.php` → `DB_NAME` constant |
 | `DB_USER` | string | `root` | MySQL username | Environment | `config/database.php` → `DB_USER` constant |
 | `DB_PASS` | string | (empty) | MySQL password | Environment | `config/database.php` → `DB_PASS` constant |
 | `TELEBIRR_APP_ID` | string | (empty) | Telebirr application ID | Environment | `config/payment.php` → `TELEBIRR_CONFIG['app_id']` |
 | `TELEBIRR_APP_KEY` | string | (empty) | Telebirr application key | Environment | `config/payment.php` → `TELEBIRR_CONFIG['app_key']` |
 | `TELEBIRR_SHORT_CODE` | string | (empty) | Telebirr merchant short code | Environment | `config/payment.php` → `TELEBIRR_CONFIG['short_code']` |
 | `TELEBIRR_PUBLIC_KEY` | string | (empty) | Telebirr RSA public key | Environment | `config/payment.php` → `TELEBIRR_CONFIG['public_key']` |
-| `TELEBIRR_API_URL` | string | `https://app.ethiomobilemoney.et:2121` | Telebirr API base URL | Environment | `config/payment.php` → `TELEBIRR_CONFIG['api_url']` |
+| `TELEBIRR_API_URL` | string | `https://api.example.com` | Telebirr API base URL | Environment | `config/payment.php` → `TELEBIRR_CONFIG['api_url']` |
 | `CHAPA_SECRET_KEY` | string | (empty) | Chapa API secret key | Environment | `config/payment.php` → `CHAPA_CONFIG['secret_key']` |
 | `CHAPA_PUBLIC_KEY` | string | (empty) | Chapa publishable key | Environment | `config/payment.php` → `CHAPA_CONFIG['public_key']` |
 | `CHAPA_WEBHOOK_SECRET` | string | (empty) | Chapa webhook verification secret | Environment | `config/payment.php` → `CHAPA_CONFIG['webhook_secret']` |
@@ -825,12 +825,12 @@ docs/
 
 | Constant Name | Data Type | Default Value | Description | Scope | Used By |
 |--------------|-----------|---------------|-------------|-------|---------|
-| `APP_NAME` | string | `'Urji Beri School SMS'` | Display name of the application | Global constant | Layout header, login page, PWA manifest, emails |
+| `APP_NAME` | string | `'School Management System'` | Display name of the application | Global constant | Layout header, login page, PWA manifest, emails |
 | `APP_VERSION` | string | `'1.0.0'` | Current application version | Global constant | Service worker cache key, footer display |
 | `APP_ENV` | string | From `getenv('APP_ENV')` or `'production'` | Environment mode | Global constant | `APP_DEBUG` derivation, error reporting |
 | `APP_DEBUG` | bool | `APP_ENV === 'development'` | Debug mode flag | Global constant | Error display, verbose error messages |
-| `APP_URL` | string | Auto-detected from `$_SERVER` or `getenv('APP_URL')` | Application base URL without trailing slash | Global constant | URL generation (`url()`), payment callback URLs, redirect targets |
-| `APP_TIMEZONE` | string | `'Africa/Addis_Ababa'` | Application timezone | Global constant | `date_default_timezone_set()`, all date operations |
+| `APP_URL` | string | Auto-detected from `$_SERVER` or `getenv('APP_URL')` | Application base URL without trailing slash | Global constant | URL generation, payment callback URLs, redirect targets |
+| `APP_TIMEZONE` | string | `'UTC'` | Application timezone | Global constant | `date_default_timezone_set()`, all date operations |
 | `ROOT_PATH` | string | Same as `APP_ROOT` | Root directory path | Global constant | File path construction |
 | `CONFIG_PATH` | string | `APP_ROOT . '/config'` | Configuration directory | Global constant | Config file loading |
 | `CORE_PATH` | string | `APP_ROOT . '/core'` | Core library directory | Global constant | Core file loading |
@@ -840,7 +840,7 @@ docs/
 | `UPLOAD_PATH` | string | `APP_ROOT . '/uploads'` | Upload storage directory | Global constant | File upload handler, upload URL generation |
 | `LOG_PATH` | string | `APP_ROOT . '/logs'` | Log directory | Global constant | Error log configuration |
 | `SQL_PATH` | string | `APP_ROOT . '/sql'` | SQL migration directory | Global constant | Migration runner |
-| `SESSION_NAME` | string | `'urjiberi_session'` | PHP session cookie name | Global constant | `session_name()` in `auth_init_session()` |
+| `SESSION_NAME` | string | `'sms_session'` | PHP session cookie name | Global constant | `session_name()` in `auth_init_session()` |
 | `SESSION_LIFETIME` | int | `7200` (2 hours) | Session lifetime in seconds | Global constant | `session.gc_maxlifetime`, `session.cookie_lifetime` |
 | `SESSION_SECURE` | bool | `true` if HTTPS detected | Secure cookie flag | Global constant | `session.cookie_secure`, security headers |
 | `SESSION_HTTPONLY` | bool | `true` | HttpOnly cookie flag | Global constant | `session.cookie_httponly` |
@@ -868,7 +868,7 @@ docs/
 |--------------|-----------|---------------|-------------|-------|---------|
 | `DB_HOST` | string | From `getenv('DB_HOST')` or `'localhost'` | MySQL server hostname | Global constant | `db_connect()` DSN |
 | `DB_PORT` | string | From `getenv('DB_PORT')` or `'3306'` | MySQL server port | Global constant | `db_connect()` DSN |
-| `DB_NAME` | string | From `getenv('DB_NAME')` or `'urjiberi_school'` | MySQL database name | Global constant | `db_connect()` DSN |
+| `DB_NAME` | string | From `getenv('DB_NAME')` or `'school_system'` | MySQL database name | Global constant | `db_connect()` DSN |
 | `DB_USER` | string | From `getenv('DB_USER')` or `'root'` | MySQL username | Global constant | `db_connect()` PDO constructor |
 | `DB_PASS` | string | From `getenv('DB_PASS')` or `''` | MySQL password | Global constant | `db_connect()` PDO constructor |
 | `DB_CHARSET` | string | `'utf8mb4'` | MySQL charset | Global constant | `db_connect()` DSN |
@@ -1349,3 +1349,4 @@ Views with pagination consistently use:
 | **PART 3** | Functional Requirements, Non-Functional Requirements, Database Design |
 | **PART 4** | API Design, Development Checklist |
 | **PART 5** | Development Plan, Coding Standards, Testing Strategy, Deployment Plan |
+

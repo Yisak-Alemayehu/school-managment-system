@@ -271,7 +271,8 @@ Reconciliation: Cron-compatible function to check pending transactions
 
 ## 13. Next Phase Plan
 
-**Phase 2** will deliver:
+**Phase 2** will deliver:3
+
 - Complete ERD narrative
 - Full normalized SQL schema (40+ tables)
 - Ordered migration files
