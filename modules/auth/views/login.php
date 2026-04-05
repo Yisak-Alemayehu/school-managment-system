@@ -60,7 +60,7 @@
         <!-- Logo -->
         <div class="text-center mb-8">
             <div class="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 p-0.5 shadow-lg shadow-primary-500/20">
-                <img src="<?= url('/img/Logo.png') ?>" alt="<?= e(APP_NAME) ?>" class="w-full h-full rounded-2xl object-contain bg-white dark:bg-dark-card p-1">
+                <img src="<?= url('/img/Logo.ico') ?>" alt="<?= e(APP_NAME) ?>" class="w-full h-full rounded-2xl object-contain bg-white dark:bg-dark-card p-1">
             </div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-dark-text">Welcome Back!</h1>
             <p class="text-gray-500 dark:text-dark-muted mt-1 text-sm">Sign in to continue to your portal</p>

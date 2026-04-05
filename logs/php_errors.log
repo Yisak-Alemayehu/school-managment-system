@@ -1896,3 +1896,4 @@ Stack trace:
 #3 {main}
   thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 20
 [13-Mar-2026 11:33:53 Africa/Addis_Ababa] Database connection failed: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: NO)
+[05-Apr-2026 10:12:06 Africa/Addis_Ababa] PHP Warning:  Undefined array key "password_changed_at" in C:\Users\yisak\Desktop\SMS\modules\users\views\view.php on line 88

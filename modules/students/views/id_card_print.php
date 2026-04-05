@@ -47,7 +47,7 @@ if (empty($students)) {
 
 // School info
 $schoolName = 'Urji Beri School';
-$schoolLogo = '/img/Logo.png';
+$schoolLogo = '/img/Logo.ico';
 $schoolPhone = '0912097003';
 $schoolAddress = 'Furi, Sheger, Oromia';
 $schoolEmail = get_setting('school', 'email', '');

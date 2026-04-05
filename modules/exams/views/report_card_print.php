@@ -26,7 +26,7 @@ $isBatch = count($cardIds) > 1;
 
 // Shared setup
 $schoolName = get_school_name();
-$schoolLogo = '/img/Logo.png';
+$schoolLogo = '/img/Logo.ico';
 
 // Grade helper (defined once, outside loop)
 function printGrade(float $mark): string {

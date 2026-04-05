@@ -9,7 +9,7 @@ $id  = input_int('id');
 $sig = trim($_GET['sig'] ?? '');
 
 $schoolName = get_school_name();
-$schoolLogo = '/img/Logo.png';
+$schoolLogo = '/img/Logo.ico';
 
 // Validate inputs
 $valid   = false;

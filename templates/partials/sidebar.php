@@ -465,7 +465,7 @@ if ($isAdmin) {
 <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-sidebar-bg dark:bg-gray-950 sidebar-transition transform -translate-x-full lg:translate-x-0 overflow-y-auto no-print">
     <!-- Logo / School Name -->
     <div class="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-        <img src="<?= url('/img/Logo.png') ?>" alt="Urji Beri School" class="w-9 h-9 rounded-lg flex-shrink-0 object-contain">
+        <img src="<?= url('/img/Logo.ico') ?>" alt="Urji Beri School" class="w-9 h-9 rounded-lg flex-shrink-0 object-contain">
         <div class="min-w-0">
             <h1 class="text-white font-semibold text-sm truncate"><?= e(get_school_name()) ?></h1>
             <p class="text-sidebar-text text-xs truncate">School SMS</p>

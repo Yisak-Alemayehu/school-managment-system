@@ -77,7 +77,7 @@ ob_start();
             </div>
             <div>
                 <dt class="text-gray-500 dark:text-dark-muted">Last Login</dt>
-                <dd class="font-medium text-gray-900 dark:text-dark-text"><?= $userRecord['last_login_at'] ? format_datetime($userRecord['last_login_at']) : 'Never' ?></dd>
+                <dd class="font-medium text-gray-900 dark:text-dark-text"><?= isset($userRecord['last_login_at']) && $userRecord['last_login_at'] ? format_datetime($userRecord['last_login_at']) : 'Never' ?></dd>
             </div>
             <div>
                 <dt class="text-gray-500 dark:text-dark-muted">Last Login IP</dt>
@@ -85,11 +85,11 @@ ob_start();
             </div>
             <div>
                 <dt class="text-gray-500 dark:text-dark-muted">Password Changed</dt>
-                <dd class="font-medium text-gray-900 dark:text-dark-text"><?= $userRecord['password_changed_at'] ? format_datetime($userRecord['password_changed_at']) : 'Never' ?></dd>
+                <dd class="font-medium text-gray-900 dark:text-dark-text"><?= isset($userRecord['password_changed_at']) && $userRecord['password_changed_at'] ? format_datetime($userRecord['password_changed_at']) : 'Never' ?></dd>
             </div>
             <div>
                 <dt class="text-gray-500 dark:text-dark-muted">Force Password Change</dt>
-                <dd class="font-medium text-gray-900 dark:text-dark-text"><?= $userRecord['force_password_change'] ? 'Yes' : 'No' ?></dd>
+                <dd class="font-medium text-gray-900 dark:text-dark-text"><?= isset($userRecord['force_password_change']) && $userRecord['force_password_change'] ? 'Yes' : 'No' ?></dd>
             </div>
         </dl>
     </div>

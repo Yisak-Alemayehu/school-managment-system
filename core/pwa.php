@@ -20,7 +20,9 @@ function pwa_meta_tags(): string {
     $html .= '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">' . "\n";
     $html .= '<meta name="apple-mobile-web-app-title" content="' . e(get_school_name()) . '">' . "\n";
     $html .= '<link rel="manifest" href="' . url('/manifest.webmanifest') . '">' . "\n";
-    $html .= '<link rel="apple-touch-icon" href="' . url('/img/Logo.png') . '">' . "\n";
+    $html .= '<link rel="icon" type="image/x-icon" href="' . url('/img/Logo.ico') . '">' . "\n";
+    $html .= '<link rel="shortcut icon" type="image/x-icon" href="' . url('/img/Logo.ico') . '">' . "\n";
+    $html .= '<link rel="apple-touch-icon" href="' . url('/img/Logo.ico') . '">' . "\n";
     return $html;
 }
 
@@ -90,7 +92,7 @@ function pwa_status_indicator(): string {
     $banner = <<<HTML
 <div id="pwa-install-banner" class="hidden fixed bottom-16 left-4 right-4 lg:bottom-4 lg:left-auto lg:right-4 lg:w-96 bg-white border border-gray-200 rounded-xl shadow-lg p-4 z-50">
     <div class="flex items-start gap-3">
-        <img src="/img/Logo.png" alt="Urji Beri School" class="flex-shrink-0 w-10 h-10 rounded-lg object-contain">
+        <img src="/img/Logo.ico" alt="Urji Beri School" class="flex-shrink-0 w-10 h-10 rounded-lg object-contain">
         <div class="flex-1 min-w-0">
             <p class="font-semibold text-gray-900 text-sm">Install Urji Beri School</p>
             <p class="text-xs text-gray-500">Add to home screen for quick access</p>
