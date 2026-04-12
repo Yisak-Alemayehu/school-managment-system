@@ -53,7 +53,11 @@ function router_dispatch(): void {
     ];
 
     $routeKey = $module . '/' . $action;
-    $isPublic = in_array($routeKey, $publicRoutes) || $module === 'auth';
+    $isPublic  = in_array($routeKey, $publicRoutes)
+              || $module === 'auth'
+              || $module === 'app'        // PWA SPA shell — served publicly
+              || $routeKey === 'pwa-api/login'
+              || $routeKey === 'pwa-api/logout'; // logout handled with token only
 
     // Allow copy-print access with signature (route handler validates HMAC)
     if ($routeKey === 'exams/report-card-print' && !empty($_GET['copy']) && !empty($_GET['sig'])) {

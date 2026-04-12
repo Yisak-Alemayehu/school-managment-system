@@ -173,6 +173,15 @@
                     <span class="text-[10px] text-gray-400 dark:text-dark-muted font-mono">admin</span>
                 </button>
             </div>
+            <div class= "grid grid-cols-2 gap-2 mt-2">
+                <button type="button" onclick="fillDemo('teacher','password')"
+                        class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-card hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all group">
+                    <span class="w-7 h-7 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3m0 0l3-3m-3 3V4m0 13a8 8 0 11-16 0 8 8 0 0116 0z"/></svg>
+                    </span>
+                    <span class="text-xs font-semibold text-gray-700 dark:text-dark-text">Teacher</span>
+                    <span class="text-[10px] text-gray-400 dark:text-dark-muted font-mono">teacher</span>
+                </button>
         </div>
     </div>
 

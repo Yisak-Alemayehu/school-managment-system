@@ -1,5 +1,8 @@
 RewriteEngine On
 
+# Pass Authorization header through to PHP (Apache strips it by default)
+RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Auto-detect RewriteBase from the request
 # Works whether app is in root or subdirectory
 RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$

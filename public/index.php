@@ -31,6 +31,7 @@ require APP_ROOT . '/core/response.php';
 require APP_ROOT . '/core/router.php';
 require APP_ROOT . '/core/rbac.php';
 require APP_ROOT . '/core/pwa.php';
+require APP_ROOT . '/core/pwa_token.php';
 require APP_ROOT . '/core/lang.php';
 
 // Set security headers
