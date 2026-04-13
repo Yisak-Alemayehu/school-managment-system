@@ -103,4 +103,55 @@ function togglePwd() {
 }
 </script>
 
+<!-- PWA install banner (shown only on login page when not yet installed) -->
+<div id="pwa-install-banner"
+     class="hidden fixed bottom-4 left-4 right-4 max-w-sm mx-auto z-50
+            bg-white border border-blue-100 rounded-2xl shadow-lg p-4 flex items-center gap-3"
+     style="box-shadow:0 8px 32px rgba(7,77,217,.18)">
+  <div class="w-12 h-12 flex-shrink-0 rounded-xl bg-primary-600 flex items-center justify-center">
+    <img src="/img/Logo.png" alt="Portal" class="w-10 h-10 rounded-lg object-cover"
+         onerror="this.style.display='none';this.parentNode.textContent='🏫'">
+  </div>
+  <div class="flex-1 min-w-0">
+    <p class="font-semibold text-sm text-gray-900 leading-tight">Install Portal App</p>
+    <p class="text-xs text-gray-500 mt-0.5 leading-tight">Add to your home screen for quick access</p>
+  </div>
+  <div class="flex flex-col gap-1.5 flex-shrink-0">
+    <button onclick="doInstall()"
+            class="bg-primary-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
+      Install
+    </button>
+    <button onclick="dismissBanner()"
+            class="text-gray-400 text-xs px-3 py-1">
+      Not now
+    </button>
+  </div>
+</div>
+
+<script>
+let _installPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    _installPrompt = e;
+    // Only show if not already dismissed this session
+    if (!sessionStorage.getItem('pwa-banner-dismissed')) {
+        document.getElementById('pwa-install-banner').classList.remove('hidden');
+    }
+});
+window.addEventListener('appinstalled', function() {
+    _installPrompt = null;
+    document.getElementById('pwa-install-banner').classList.add('hidden');
+});
+function doInstall() {
+    if (!_installPrompt) return;
+    _installPrompt.prompt();
+    _installPrompt.userChoice.then(function() { _installPrompt = null; });
+    document.getElementById('pwa-install-banner').classList.add('hidden');
+}
+function dismissBanner() {
+    sessionStorage.setItem('pwa-banner-dismissed', '1');
+    document.getElementById('pwa-install-banner').classList.add('hidden');
+}
+</script>
+
 <?php portal_foot(); ?>

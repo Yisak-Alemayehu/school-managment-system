@@ -15,7 +15,7 @@ require_once __DIR__ . '/_layout.php';
 $action = current_action() ?: 'login';
 
 // Public actions (no portal auth required)
-if (!portal_check() && !in_array($action, ['login', 'logout'])) {
+if (!portal_check() && !in_array($action, ['login', 'logout', 'offline'])) {
     redirect(url('portal', 'login'));
 }
 
@@ -26,6 +26,11 @@ switch ($action) {
     // ── Root / index ─────────────────────────────────────────────────────────
     case 'index':
         redirect(portal_check() ? url('portal', 'dashboard') : url('portal', 'login'));
+        break;
+
+    // ── Offline (served by service worker cache) ──────────────────────────────
+    case 'offline':
+        require __DIR__ . '/views/offline.php';
         break;
 
     // ── Login ─────────────────────────────────────────────────────────────────

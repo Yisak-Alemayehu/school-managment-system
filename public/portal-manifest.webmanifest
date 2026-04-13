@@ -1,14 +1,18 @@
 {
+    "id": "/portal/",
     "name": "Student & Parent Portal",
     "short_name": "Portal",
     "description": "Student and parent school portal — check results, attendance, fees and more.",
     "start_url": "/portal/dashboard",
     "scope": "/portal/",
     "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
     "orientation": "portrait-primary",
-    "background_color": "#ffffff",
+    "background_color": "#074DD9",
     "theme_color": "#074DD9",
     "categories": ["education"],
+    "lang": "en",
+    "dir": "ltr",
     "icons": [
         {
             "src": "/img/Logo.png",

@@ -61,6 +61,10 @@ self.addEventListener('fetch', function(event) {
     // Skip API/webhook requests
     if (request.url.includes('/payments/webhook')) return;
 
+    // Let the portal service worker handle all /portal/ routes
+    var url = new URL(request.url);
+    if (url.pathname.startsWith('/portal')) return;
+
     // Navigation requests: network-first
     if (request.mode === 'navigate') {
         event.respondWith(
