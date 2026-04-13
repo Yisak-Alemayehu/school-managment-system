@@ -50,7 +50,6 @@ function ecDatePicker(config) {
         _name: config.name || 'date_ec',
         _required: config.required || false,
         label: config.label || '',
-        formatted: '',
 
         months: [
             {num: 1,  name: 'Meskerem'},
@@ -77,7 +76,6 @@ function ecDatePicker(config) {
                     this.year = String(parseInt(parts[2]) || '');
                 }
             }
-            this.updateValue();
         },
 
         get fieldName() {
@@ -106,17 +104,19 @@ function ecDatePicker(config) {
             return y && (y % 4 === 3);
         },
 
+        get formatted() {
+            if (this.day && this.month && this.year && String(this.year).length >= 4) {
+                var d = String(this.day).padStart(2, '0');
+                var m = String(this.month).padStart(2, '0');
+                return d + '/' + m + '/' + this.year;
+            }
+            return '';
+        },
+
         updateValue() {
             // Clamp day if it exceeds the current month's max
             if (this.day && parseInt(this.day) > this.maxDay) {
-                this.day = this.maxDay;
-            }
-            if (this.day && this.month && this.year) {
-                var d = String(this.day).padStart(2, '0');
-                var m = String(this.month).padStart(2, '0');
-                this.formatted = d + '/' + m + '/' + this.year;
-            } else {
-                this.formatted = '';
+                this.day = String(this.maxDay);
             }
         }
     };

@@ -554,47 +554,41 @@ switch ($action) {
     // GUARDIAN & STUDENT SEARCH API ENDPOINTS
     // ══════════════════════════════════════════════════════════════
 
-    // ── GET /api/guardian-search?phone=X or ?name=X ─────────────
-    // Search guardians by phone or name for sibling auto-fill
+    // ── GET /api/guardian-search?q=X ─────────────────────────────
+    // Search guardians by name or phone for sibling auto-fill
     case 'guardian-search':
-        auth_require_permission('students.create');
-        $phone = trim(input('phone'));
-        $name  = trim(input('name'));
+        try {
+            auth_require_permission('students.create');
+            $q = trim(input('q') ?: input('name') ?: input('phone'));
 
-        if (!$phone && !$name) {
-            echo json_encode(['data' => []]);
-            exit;
+            if (strlen($q) < 2) {
+                echo json_encode(['data' => []]);
+                exit;
+            }
+
+            $like = "%" . $q . "%";
+
+            $guardians = db_fetch_all(
+                "SELECT g.id, g.first_name, g.last_name, g.full_name, g.relation, g.phone, g.alt_phone, g.email, g.occupation, g.address, g.city, g.region,
+                        GROUP_CONCAT(DISTINCT s.full_name ORDER BY s.full_name SEPARATOR ', ') AS children
+                 FROM guardians g
+                 LEFT JOIN student_guardians sg ON g.id = sg.guardian_id
+                 LEFT JOIN students s ON sg.student_id = s.id AND s.deleted_at IS NULL
+                 WHERE (g.first_name LIKE ? OR g.last_name LIKE ?
+                        OR CONCAT(g.first_name, ' ', g.last_name) LIKE ?
+                        OR g.phone LIKE ? OR g.alt_phone LIKE ?)
+                 GROUP BY g.id
+                 ORDER BY g.full_name
+                 LIMIT 20",
+                [$like, $like, $like, $like, $like]
+            );
+
+            echo json_encode(['data' => $guardians ?: []]);
+        } catch (Throwable $e) {
+            error_log('guardian-search error: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['error' => 'Search error', 'data' => []]);
         }
-
-        $where = [];
-        $params = [];
-
-        if ($phone) {
-            $where[] = "g.phone LIKE ?";
-            $params[] = "%" . $phone . "%";
-        }
-        if ($name) {
-            $where[] = "(g.first_name LIKE ? OR g.last_name LIKE ? OR CONCAT(g.first_name, ' ', g.last_name) LIKE ?)";
-            $like = "%" . $name . "%";
-            $params = array_merge($params, [$like, $like, $like]);
-        }
-
-        $whereStr = implode(' AND ', $where);
-
-        $guardians = db_fetch_all(
-            "SELECT g.id, g.first_name, g.last_name, g.full_name, g.relation, g.phone, g.alt_phone, g.email, g.occupation, g.address, g.city, g.region,
-                    GROUP_CONCAT(DISTINCT s.full_name ORDER BY s.full_name SEPARATOR ', ') AS children
-             FROM guardians g
-             LEFT JOIN student_guardians sg ON g.id = sg.guardian_id
-             LEFT JOIN students s ON sg.student_id = s.id AND s.deleted_at IS NULL
-             WHERE {$whereStr}
-             GROUP BY g.id
-             ORDER BY g.full_name
-             LIMIT 20",
-            $params
-        );
-
-        echo json_encode(['data' => $guardians ?: []]);
         exit;
 
     // ── GET /api/guardian-detail?id=X ────────────────────────────

@@ -1,13 +1,20 @@
 <?php
 /**
  * Students — Reset Student Password
+ * Parents see only their linked children; bulk reset is admin-only.
  */
+
+$isParent = auth_has_role('parent');
 
 $classes   = db_fetch_all("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY sort_order");
 $classId   = input_int('class_id');
 $sections  = $classId
     ? db_fetch_all("SELECT id, name FROM sections WHERE class_id = ? AND is_active = 1 ORDER BY name", [$classId])
     : [];
+
+if ($isParent) {
+    $parentStudents = rbac_get_children();
+}
 
 ob_start();
 ?>
@@ -30,9 +37,20 @@ ob_start();
             <input type="hidden" name="mode" value="single">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Admission No. or Username <span class="text-red-500">*</span></label>
-                    <input type="text" name="identifier" required placeholder="e.g. STU-001"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    <?php if ($isParent): ?>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Child <span class="text-red-500">*</span></label>
+                        <select name="student_id" required
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                            <option value="">— Select child —</option>
+                            <?php foreach ($parentStudents as $ch): ?>
+                                <option value="<?= $ch['id'] ?>"><?= e($ch['full_name']) ?> (<?= e($ch['admission_no']) ?>)</option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php else: ?>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Admission No. or Username <span class="text-red-500">*</span></label>
+                        <input type="text" name="identifier" required placeholder="e.g. STU-001"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                    <?php endif; ?>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password <span class="text-red-500">*</span></label>
@@ -49,7 +67,8 @@ ob_start();
         </form>
     </div>
 
-    <!-- Option 2: By Class -->
+    <?php if (!$isParent): ?>
+    <!-- Option 2: By Class (admin/staff only) -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6">
         <h2 class="text-sm font-semibold text-gray-900 dark:text-dark-text mb-4 pb-2 border-b">Bulk Reset by Class / Section</h2>
         <form method="POST" action="<?= url('students', 'reset-password') ?>">
@@ -106,9 +125,11 @@ ob_start();
             </div>
         </form>
     </div>
+    <?php endif; ?>
 </div>
 
 <script>
+<?php if (!$isParent): ?>
 (function() {
     var mode = document.getElementById('bulkPasswordMode');
     var custom = document.getElementById('bulkCustomPassword');
@@ -123,6 +144,7 @@ ob_start();
     mode.addEventListener('change', updateCustom);
     updateCustom();
 })();
+<?php endif; ?>
 </script>
 
 <?php

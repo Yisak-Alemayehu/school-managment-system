@@ -131,9 +131,13 @@ if ($isAdmin) {
                 ['action' => 'details',        'label' => 'Student Details'],
                 ['action' => 'id-cards',       'label' => 'Generate ID Card'],
             ],
-            'Credentials' => [
-                ['action' => 'credentials',    'label' => 'Generate Username & Password'],
-                ['action' => 'reset-password', 'label' => 'Reset Password'],
+            'Student Credentials' => [
+                ['action' => 'credentials',              'label' => 'Generate Username & Password'],
+                ['action' => 'reset-password',           'label' => 'Reset Password'],
+            ],
+            'Parent Credentials' => [
+                ['action' => 'parent-credentials',       'label' => 'Generate Parent Username & Password'],
+                ['action' => 'parent-reset-password',    'label' => 'Reset Parent Password'],
             ],
         ],
     ];
@@ -153,7 +157,7 @@ if ($isAdmin) {
         ],
     ];
 } elseif ($isParent) {
-    // 🟠 Parent: View children only
+    // 🟠 Parent: View children & manage their credentials
     $navItems[] = [
         'icon'   => 'users',
         'label'  => 'Students',
@@ -162,6 +166,10 @@ if ($isAdmin) {
         'groups' => [
             'My Children' => [
                 ['action' => 'details',        'label' => 'Student Details'],
+            ],
+            'Credentials' => [
+                ['action' => 'credentials',    'label' => 'Generate Username & Password'],
+                ['action' => 'reset-password', 'label' => 'Reset Password'],
             ],
         ],
     ];

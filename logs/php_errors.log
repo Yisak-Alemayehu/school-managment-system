@@ -1952,3 +1952,114 @@ Stack trace:
 #6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
 #7 {main}
   thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[12-Apr-2026 20:35:26 Africa/Addis_Ababa] PHP Fatal error:  Maximum execution time of 30 seconds exceeded in C:\Users\yisak\Desktop\SMS\modules\students\actions\generate_parent_credentials.php on line 74
+[12-Apr-2026 20:37:43 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT id, titl...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(54): db_query('SELECT id, titl...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\pwa-api\actions\parent.php(61): db_fetch_all('SELECT id, titl...', Array)
+#3 C:\Users\yisak\Desktop\SMS\modules\pwa-api\routes.php(104): pwa_parent_dashboard(Array)
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(82): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[12-Apr-2026 20:37:45 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT COUNT(*)...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(69): db_query('SELECT COUNT(*)...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\pwa-api\actions\notices.php(23): db_fetch_value('SELECT COUNT(*)...')
+#3 C:\Users\yisak\Desktop\SMS\modules\pwa-api\routes.php(128): pwa_notices(Array)
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(82): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[12-Apr-2026 20:56:51 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT COUNT(*)...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(69): db_query('SELECT COUNT(*)...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\pwa-api\actions\notices.php(23): db_fetch_value('SELECT COUNT(*)...')
+#3 C:\Users\yisak\Desktop\SMS\modules\pwa-api\routes.php(128): pwa_notices(Array)
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(82): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[12-Apr-2026 20:56:55 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT id, titl...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(54): db_query('SELECT id, titl...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\pwa-api\actions\parent.php(61): db_fetch_all('SELECT id, titl...', Array)
+#3 C:\Users\yisak\Desktop\SMS\modules\pwa-api\routes.php(104): pwa_parent_dashboard(Array)
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(82): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[12-Apr-2026 21:10:15 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT id, titl...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(54): db_query('SELECT id, titl...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\pwa-api\actions\student.php(65): db_fetch_all('SELECT id, titl...', Array)
+#3 C:\Users\yisak\Desktop\SMS\modules\pwa-api\routes.php(79): pwa_student_dashboard(Array)
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(82): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[12-Apr-2026 21:10:17 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT COUNT(*)...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(69): db_query('SELECT COUNT(*)...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\pwa-api\actions\notices.php(23): db_fetch_value('SELECT COUNT(*)...')
+#3 C:\Users\yisak\Desktop\SMS\modules\pwa-api\routes.php(128): pwa_notices(Array)
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(82): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[12-Apr-2026 21:36:42 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT id, titl...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(54): db_query('SELECT id, titl...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\pwa-api\actions\student.php(65): db_fetch_all('SELECT id, titl...', Array)
+#3 C:\Users\yisak\Desktop\SMS\modules\pwa-api\routes.php(79): pwa_student_dashboard(Array)
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(82): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[12-Apr-2026 21:36:44 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT COUNT(*)...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(69): db_query('SELECT COUNT(*)...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\pwa-api\actions\notices.php(23): db_fetch_value('SELECT COUNT(*)...')
+#3 C:\Users\yisak\Desktop\SMS\modules\pwa-api\routes.php(128): pwa_notices(Array)
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(82): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[13-Apr-2026 06:40:29 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'audience' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT id, titl...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(54): db_query('SELECT id, titl...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\portal\views\dashboard_student.php(68): db_fetch_all('SELECT id, titl...', Array)
+#3 C:\Users\yisak\Desktop\SMS\modules\portal\routes.php(170): require('C:\\Users\\yisak\\...')
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(83): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(66): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[13-Apr-2026 07:24:49 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'sf.amount_paid' in 'field list' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT SUM(sf.a...')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(61): db_query('SELECT SUM(sf.a...', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\portal\views\dashboard_parent.php(57): db_fetch_one('SELECT SUM(sf.a...', Array)
+#3 C:\Users\yisak\Desktop\SMS\modules\portal\routes.php(172): require('C:\\Users\\yisak\\...')
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(80): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(65): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45

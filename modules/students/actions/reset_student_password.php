@@ -6,29 +6,50 @@ csrf_protect();
 
 $mode = $_POST['mode'] ?? 'single';
 
+// Security: parents may not use bulk reset
+if ($mode === 'bulk' && auth_has_role('parent')) {
+    set_flash('error', 'You do not have permission to perform a bulk password reset.');
+    redirect(url('students', 'reset-password'));
+}
+
 if ($mode === 'single') {
-    $identifier  = trim($_POST['identifier'] ?? '');
     $newPassword = trim($_POST['new_password'] ?? '');
 
-    if (!$identifier) {
-        set_flash('error', 'Please provide an admission number or username.');
-        redirect(url('students', 'reset-password'));
+    // Parents submit student_id; admins submit an identifier string
+    if (auth_has_role('parent')) {
+        $studentId = (int)($_POST['student_id'] ?? 0);
+        if (!$studentId || !rbac_parent_has_child($studentId)) {
+            set_flash('error', 'You do not have permission to reset this student\'s password.');
+            redirect(url('students', 'reset-password'));
+        }
+        $user = db_fetch_one(
+            "SELECT u.id FROM users u
+               JOIN students s ON s.user_id = u.id
+              WHERE s.id = ? AND s.deleted_at IS NULL
+              LIMIT 1",
+            [$studentId]
+        );
+    } else {
+        $identifier = trim($_POST['identifier'] ?? '');
+        if (!$identifier) {
+            set_flash('error', 'Please provide an admission number or username.');
+            redirect(url('students', 'reset-password'));
+        }
+        // Find user by admission_no or username
+        $user = db_fetch_one(
+            "SELECT u.id FROM users u
+               JOIN students s ON s.user_id = u.id
+              WHERE s.admission_no = ? AND s.deleted_at IS NULL
+              LIMIT 1",
+            [$identifier]
+        );
+        if (!$user) {
+            $user = db_fetch_one("SELECT id FROM users WHERE username = ? LIMIT 1", [$identifier]);
+        }
     }
 
-    // Find user by admission_no or username
-    $user = db_fetch_one(
-        "SELECT u.id FROM users u
-           JOIN students s ON s.user_id = u.id
-          WHERE s.admission_no = ? AND s.deleted_at IS NULL
-          LIMIT 1",
-        [$identifier]
-    );
     if (!$user) {
-        $user = db_fetch_one("SELECT id FROM users WHERE username = ? LIMIT 1", [$identifier]);
-    }
-
-    if (!$user) {
-        set_flash('error', 'Student not found with that admission number or username.');
+        set_flash('error', 'Student not found.');
         redirect(url('students', 'reset-password'));
     }
 

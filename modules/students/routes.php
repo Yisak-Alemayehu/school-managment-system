@@ -106,7 +106,11 @@ switch ($action) {
 
     // ── Generate Username & Password ─────────────────────────────────────
     case 'credentials':
-        auth_require_permission('students.edit');
+        if (auth_has_role('parent')) {
+            auth_require_permission('students.view');
+        } else {
+            auth_require_permission('students.edit');
+        }
         if (is_post()) {
             require __DIR__ . '/actions/generate_credentials.php';
         } else {
@@ -117,7 +121,11 @@ switch ($action) {
 
     // ── Reset Student Password ───────────────────────────────────────────
     case 'reset-password':
-        auth_require_permission('students.edit');
+        if (auth_has_role('parent')) {
+            auth_require_permission('students.view');
+        } else {
+            auth_require_permission('students.edit');
+        }
         if (is_post()) {
             require __DIR__ . '/actions/reset_student_password.php';
         } else {
@@ -153,6 +161,28 @@ switch ($action) {
     case 'export':
         auth_require_permission('students.view');
         require __DIR__ . '/actions/export.php';
+        break;
+
+    // ── Generate Parent Username & Password (admin only) ─────────────────
+    case 'parent-credentials':
+        auth_require_permission('students.edit');
+        if (is_post()) {
+            require __DIR__ . '/actions/generate_parent_credentials.php';
+        } else {
+            $pageTitle = 'Generate Parent Username & Password';
+            require __DIR__ . '/views/parent_credentials.php';
+        }
+        break;
+
+    // ── Reset Parent Password (admin only) ───────────────────────────────
+    case 'parent-reset-password':
+        auth_require_permission('students.edit');
+        if (is_post()) {
+            require __DIR__ . '/actions/reset_parent_password.php';
+        } else {
+            $pageTitle = 'Reset Parent Password';
+            require __DIR__ . '/views/parent_reset_password.php';
+        }
         break;
 
     default:

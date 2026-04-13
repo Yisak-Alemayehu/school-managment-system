@@ -93,7 +93,7 @@ ob_start();
                                     <option value="<?= $mnum ?>"><?= e($mdata['en']) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <input type="number" x-model="year" @change="updateValue()" placeholder="Year" class="w-24 px-2 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" min="1900" max="2100">
+                            <input type="number" x-model="year" @input="updateValue()" placeholder="Year" class="w-24 px-2 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" min="1900" max="2200">
                         </div>
                         <input type="hidden" :name="fieldName" :value="formatted" :required="isRequired">
                     </div>

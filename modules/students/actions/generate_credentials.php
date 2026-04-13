@@ -20,6 +20,16 @@ if (empty($ids)) {
     redirect(url('students', 'credentials'));
 }
 
+// Security: parents may only update their own children's credentials
+if (auth_has_role('parent')) {
+    $allowedIds = rbac_children_ids();
+    $ids = array_filter($ids, fn($id) => in_array($id, $allowedIds));
+    if (empty($ids)) {
+        set_flash('error', 'You do not have permission to manage credentials for the selected student(s).');
+        redirect(url('students', 'credentials'));
+    }
+}
+
 $generated = 0;
 $skipped   = 0;
 $errors    = [];

@@ -97,7 +97,7 @@ partial('ethiopian_datepicker');
                                     <option value="<?= $mnum ?>"><?= e($mdata['en']) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <input type="number" x-model="year" @change="updateValue()" placeholder="Year" class="w-24 px-2 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" min="1900" max="2100">
+                            <input type="number" x-model="year" @input="updateValue()" placeholder="Year" class="w-24 px-2 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text" min="1900" max="2200">
                         </div>
                         <input type="hidden" :name="fieldName" :value="formatted" :required="isRequired">
                     </div>
@@ -475,7 +475,7 @@ function searchReturningStudent() {
     inner.innerHTML = '<p class="p-3 text-sm text-gray-500">Searching...</p>';
     container.classList.remove('hidden');
 
-    fetch('<?= url('api') ?>&action=student-search&q=' + encodeURIComponent(q))
+    fetch('<?= url('api', 'student-search') ?>&q=' + encodeURIComponent(q))
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (!data.data || data.data.length === 0) {
@@ -495,7 +495,7 @@ function searchReturningStudent() {
 }
 
 function selectReturningStudent(id) {
-    fetch('<?= url('api') ?>&action=student-for-enroll&id=' + id)
+    fetch('<?= url('api', 'student-for-enroll') ?>&id=' + id)
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (!data.data) { alert('Could not load student data.'); return; }
@@ -546,7 +546,7 @@ function searchGuardian() {
     inner.innerHTML = '<p class="p-2 text-sm text-gray-500">Searching...</p>';
     container.classList.remove('hidden');
 
-    fetch('<?= url('api') ?>&action=guardian-search&q=' + encodeURIComponent(q))
+    fetch('<?= url('api', 'guardian-search') ?>&q=' + encodeURIComponent(q))
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (!data.data || data.data.length === 0) {

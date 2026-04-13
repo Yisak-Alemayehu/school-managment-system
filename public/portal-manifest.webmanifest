@@ -1,0 +1,55 @@
+{
+    "name": "Student & Parent Portal",
+    "short_name": "Portal",
+    "description": "Student and parent school portal — check results, attendance, fees and more.",
+    "start_url": "/portal/dashboard",
+    "scope": "/portal/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#ffffff",
+    "theme_color": "#074DD9",
+    "categories": ["education"],
+    "icons": [
+        {
+            "src": "/img/Logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/img/Logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/img/Logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/img/Logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "url": "/portal/dashboard",
+            "icons": [{"src": "/img/Logo.png", "sizes": "any", "type": "image/png"}]
+        },
+        {
+            "name": "Results",
+            "url": "/portal/results",
+            "icons": [{"src": "/img/Logo.png", "sizes": "any", "type": "image/png"}]
+        },
+        {
+            "name": "Notices",
+            "url": "/portal/notices",
+            "icons": [{"src": "/img/Logo.png", "sizes": "any", "type": "image/png"}]
+        }
+    ]
+}

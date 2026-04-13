@@ -2,37 +2,64 @@
 /**
  * Students � Generate Username & Password
  * Generate login credentials by class or for an individual student.
+ * Parents see only their linked children.
  */
 
-$classes   = db_fetch_all("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY sort_order");
-$classId   = input_int('class_id');
-$sections  = $classId
-    ? db_fetch_all("SELECT id, name FROM sections WHERE class_id = ? AND is_active = 1 ORDER BY name", [$classId])
-    : [];
+$isParent = auth_has_role('parent');
 
-// Load preview list
+if ($isParent) {
+    // Load parent's children with current username info
+    $rawChildren    = rbac_get_children();
+    $parentStudents = [];
+    foreach ($rawChildren as $ch) {
+        $u = !empty($ch['user_id'])
+            ? db_fetch_one("SELECT username FROM users WHERE id = ?", [$ch['user_id']])
+            : null;
+        $parentStudents[] = [
+            'id'           => $ch['id'],
+            'full_name'    => $ch['full_name'],
+            'admission_no' => $ch['admission_no'],
+            'username'     => $u ? $u['username'] : null,
+            'class_name'   => $ch['class_name'] ?? '',
+            'section_name' => $ch['section_name'] ?? '',
+        ];
+    }
+    $classes = $sections = $students = [];
+    $classId = $sectionId = $singleId = 0;
+} else {
+    $classes   = db_fetch_all("SELECT id, name FROM classes WHERE is_active = 1 ORDER BY sort_order");
+    $classId   = input_int('class_id');
+    $sections  = $classId
+        ? db_fetch_all("SELECT id, name FROM sections WHERE class_id = ? AND is_active = 1 ORDER BY name", [$classId])
+        : [];
+    $parentStudents = [];
+}
+
+// Load preview list (admin mode)
 $students = [];
 $sectionId = input_int('section_id');
 $singleId  = input_int('student_id');
 
-if ($sectionId) {
-    $students = db_fetch_all(
-        "SELECT s.id, s.full_name, s.admission_no, u.username
-           FROM students s
-           LEFT JOIN users u ON u.id = s.user_id
-           JOIN enrollments e ON e.student_id = s.id
-          WHERE e.section_id = ? AND e.status = 'active' AND s.deleted_at IS NULL
-          ORDER BY s.full_name",
-        [$sectionId]
-    );
-} elseif ($singleId) {
-    $students = db_fetch_all(
-        "SELECT s.id, s.full_name, s.admission_no, u.username
-           FROM students s
-           LEFT JOIN users u ON u.id = s.user_id
-          WHERE s.id = ? AND s.deleted_at IS NULL",
-        [$singleId]
-    );
+if (!$isParent) {
+    if ($sectionId) {
+        $students = db_fetch_all(
+            "SELECT s.id, s.full_name, s.admission_no, u.username
+               FROM students s
+               LEFT JOIN users u ON u.id = s.user_id
+               JOIN enrollments e ON e.student_id = s.id
+              WHERE e.section_id = ? AND e.status = 'active' AND s.deleted_at IS NULL
+              ORDER BY s.full_name",
+            [$sectionId]
+        );
+    } elseif ($singleId) {
+        $students = db_fetch_all(
+            "SELECT s.id, s.full_name, s.admission_no, u.username
+               FROM students s
+               LEFT JOIN users u ON u.id = s.user_id
+              WHERE s.id = ? AND s.deleted_at IS NULL",
+            [$singleId]
+        );
+    }
 }
 
 ob_start();
@@ -48,7 +75,59 @@ ob_start();
         <div class="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm"><?= e($msg) ?></div>
     <?php endif; ?>
 
-    <!-- Mode Tabs -->
+<?php if ($isParent): ?>
+    <!-- Parent: My Children Credentials -->
+    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 space-y-5">
+        <p class="text-sm text-gray-500 dark:text-dark-muted">Set login credentials for your linked children.</p>
+
+        <?php if (empty($parentStudents)): ?>
+            <p class="text-sm text-gray-400 dark:text-gray-500 italic">No children linked to your account.</p>
+        <?php else: ?>
+            <?php foreach ($parentStudents as $ch): ?>
+            <details class="border border-gray-200 dark:border-dark-border rounded-lg">
+                <summary class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-bg rounded-lg">
+                    <div>
+                        <span class="font-medium text-gray-900 dark:text-dark-text"><?= e($ch['full_name']) ?></span>
+                        <span class="ml-2 text-xs text-gray-500 dark:text-dark-muted"><?= e($ch['admission_no']) ?></span>
+                        <?php if ($ch['class_name']): ?>
+                            <span class="ml-2 text-xs text-gray-400 dark:text-dark-muted"><?= e($ch['class_name']) ?><?= $ch['section_name'] ? ' · ' . e($ch['section_name']) : '' ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <span class="text-xs <?= $ch['username'] ? 'text-green-600' : 'text-yellow-600' ?>">
+                        <?= $ch['username'] ? 'Username: ' . e($ch['username']) : 'No credentials yet' ?>
+                    </span>
+                </summary>
+                <div class="px-4 pb-4 pt-2 border-t border-gray-200 dark:border-dark-border">
+                    <form method="POST" action="<?= url('students', 'credentials') ?>">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="mode" value="single">
+                        <input type="hidden" name="ids[]" value="<?= $ch['id'] ?>">
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                                <input type="text" name="manual_username" placeholder="Leave blank to auto-generate"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                                <input type="text" name="manual_password" placeholder="Leave blank to auto-generate"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 font-medium">
+                                Set Credentials
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </details>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+
+<?php else: ?>
+    <!-- Admin / Staff: Mode Tabs -->
     <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 space-y-5">
         <div class="flex gap-4 border-b border-gray-200 dark:border-dark-border pb-4">
             <button type="button" onclick="switchMode('class')"
@@ -194,9 +273,11 @@ ob_start();
             <?php endif; ?>
         </div>
     </div>
+<?php endif; ?>
 </div>
 
 <script>
+<?php if (!$isParent): ?>
 function switchMode(mode) {
     document.getElementById('mode-class').classList.toggle('hidden', mode !== 'class');
     document.getElementById('mode-single').classList.toggle('hidden', mode !== 'single');
@@ -221,6 +302,7 @@ if (passwordMode && customSection) {
     passwordMode.addEventListener('change', updateCustomPassword);
     updateCustomPassword();
 }
+<?php endif; ?>
 </script>
 
 <?php
