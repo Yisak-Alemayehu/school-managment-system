@@ -301,7 +301,7 @@ partial('ethiopian_datepicker');
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship <span class="text-red-500">*</span></label>
                             <select name="guardians[0][relation]" required class="w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-lg text-sm bg-white dark:bg-dark-card dark:text-dark-text focus:ring-2 focus:ring-primary-500">
                                 <option value="">Select...</option>
-                                <?php foreach (['father','mother','guardian','uncle','aunt','sibling','grandparent','other'] as $rel): ?>
+                                <?php foreach (['father','mother','guardian','uncle','aunt','sibling','other'] as $rel): ?>
                                     <option value="<?= $rel ?>" <?= ($_POST['guardians'][0]['relation'] ?? '') === $rel ? 'selected' : '' ?>><?= ucfirst($rel) ?></option>
                                 <?php endforeach; ?>
                             </select>
@@ -371,7 +371,6 @@ partial('ethiopian_datepicker');
                     <option value="uncle">Uncle</option>
                     <option value="aunt">Aunt</option>
                     <option value="sibling">Sibling</option>
-                    <option value="grandparent">Grandparent</option>
                     <option value="other">Other</option>
                 </select>
             </div>
