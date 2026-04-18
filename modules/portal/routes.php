@@ -203,6 +203,15 @@ switch ($action) {
     // ── Shared pages ──────────────────────────────────────────────────────────
     case 'messages':
         portal_require();
+        // AJAX: unread count check for real-time polling
+        if (isset($_GET['_check_unread'])) {
+            header('Content-Type: text/plain');
+            echo (int) db_fetch_value(
+                "SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = 0",
+                [portal_user_id()]
+            );
+            exit;
+        }
         if (is_post()) {
             // Handle message send
             $receiverId = (int) ($_POST['receiver_id'] ?? 0);

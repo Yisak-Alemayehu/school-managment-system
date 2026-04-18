@@ -1,6 +1,7 @@
 <?php
 /**
- * Portal — Timetable View (student & parent)
+ * Portal — Enhanced Timetable View (student & parent)
+ * Features: Tab navigation, today highlight, weekly overview, smooth scrolling
  */
 
 $role = portal_role();
@@ -31,7 +32,9 @@ $enrollment = db_fetch_one(
 );
 
 $timetable = [];
-$days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+$allDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+$dayLabels = ['monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat', 'sunday' => 'Sun'];
+$dayColors = ['monday' => 'blue', 'tuesday' => 'green', 'wednesday' => 'purple', 'thursday' => 'orange', 'friday' => 'pink', 'saturday' => 'yellow', 'sunday' => 'gray'];
 
 if ($enrollment) {
     $rows = db_fetch_all(
@@ -50,7 +53,7 @@ if ($enrollment) {
         [$enrollment['class_id'], $enrollment['section_id'], $enrollment['session_id']]
     );
 
-    foreach ($days as $day) {
+    foreach ($allDays as $day) {
         $daySlots = array_values(array_filter($rows, fn($r) => $r['day_of_week'] === $day));
         if (!empty($daySlots)) {
             $timetable[$day] = $daySlots;
@@ -58,17 +61,39 @@ if ($enrollment) {
     }
 }
 
-$today = strtolower(date('l')); // 'monday', 'tuesday', etc.
+$today = strtolower(date('l'));
+$viewMode = $_GET['view'] ?? 'daily';
+$selectedDay = $_GET['day'] ?? $today;
+if (!in_array($selectedDay, $allDays)) $selectedDay = $today;
+
+// Current time for highlighting active class
+$nowTime = date('H:i:s');
+$nowDay = $today;
 
 portal_head('Timetable', portal_url('dashboard'));
 ?>
 
 <?php if ($enrollment): ?>
-<div class="flex items-center gap-2 mb-5">
-  <span class="badge badge-blue"><?= e($enrollment['class_name']) ?></span>
-  <?php if ($enrollment['section_name']): ?>
-  <span class="badge badge-gray"><?= e($enrollment['section_name']) ?></span>
-  <?php endif; ?>
+<div class="flex items-center justify-between mb-4">
+  <div class="flex items-center gap-2">
+    <span class="badge badge-blue"><?= e($enrollment['class_name']) ?></span>
+    <?php if ($enrollment['section_name']): ?>
+    <span class="badge badge-gray"><?= e($enrollment['section_name']) ?></span>
+    <?php endif; ?>
+  </div>
+  <!-- View mode toggle -->
+  <div class="flex bg-gray-100 rounded-lg p-0.5">
+    <a href="<?= portal_url('timetable', ['view' => 'daily', 'day' => $selectedDay]) ?>"
+       class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all
+              <?= $viewMode === 'daily' ? 'bg-white shadow-sm text-primary-700' : 'text-gray-500' ?>">
+      Daily
+    </a>
+    <a href="<?= portal_url('timetable', ['view' => 'weekly']) ?>"
+       class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all
+              <?= $viewMode === 'weekly' ? 'bg-white shadow-sm text-primary-700' : 'text-gray-500' ?>">
+      Weekly
+    </a>
+  </div>
 </div>
 <?php endif; ?>
 
@@ -77,57 +102,157 @@ portal_head('Timetable', portal_url('dashboard'));
   <p class="text-4xl mb-3">📋</p>
   <p class="text-sm">No timetable available for your class.</p>
 </div>
-<?php else: ?>
+<?php elseif ($viewMode === 'daily'): ?>
 
-<!-- Day tabs -->
-<div class="flex gap-1.5 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-  <?php foreach (array_keys($timetable) as $day): ?>
-  <a href="#day-<?= $day ?>"
-     class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors
-            <?= $day === $today ? 'bg-primary-600 text-white border-primary-600' : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300' ?>">
-    <?= ucfirst($day) ?>
-    <?php if ($day === $today): ?> ← Today<?php endif; ?>
+<!-- ═══ DAILY VIEW ═══ -->
+
+<!-- Day selector -->
+<div class="flex gap-1.5 overflow-x-auto pb-3 mb-4 scrollbar-hide" id="day-tabs">
+  <?php foreach (array_keys($timetable) as $day):
+    $isToday = $day === $today;
+    $isSelected = $day === $selectedDay;
+    $slotCount = count($timetable[$day]);
+  ?>
+  <a href="<?= portal_url('timetable', ['view' => 'daily', 'day' => $day]) ?>"
+     class="flex-shrink-0 flex flex-col items-center px-3.5 py-2 rounded-xl text-xs font-semibold border-2 transition-all min-w-[60px]
+            <?= $isSelected
+              ? 'bg-primary-600 text-white border-primary-600 shadow-md shadow-primary-200'
+              : ($isToday
+                ? 'bg-primary-50 text-primary-700 border-primary-200'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-primary-300') ?>">
+    <span class="text-[10px] uppercase opacity-75"><?= $dayLabels[$day] ?></span>
+    <span class="text-sm font-bold mt-0.5"><?= $slotCount ?></span>
+    <?php if ($isToday && !$isSelected): ?>
+    <span class="w-1.5 h-1.5 rounded-full bg-primary-500 mt-1"></span>
+    <?php endif; ?>
   </a>
   <?php endforeach; ?>
 </div>
 
-<!-- Day blocks -->
-<?php foreach ($timetable as $day => $slots): ?>
-<div id="day-<?= $day ?>" class="mb-5">
-  <div class="flex items-center gap-2 mb-2">
-    <p class="section-title mb-0"><?= ucfirst($day) ?></p>
-    <?php if ($day === $today): ?>
-    <span class="badge badge-blue">Today</span>
-    <?php endif; ?>
-  </div>
-  <div class="card p-0 overflow-hidden divide-y divide-gray-50">
-    <?php foreach ($slots as $slot): ?>
-    <div class="flex items-center gap-4 px-4 py-3">
-      <!-- Time column -->
-      <div class="flex-shrink-0 text-center w-16">
-        <p class="text-xs font-bold text-primary-600"><?= e(substr($slot['start_time'], 0, 5)) ?></p>
-        <?php if ($slot['end_time']): ?>
-        <p class="text-xs text-gray-400"><?= e(substr($slot['end_time'], 0, 5)) ?></p>
+<!-- Day header -->
+<div class="flex items-center gap-2 mb-3">
+  <h3 class="text-lg font-bold text-gray-900"><?= ucfirst($selectedDay) ?></h3>
+  <?php if ($selectedDay === $today): ?>
+  <span class="badge badge-blue">Today</span>
+  <?php endif; ?>
+  <?php if (isset($timetable[$selectedDay])): ?>
+  <span class="text-xs text-gray-400"><?= count($timetable[$selectedDay]) ?> classes</span>
+  <?php endif; ?>
+</div>
+
+<!-- Time slots -->
+<?php if (isset($timetable[$selectedDay])): ?>
+<div class="space-y-2 mb-5">
+  <?php foreach ($timetable[$selectedDay] as $i => $slot):
+    $isNow = ($selectedDay === $today && $nowTime >= $slot['start_time'] && $nowTime <= ($slot['end_time'] ?? '23:59:59'));
+    $isPast = ($selectedDay === $today && $nowTime > ($slot['end_time'] ?? $slot['start_time']));
+    $colorKey = $dayColors[$selectedDay] ?? 'blue';
+  ?>
+  <div class="card flex items-stretch gap-0 p-0 overflow-hidden transition-all animate-fade-in
+              <?= $isNow ? 'ring-2 ring-primary-500 shadow-md' : ($isPast ? 'opacity-60' : '') ?>"
+       style="animation-delay: <?= $i * 50 ?>ms">
+    <!-- Time bar -->
+    <div class="flex-shrink-0 w-20 flex flex-col items-center justify-center py-3
+                <?= $isNow ? 'bg-primary-600 text-white' : 'bg-gray-50 text-gray-600' ?>">
+      <p class="text-sm font-bold"><?= e(substr($slot['start_time'], 0, 5)) ?></p>
+      <?php if ($slot['end_time']): ?>
+      <p class="text-[10px] opacity-75"><?= e(substr($slot['end_time'], 0, 5)) ?></p>
+      <?php endif; ?>
+      <?php if ($isNow): ?>
+      <span class="mt-1 text-[9px] font-bold uppercase tracking-wider bg-white/20 px-1.5 py-0.5 rounded">NOW</span>
+      <?php endif; ?>
+    </div>
+    <!-- Content -->
+    <div class="flex-1 px-4 py-3 flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-sm font-bold text-gray-900"><?= e($slot['subject_name']) ?></p>
+        <?php if ($slot['subject_code']): ?>
+        <p class="text-xs text-gray-400"><?= e($slot['subject_code']) ?></p>
         <?php endif; ?>
-      </div>
-      <!-- Subject -->
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold text-gray-900"><?= e($slot['subject_name']) ?></p>
         <?php if ($slot['teacher_name']): ?>
-        <p class="text-xs text-gray-500">👨‍🏫 <?= e($slot['teacher_name']) ?></p>
+        <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <?= e($slot['teacher_name']) ?>
+        </p>
         <?php endif; ?>
       </div>
-      <!-- Room -->
       <?php if ($slot['room']): ?>
       <div class="flex-shrink-0">
-        <span class="badge badge-gray">🚪 <?= e($slot['room']) ?></span>
+        <span class="badge badge-gray flex items-center gap-1">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+          <?= e($slot['room']) ?>
+        </span>
       </div>
       <?php endif; ?>
     </div>
-    <?php endforeach; ?>
   </div>
+  <?php endforeach; ?>
 </div>
-<?php endforeach; ?>
+<?php else: ?>
+<div class="card text-center py-10 text-gray-400">
+  <p class="text-3xl mb-2">😌</p>
+  <p class="text-sm">No classes scheduled for <?= ucfirst($selectedDay) ?>.</p>
+</div>
 <?php endif; ?>
+
+<?php else: ?>
+
+<!-- ═══ WEEKLY VIEW ═══ -->
+<div class="space-y-4 mb-5">
+  <?php foreach ($timetable as $day => $slots):
+    $isToday = $day === $today;
+  ?>
+  <div class="animate-fade-in">
+    <div class="flex items-center gap-2 mb-2">
+      <p class="text-sm font-bold text-gray-900"><?= ucfirst($day) ?></p>
+      <?php if ($isToday): ?>
+      <span class="badge badge-blue text-[9px]">Today</span>
+      <?php endif; ?>
+      <span class="text-xs text-gray-400"><?= count($slots) ?> class<?= count($slots) > 1 ? 'es' : '' ?></span>
+    </div>
+    <div class="card p-0 overflow-hidden divide-y divide-gray-50">
+      <?php foreach ($slots as $slot):
+        $isNow = ($isToday && $nowTime >= $slot['start_time'] && $nowTime <= ($slot['end_time'] ?? '23:59:59'));
+      ?>
+      <div class="flex items-center gap-3 px-3 py-2.5 <?= $isNow ? 'bg-primary-50' : '' ?>">
+        <div class="flex-shrink-0 text-center w-14">
+          <p class="text-xs font-bold <?= $isNow ? 'text-primary-600' : 'text-gray-600' ?>"><?= e(substr($slot['start_time'], 0, 5)) ?></p>
+          <?php if ($slot['end_time']): ?>
+          <p class="text-[10px] text-gray-400"><?= e(substr($slot['end_time'], 0, 5)) ?></p>
+          <?php endif; ?>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-900 truncate"><?= e($slot['subject_name']) ?></p>
+          <div class="flex items-center gap-2 mt-0.5">
+            <?php if ($slot['teacher_name']): ?>
+            <span class="text-[10px] text-gray-500 truncate"><?= e($slot['teacher_name']) ?></span>
+            <?php endif; ?>
+            <?php if ($slot['room']): ?>
+            <span class="text-[10px] text-gray-400">· <?= e($slot['room']) ?></span>
+            <?php endif; ?>
+          </div>
+        </div>
+        <?php if ($isNow): ?>
+        <span class="flex-shrink-0 w-2 h-2 rounded-full bg-primary-600 animate-pulse"></span>
+        <?php endif; ?>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <?php endforeach; ?>
+</div>
+
+<?php endif; ?>
+
+<style>
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.animate-fade-in { animation: fadeIn 0.3s ease-out both; }
+.scrollbar-hide::-webkit-scrollbar { display:none; }
+.scrollbar-hide { -ms-overflow-style:none; scrollbar-width:none; }
+</style>
 
 <?php portal_foot(); ?>
