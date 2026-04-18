@@ -5,12 +5,12 @@
  */
 
 auth_require();
-auth_require_permission('users.view');
 
 $action = current_action();
 
 switch ($action) {
     case 'index':
+        auth_require_permission('users.list');
         $pageTitle = 'User Management';
         require __DIR__ . '/views/index.php';
         break;
@@ -38,6 +38,7 @@ switch ($action) {
         break;
 
     case 'view':
+        auth_require_permission('users.view');
         $id = route_id();
         if (!$id) { redirect(url('users')); }
         $pageTitle = 'User Details';

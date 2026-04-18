@@ -45,13 +45,14 @@
             <div class="hidden lg:flex items-center gap-8">
                 <a href="#features" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">Features</a>
                 <a href="#showcase" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">Product</a>
+                <a href="#mobile-app" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">Mobile App</a>
                 <a href="#pricing" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">Pricing</a>
                 <a href="#testimonials" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">Testimonials</a>
                 <a href="#faq" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">FAQ</a>
             </div>
             <div class="hidden lg:flex items-center gap-3">
                 <?php if (Auth::check()): ?>
-                    <a href="<?= base_url(Auth::isAdmin() ? 'admin' : 'dashboard') ?>" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">Dashboard</a>
+                    <a href="<?= base_url(Auth::isAdmin() ? 'admin' : 'customer') ?>" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors">Dashboard</a>
                 <?php else: ?>
                     <a href="<?= base_url('login') ?>" class="text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors px-4 py-2">Sign In</a>
                     <a href="<?= base_url('register') ?>" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all">
@@ -70,12 +71,13 @@
         <div class="px-4 py-4 space-y-2">
             <a href="#features" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-600">Features</a>
             <a href="#showcase" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-600">Product</a>
+            <a href="#mobile-app" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-600">Mobile App</a>
             <a href="#pricing" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-600">Pricing</a>
             <a href="#testimonials" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-600">Testimonials</a>
             <a href="#faq" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-primary-50 hover:text-primary-600">FAQ</a>
             <div class="pt-3 border-t border-gray-100 flex gap-2">
                 <?php if (Auth::check()): ?>
-                    <a href="<?= base_url(Auth::isAdmin() ? 'admin' : 'dashboard') ?>" class="flex-1 text-center bg-primary-600 text-white text-sm font-semibold py-2.5 rounded-xl">Dashboard</a>
+                    <a href="<?= base_url(Auth::isAdmin() ? 'admin' : 'customer') ?>" class="flex-1 text-center bg-primary-600 text-white text-sm font-semibold py-2.5 rounded-xl">Dashboard</a>
                 <?php else: ?>
                     <a href="<?= base_url('login') ?>" class="flex-1 text-center text-sm font-medium text-gray-700 py-2.5 rounded-xl border border-gray-200">Sign In</a>
                     <a href="<?= base_url('register') ?>" class="flex-1 text-center bg-primary-600 text-white text-sm font-semibold py-2.5 rounded-xl">Get Started</a>
@@ -365,6 +367,262 @@
                 <div class="text-center mt-8">
                     <p class="text-xs text-gray-500">Click the tabs above to explore different modules</p>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════ PWA MOBILE SHOWCASE ═══════════════════ -->
+<section id="mobile-app" class="py-20 lg:py-28 bg-gradient-to-b from-white via-gray-50/80 to-white overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center max-w-2xl mx-auto mb-14 animate-on-scroll">
+            <div class="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 text-violet-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                Mobile Experience
+            </div>
+            <h2 class="text-3xl lg:text-4xl font-extrabold tracking-tight">Everything in Your Pocket</h2>
+            <p class="mt-4 text-lg text-gray-600">Our Progressive Web App delivers a native-like experience on any device — no app store needed.</p>
+        </div>
+
+        <!-- Role Tabs -->
+        <div class="flex justify-center mb-12 animate-on-scroll">
+            <div class="inline-flex flex-wrap justify-center gap-2 p-1.5 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                <button class="pwa-tab active flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all" data-pwa-tab="student">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                    Student
+                </button>
+                <button class="pwa-tab flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all" data-pwa-tab="parent">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Parent
+                </button>
+                <button class="pwa-tab flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all" data-pwa-tab="teacher">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                    Teacher
+                    <span class="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold rounded-md uppercase tracking-wider">Soon</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== STUDENT PANEL ===== -->
+        <div class="pwa-role-panel" data-pwa-panel="student">
+            <div class="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+                <!-- Left: text -->
+                <div class="lg:w-2/5 text-center lg:text-left animate-on-scroll">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Student Dashboard</h3>
+                    <p class="text-gray-600 mb-6">Students get instant access to their results, class schedules, messages from teachers, and school announcements — all from their phone.</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"/></svg></div><span class="text-sm font-medium text-gray-700">View results & report cards</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg></div><span class="text-sm font-medium text-gray-700">Message teachers directly</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div><span class="text-sm font-medium text-gray-700">Get instant notifications</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><span class="text-sm font-medium text-gray-700">Check attendance records</span></div>
+                    </div>
+                </div>
+                <!-- Right: phone carousel -->
+                <div class="lg:w-3/5 flex justify-center animate-on-scroll">
+                    <div class="relative">
+                        <!-- Decorative blobs -->
+                        <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-200/30 rounded-full blur-3xl"></div>
+                        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-violet-200/30 rounded-full blur-3xl"></div>
+                        <!-- Phone slider -->
+                        <div class="pwa-phone-slider flex items-end gap-6" data-pwa-slider="student">
+                            <?php
+                            $studentScreens = [
+                                ['file' => 'screenshots/mobile/student-dashboard.png', 'label' => 'Dashboard', 'gradient' => 'from-blue-500 to-indigo-600'],
+                                ['file' => 'screenshots/mobile/student-results.png', 'label' => 'Results', 'gradient' => 'from-violet-500 to-purple-600'],
+                                ['file' => 'screenshots/mobile/student-messages.png', 'label' => 'Messages', 'gradient' => 'from-emerald-500 to-teal-600'],
+                                ['file' => 'screenshots/mobile/student-notifications.png', 'label' => 'Notifications', 'gradient' => 'from-amber-500 to-orange-600'],
+                            ];
+                            foreach ($studentScreens as $si => $screen):
+                                $isCenter = ($si === 0);
+                            ?>
+                            <div class="pwa-phone-frame <?= $isCenter ? 'pwa-phone-active' : 'pwa-phone-side' ?>" data-screen-index="<?= $si ?>">
+                                <div class="pwa-phone-body">
+                                    <!-- Dynamic Island -->
+                                    <div class="pwa-phone-island"></div>
+                                    <!-- Screen -->
+                                    <div class="pwa-phone-screen bg-gradient-to-br <?= $screen['gradient'] ?>">
+                                        <img src="<?= asset($screen['file']) ?>" alt="<?= e($screen['label']) ?>" class="w-full h-full object-cover object-top" loading="lazy" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';">
+                                        <!-- Fallback -->
+                                        <div class="pwa-phone-fallback hidden items-center justify-center h-full" style="display:none;">
+                                            <div class="text-center text-white/90 p-4">
+                                                <div class="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center mx-auto mb-3">
+                                                    <svg class="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                                </div>
+                                                <p class="text-xs font-bold"><?= e($screen['label']) ?></p>
+                                                <p class="text-[10px] text-white/50 mt-1">Student PWA</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Home indicator -->
+                                    <div class="pwa-phone-home"></div>
+                                </div>
+                                <div class="text-center mt-3"><span class="text-[11px] font-medium text-gray-500"><?= e($screen['label']) ?></span></div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <!-- Slider dots -->
+                        <div class="flex justify-center gap-2 mt-6">
+                            <?php foreach ($studentScreens as $si => $screen): ?>
+                            <button class="pwa-dot <?= $si === 0 ? 'active' : '' ?> w-2 h-2 rounded-full transition-all" data-slider="student" data-dot="<?= $si ?>"></button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PARENT PANEL ===== -->
+        <div class="pwa-role-panel" data-pwa-panel="parent" style="display:none">
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-10 lg:gap-16">
+                <!-- Left: text (reversed for visual variety) -->
+                <div class="lg:w-2/5 text-center lg:text-left animate-on-scroll">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Parent Dashboard</h3>
+                    <p class="text-gray-600 mb-6">Parents stay connected to their child's education — track grades, communicate with teachers, receive payment reminders, and never miss an announcement.</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"/></svg></div><span class="text-sm font-medium text-gray-700">Track child's academic results</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div><span class="text-sm font-medium text-gray-700">Monitor academic progress</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><span class="text-sm font-medium text-gray-700">Communicate with teachers</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1"/></svg></div><span class="text-sm font-medium text-gray-700">Fee payment alerts & history</span></div>
+                    </div>
+                </div>
+                <!-- Right: phone carousel -->
+                <div class="lg:w-3/5 flex justify-center animate-on-scroll">
+                    <div class="relative">
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-pink-200/30 rounded-full blur-3xl"></div>
+                        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-emerald-200/30 rounded-full blur-3xl"></div>
+                        <div class="pwa-phone-slider flex items-end gap-6" data-pwa-slider="parent">
+                            <?php
+                            $parentScreens = [
+                                ['file' => 'screenshots/mobile/parent-dashboard.png', 'label' => 'Dashboard', 'gradient' => 'from-pink-500 to-rose-600'],
+                                ['file' => 'screenshots/mobile/parent-results.png', 'label' => 'Child Results', 'gradient' => 'from-blue-500 to-indigo-600'],
+                                ['file' => 'screenshots/mobile/parent-progress.png', 'label' => 'Progress', 'gradient' => 'from-emerald-500 to-teal-600'],
+                                ['file' => 'screenshots/mobile/parent-messages.png', 'label' => 'Messages', 'gradient' => 'from-violet-500 to-purple-600'],
+                            ];
+                            foreach ($parentScreens as $si => $screen):
+                                $isCenter = ($si === 0);
+                            ?>
+                            <div class="pwa-phone-frame <?= $isCenter ? 'pwa-phone-active' : 'pwa-phone-side' ?>" data-screen-index="<?= $si ?>">
+                                <div class="pwa-phone-body">
+                                    <div class="pwa-phone-island"></div>
+                                    <div class="pwa-phone-screen bg-gradient-to-br <?= $screen['gradient'] ?>">
+                                        <img src="<?= asset($screen['file']) ?>" alt="<?= e($screen['label']) ?>" class="w-full h-full object-cover object-top" loading="lazy" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';">
+                                        <div class="pwa-phone-fallback hidden items-center justify-center h-full" style="display:none;">
+                                            <div class="text-center text-white/90 p-4">
+                                                <div class="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center mx-auto mb-3">
+                                                    <svg class="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                                </div>
+                                                <p class="text-xs font-bold"><?= e($screen['label']) ?></p>
+                                                <p class="text-[10px] text-white/50 mt-1">Parent PWA</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pwa-phone-home"></div>
+                                </div>
+                                <div class="text-center mt-3"><span class="text-[11px] font-medium text-gray-500"><?= e($screen['label']) ?></span></div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="flex justify-center gap-2 mt-6">
+                            <?php foreach ($parentScreens as $si => $screen): ?>
+                            <button class="pwa-dot <?= $si === 0 ? 'active' : '' ?> w-2 h-2 rounded-full transition-all" data-slider="parent" data-dot="<?= $si ?>"></button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TEACHER PANEL (Coming Soon) ===== -->
+        <div class="pwa-role-panel" data-pwa-panel="teacher" style="display:none">
+            <div class="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+                <div class="lg:w-2/5 text-center lg:text-left animate-on-scroll">
+                    <div class="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-full mb-4 uppercase tracking-wider">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Coming Soon
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Teacher Dashboard</h3>
+                    <p class="text-gray-600 mb-6">Mark attendance, enter grades, send messages to parents, and manage your classes — all from your phone. Full release coming soon.</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></div><span class="text-sm font-medium text-gray-700">One-tap attendance marking</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></div><span class="text-sm font-medium text-gray-700">Enter & manage grades</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg></div><span class="text-sm font-medium text-gray-700">Direct parent communication</span></div>
+                        <div class="flex items-center gap-3 lg:justify-start justify-center"><div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div><span class="text-sm font-medium text-gray-700">Class management tools</span></div>
+                    </div>
+                </div>
+                <!-- Right: phone carousel with Coming Soon overlay -->
+                <div class="lg:w-3/5 flex justify-center animate-on-scroll">
+                    <div class="relative">
+                        <div class="absolute -top-10 -left-10 w-40 h-40 bg-amber-200/30 rounded-full blur-3xl"></div>
+                        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-200/30 rounded-full blur-3xl"></div>
+                        <div class="pwa-phone-slider flex items-end gap-6" data-pwa-slider="teacher">
+                            <?php
+                            $teacherScreens = [
+                                ['file' => 'screenshots/mobile/teacher-dashboard.png', 'label' => 'Dashboard', 'gradient' => 'from-blue-500 to-indigo-600'],
+                                ['file' => 'screenshots/mobile/teacher-attendance.png', 'label' => 'Attendance', 'gradient' => 'from-emerald-500 to-teal-600'],
+                                ['file' => 'screenshots/mobile/teacher-grades.png', 'label' => 'Grades', 'gradient' => 'from-violet-500 to-purple-600'],
+                                ['file' => 'screenshots/mobile/teacher-messages.png', 'label' => 'Messages', 'gradient' => 'from-amber-500 to-orange-600'],
+                            ];
+                            foreach ($teacherScreens as $si => $screen):
+                                $isCenter = ($si === 0);
+                            ?>
+                            <div class="pwa-phone-frame <?= $isCenter ? 'pwa-phone-active' : 'pwa-phone-side' ?>" data-screen-index="<?= $si ?>">
+                                <div class="pwa-phone-body">
+                                    <div class="pwa-phone-island"></div>
+                                    <div class="pwa-phone-screen bg-gradient-to-br <?= $screen['gradient'] ?>">
+                                        <img src="<?= asset($screen['file']) ?>" alt="<?= e($screen['label']) ?>" class="w-full h-full object-cover object-top" loading="lazy" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';">
+                                        <div class="pwa-phone-fallback hidden items-center justify-center h-full" style="display:none;">
+                                            <div class="text-center text-white/90 p-4">
+                                                <div class="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center mx-auto mb-3">
+                                                    <svg class="w-6 h-6 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                                </div>
+                                                <p class="text-xs font-bold"><?= e($screen['label']) ?></p>
+                                                <p class="text-[10px] text-white/50 mt-1">Teacher PWA</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pwa-phone-home"></div>
+                                </div>
+                                <div class="text-center mt-3"><span class="text-[11px] font-medium text-gray-500"><?= e($screen['label']) ?></span></div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <!-- Coming Soon overlay -->
+                        <div class="absolute inset-0 bg-white/40 backdrop-blur-[2px] rounded-2xl flex items-center justify-center z-10">
+                            <div class="bg-white shadow-xl border border-gray-200 rounded-2xl px-6 py-4 text-center">
+                                <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                                    <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div class="text-sm font-bold text-gray-900">Live Preview</div>
+                                <div class="text-xs text-gray-500 mt-0.5">Full Release Coming Soon</div>
+                            </div>
+                        </div>
+                        <div class="flex justify-center gap-2 mt-6">
+                            <?php foreach ($teacherScreens as $si => $screen): ?>
+                            <button class="pwa-dot <?= $si === 0 ? 'active' : '' ?> w-2 h-2 rounded-full transition-all" data-slider="teacher" data-dot="<?= $si ?>"></button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Install CTA -->
+        <div class="mt-16 text-center animate-on-scroll">
+            <div class="inline-flex flex-col sm:flex-row items-center gap-4 bg-gradient-to-r from-primary-50 to-violet-50 border border-primary-100 rounded-2xl px-8 py-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-sm font-bold text-gray-900">Install as App</div>
+                        <div class="text-xs text-gray-500">No app store needed — works on any device</div>
+                    </div>
+                </div>
+                <a href="#contact" class="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm shadow-md shadow-primary-500/20 transition-all">
+                    Get Started
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                </a>
             </div>
         </div>
     </div>

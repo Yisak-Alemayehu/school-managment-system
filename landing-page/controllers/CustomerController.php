@@ -62,7 +62,7 @@ class CustomerController
         Auth::requireSchool();
         if (!Auth::validateCsrf($_POST['csrf_token'] ?? '')) {
             flash('error', 'Invalid request.');
-            redirect('dashboard/demo');
+            redirect('customer/demo');
         }
 
         $school = self::getSchool();
@@ -72,7 +72,7 @@ class CustomerController
         $slot = Database::fetch("SELECT * FROM demo_slots WHERE id = ? AND is_available = 1", [$slotId]);
         if (!$slot) {
             flash('error', 'Selected slot is no longer available.');
-            redirect('dashboard/demo');
+            redirect('customer/demo');
         }
 
         // Create demo booking
@@ -105,7 +105,7 @@ class CustomerController
         }
 
         flash('success', 'Demo booked successfully!');
-        redirect('dashboard/demo');
+        redirect('customer/demo');
     }
 
     public static function agreement(): void
@@ -128,7 +128,7 @@ class CustomerController
         Auth::requireSchool();
         if (!Auth::validateCsrf($_POST['csrf_token'] ?? '')) {
             flash('error', 'Invalid request.');
-            redirect('dashboard/agreement');
+            redirect('customer/agreement');
         }
 
         $school = self::getSchool();
@@ -138,7 +138,7 @@ class CustomerController
         $agreement = Database::fetch("SELECT * FROM agreements WHERE id = ? AND school_id = ?", [$agreementId, $school['id']]);
         if (!$agreement || !in_array($agreement['status'], ['sent', 'viewed'])) {
             flash('error', 'Agreement not found or already responded.');
-            redirect('dashboard/agreement');
+            redirect('customer/agreement');
         }
 
         Database::update('agreements', [
@@ -163,7 +163,7 @@ class CustomerController
         }
 
         flash('success', 'Agreement ' . $response . ' successfully.');
-        redirect('dashboard/agreement');
+        redirect('customer/agreement');
     }
 
     public static function payments(): void
@@ -182,7 +182,7 @@ class CustomerController
         Auth::requireSchool();
         if (!Auth::validateCsrf($_POST['csrf_token'] ?? '')) {
             flash('error', 'Invalid request.');
-            redirect('dashboard/payments');
+            redirect('customer/payments');
         }
 
         $school    = self::getSchool();
@@ -192,13 +192,13 @@ class CustomerController
 
         if (!$transRef || !$method) {
             flash('error', 'Transaction reference and payment method are required.');
-            redirect('dashboard/payments');
+            redirect('customer/payments');
         }
 
         $payment = Database::fetch("SELECT * FROM payments WHERE id = ? AND school_id = ? AND status = 'pending'", [$paymentId, $school['id']]);
         if (!$payment) {
             flash('error', 'Payment not found or already processed.');
-            redirect('dashboard/payments');
+            redirect('customer/payments');
         }
 
         Database::update('payments', [
@@ -221,7 +221,7 @@ class CustomerController
         }
 
         flash('success', 'Payment submitted! It will be verified shortly.');
-        redirect('dashboard/payments');
+        redirect('customer/payments');
     }
 
     public static function notifications(): void
@@ -249,7 +249,7 @@ class CustomerController
         Auth::requireSchool();
         if (!Auth::validateCsrf($_POST['csrf_token'] ?? '')) {
             flash('error', 'Invalid request.');
-            redirect('dashboard/profile');
+            redirect('customer/profile');
         }
 
         $school = self::getSchool();
@@ -266,7 +266,7 @@ class CustomerController
 
         if (!$schoolData['name']) {
             flash('error', 'School name is required.');
-            redirect('dashboard/profile');
+            redirect('customer/profile');
         }
 
         Database::update('schools', $schoolData, 'id = ?', [$school['id']]);
@@ -279,6 +279,6 @@ class CustomerController
         }
 
         flash('success', 'Profile updated successfully.');
-        redirect('dashboard/profile');
+        redirect('customer/profile');
     }
 }

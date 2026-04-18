@@ -124,6 +124,79 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // --- PWA Mobile Showcase ---
+    // Role tab switching
+    document.querySelectorAll('.pwa-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.pwa-tab').forEach(function(t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            var role = tab.dataset.pwaTab;
+            document.querySelectorAll('.pwa-role-panel').forEach(function(panel) {
+                if (panel.dataset.pwaPanel === role) {
+                    panel.style.display = '';
+                } else {
+                    panel.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Phone slider: click a phone to make it active
+    function activatePhone(slider, index) {
+        var phones = slider.querySelectorAll('.pwa-phone-frame');
+        var sliderName = slider.dataset.pwaSlider;
+        phones.forEach(function(phone, i) {
+            if (i === index) {
+                phone.classList.remove('pwa-phone-side');
+                phone.classList.add('pwa-phone-active');
+            } else {
+                phone.classList.remove('pwa-phone-active');
+                phone.classList.add('pwa-phone-side');
+            }
+        });
+        // Update dots
+        document.querySelectorAll('.pwa-dot[data-slider="' + sliderName + '"]').forEach(function(dot) {
+            if (parseInt(dot.dataset.dot, 10) === index) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    document.querySelectorAll('.pwa-phone-slider').forEach(function(slider) {
+        slider.querySelectorAll('.pwa-phone-frame').forEach(function(phone) {
+            phone.addEventListener('click', function() {
+                var idx = parseInt(phone.dataset.screenIndex, 10);
+                activatePhone(slider, idx);
+            });
+        });
+    });
+
+    // Dots click
+    document.querySelectorAll('.pwa-dot').forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            var sliderName = dot.dataset.slider;
+            var idx = parseInt(dot.dataset.dot, 10);
+            var slider = document.querySelector('.pwa-phone-slider[data-pwa-slider="' + sliderName + '"]');
+            if (slider) activatePhone(slider, idx);
+        });
+    });
+
+    // Auto-rotate phones every 3s
+    document.querySelectorAll('.pwa-phone-slider').forEach(function(slider) {
+        var count = slider.querySelectorAll('.pwa-phone-frame').length;
+        var current = 0;
+        setInterval(function() {
+            // Only auto-rotate if section is visible
+            var rect = slider.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                current = (current + 1) % count;
+                activatePhone(slider, current);
+            }
+        }, 3500);
+    });
+
     // --- Smooth scroll for anchor links ---
     document.querySelectorAll('a[href^="#"]').forEach(function(link) {
         link.addEventListener('click', function(e) {

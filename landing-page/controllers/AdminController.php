@@ -228,7 +228,7 @@ class AdminController
             'title'   => 'Agreement Sent',
             'message' => 'A new service agreement has been sent for your review.',
             'type'    => 'info',
-            'link'    => '/dashboard/agreement',
+            'link'    => '/customer/agreement',
         ]);
 
         flash('success', 'Agreement sent to ' . $school['name']);
@@ -288,7 +288,7 @@ class AdminController
                 'title'   => 'New Payment Required',
                 'message' => 'A payment of ' . format_etb($amount) . ' has been created for your account.',
                 'type'    => 'warning',
-                'link'    => '/dashboard/payments',
+                'link'    => '/customer/payments',
             ]);
         }
 

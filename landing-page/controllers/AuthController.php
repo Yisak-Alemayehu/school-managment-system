@@ -8,7 +8,7 @@ class AuthController
     public static function showLogin(): void
     {
         if (Auth::check()) {
-            redirect(Auth::isAdmin() ? 'admin' : 'dashboard');
+            redirect(Auth::isAdmin() ? 'admin' : 'customer');
         }
         $seo = get_seo('login');
         include __DIR__ . '/../views/auth/login.php';
@@ -47,7 +47,7 @@ class AuthController
                 'ip_address'  => $_SERVER['REMOTE_ADDR'] ?? '',
             ]);
 
-            redirect($user['role'] === 'admin' ? 'admin' : 'dashboard');
+            redirect($user['role'] === 'admin' ? 'admin' : 'customer');
         }
 
         $_SESSION['login_attempts'] = $attempts + 1;
@@ -59,7 +59,7 @@ class AuthController
     public static function showRegister(): void
     {
         if (Auth::check()) {
-            redirect(Auth::isAdmin() ? 'admin' : 'dashboard');
+            redirect(Auth::isAdmin() ? 'admin' : 'customer');
         }
         $seo = get_seo('register');
         include __DIR__ . '/../views/auth/register.php';
@@ -134,7 +134,7 @@ class AuthController
         Auth::attempt($email, $password);
 
         flash('success', 'Welcome to Eduelevate! Your access request has been submitted.');
-        redirect('dashboard');
+        redirect('customer');
     }
 
     public static function logout(): void
