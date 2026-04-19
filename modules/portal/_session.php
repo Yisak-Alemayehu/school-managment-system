@@ -105,5 +105,9 @@ function portal_switch_child(int $studentId): void
 function portal_url(string $action, array $params = []): string
 {
     $base = url('portal', $action);
-    return $params ? $base . '?' . http_build_query($params) : $base;
+    if ($params) {
+        $sep = str_contains($base, '?') ? '&' : '?';
+        return $base . $sep . http_build_query($params);
+    }
+    return $base;
 }

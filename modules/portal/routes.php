@@ -247,6 +247,21 @@ switch ($action) {
         require __DIR__ . '/views/messages.php';
         break;
 
+    case 'materials':
+        portal_require();
+        require __DIR__ . '/views/materials.php';
+        break;
+
+    case 'materials-subject':
+        portal_require();
+        require __DIR__ . '/views/materials_subject.php';
+        break;
+
+    case 'materials-viewer':
+        portal_require();
+        require __DIR__ . '/views/materials_viewer.php';
+        break;
+
     case 'notices':
         portal_require();
         require __DIR__ . '/views/notices.php';

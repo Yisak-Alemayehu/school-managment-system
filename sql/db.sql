@@ -15,6 +15,10 @@ SET FOREIGN_KEY_CHECKS = 0;
 --  SECTION 1: DROP ALL TABLES (reverse FK order)
 -- ############################################################
 
+-- ── Academic Materials & PWA ──
+DROP TABLE IF EXISTS `academic_materials`;
+DROP TABLE IF EXISTS `pwa_tokens`;
+
 -- ── Messaging Module ──
 DROP TABLE IF EXISTS `msg_attachments`;
 DROP TABLE IF EXISTS `msg_message_status`;
@@ -1610,16 +1614,74 @@ CREATE TABLE `msg_group_members` (
 
 
 -- ############################################################
+--  SECTION 6: PWA TOKENS
+-- ############################################################
+
+CREATE TABLE IF NOT EXISTS `pwa_tokens` (
+    `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id`     BIGINT UNSIGNED NOT NULL,
+    `token_hash`  CHAR(64) NOT NULL COMMENT 'SHA-256 hex of the raw token',
+    `role`        ENUM('student','parent') NOT NULL,
+    `linked_id`   BIGINT UNSIGNED DEFAULT NULL COMMENT 'student.id or guardian.id',
+    `device_name` VARCHAR(255) DEFAULT NULL,
+    `expires_at`  DATETIME NOT NULL,
+    `last_used_at` DATETIME DEFAULT NULL,
+    `created_at`  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_pwa_tokens_hash` (`token_hash`),
+    INDEX `idx_pwa_tokens_user` (`user_id`),
+    INDEX `idx_pwa_tokens_expires` (`expires_at`),
+    CONSTRAINT `fk_pwa_tokens_user`
+        FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Stateless bearer tokens for the PWA (Student & Parent app)';
+
+
+-- ############################################################
+--  SECTION 7: ACADEMIC MATERIALS
+-- ############################################################
+
+CREATE TABLE IF NOT EXISTS `academic_materials` (
+    `id`              BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    `title`           VARCHAR(255) NOT NULL,
+    `class_id`        BIGINT UNSIGNED NOT NULL,
+    `subject_id`      BIGINT UNSIGNED NOT NULL,
+    `book_type`       ENUM('teachers_guide','student_book','supplementary') NOT NULL,
+    `cover_image`     VARCHAR(500) DEFAULT NULL,
+    `file_path`       VARCHAR(500) NOT NULL,
+    `file_size`       BIGINT UNSIGNED DEFAULT 0,
+    `uploaded_by`     BIGINT UNSIGNED NOT NULL,
+    `status`          ENUM('active','inactive') DEFAULT 'active',
+    `created_at`      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`      DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    `deleted_at`      DATETIME DEFAULT NULL,
+
+    INDEX `idx_materials_class`      (`class_id`),
+    INDEX `idx_materials_subject`    (`subject_id`),
+    INDEX `idx_materials_type`       (`book_type`),
+    INDEX `idx_materials_status`     (`status`),
+    INDEX `idx_materials_deleted`    (`deleted_at`),
+    INDEX `idx_materials_class_subj` (`class_id`, `subject_id`),
+
+    FOREIGN KEY (`class_id`)    REFERENCES `classes`(`id`)  ON DELETE CASCADE,
+    FOREIGN KEY (`subject_id`)  REFERENCES `subjects`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`uploaded_by`) REFERENCES `users`(`id`)    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ############################################################
 --  FINALIZE
 -- ############################################################
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
--- Schema complete — 71 tables across 4 modules:
---   Core:      35 tables (auth, academics, students, exams, etc.)
---   Finance:   10 tables (fees, transactions, penalties, groups)
---   HR:        13 tables (employees, payroll, attendance, leaves)
---   Messaging:  7 tables (conversations, messages, groups)
+-- Schema complete — 73 tables across 6 modules:
+--   Core:       35 tables (auth, academics, students, exams, etc.)
+--   Finance:    10 tables (fees, transactions, penalties, groups)
+--   HR:         13 tables (employees, payroll, attendance, leaves)
+--   Messaging:   7 tables (conversations, messages, groups)
+--   PWA:         1 table  (pwa_tokens)
+--   Materials:   1 table  (academic_materials)
 --
 -- Next: run seed.sql to populate initial data.
 -- ============================================================

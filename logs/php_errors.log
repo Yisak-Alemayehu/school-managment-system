@@ -2130,3 +2130,22 @@ Stack trace:
 #7 {main}
   thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
 [18-Apr-2026 12:21:26 Africa/Addis_Ababa] Database connection failed: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: NO)
+[19-Apr-2026 12:18:38 Africa/Addis_Ababa] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 's.deleted_at' in 'where clause' in C:\Users\yisak\Desktop\SMS\core\db.php:45
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\core\db.php(45): PDO->prepare('SELECT s.id, s....')
+#1 C:\Users\yisak\Desktop\SMS\core\db.php(54): db_query('SELECT s.id, s....', Array)
+#2 C:\Users\yisak\Desktop\SMS\modules\portal\views\materials.php(37): db_fetch_all('SELECT s.id, s....', Array)
+#3 C:\Users\yisak\Desktop\SMS\modules\portal\routes.php(252): require('C:\\Users\\yisak\\...')
+#4 C:\Users\yisak\Desktop\SMS\core\router.php(80): require('C:\\Users\\yisak\\...')
+#5 C:\Users\yisak\Desktop\SMS\public\index.php(65): router_dispatch()
+#6 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#7 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\core\db.php on line 45
+[19-Apr-2026 12:38:52 Africa/Addis_Ababa] PHP Fatal error:  Uncaught Error: Call to undefined function format_file_size() in C:\Users\yisak\Desktop\SMS\modules\portal\views\materials_subject.php:119
+Stack trace:
+#0 C:\Users\yisak\Desktop\SMS\modules\portal\routes.php(257): require()
+#1 C:\Users\yisak\Desktop\SMS\core\router.php(80): require('C:\\Users\\yisak\\...')
+#2 C:\Users\yisak\Desktop\SMS\public\index.php(65): router_dispatch()
+#3 C:\Program Files\Herd\resources\app.asar.unpacked\resources\valet\server.php(139): require('C:\\Users\\yisak\\...')
+#4 {main}
+  thrown in C:\Users\yisak\Desktop\SMS\modules\portal\views\materials_subject.php on line 119

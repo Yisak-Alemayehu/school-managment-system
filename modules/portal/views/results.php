@@ -502,15 +502,11 @@ portal_head('Results', portal_url('dashboard'));
   <?php else: ?>
   <div class="card text-center py-8 text-gray-400">
     <p class="text-3xl mb-2">📋</p>
-    <p class="text-sm">No assessments or results available for this subject and term.</p>
+    <p class="text-sm">No assessments or results recorded yet for this term.</p>
+    <p class="text-xs mt-1">Results will appear here once your teacher enters them.</p>
   </div>
   <?php endif; ?>
 </div>
 <?php endif; ?>
-
-<style>
-@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-.animate-fade-in { animation: fadeIn 0.3s ease-out; }
-</style>
 
 <?php portal_foot('results'); ?>

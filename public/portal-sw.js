@@ -3,7 +3,7 @@
  * Scope: /portal/
  */
 
-const CACHE = 'portal-v2';
+const CACHE = 'portal-v3';
 
 // Static assets to pre-cache on install
 const PRECACHE = [
