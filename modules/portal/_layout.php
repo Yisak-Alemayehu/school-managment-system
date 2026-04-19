@@ -25,6 +25,7 @@ function portal_head(string $title, string $backUrl = ''): void
   <meta name="apple-mobile-web-app-title" content="Portal">
   <link rel="manifest" href="/portal-manifest.webmanifest">
   <link rel="apple-touch-icon" href="/img/Logo.png">
+  <?= csrf_meta() ?>
   <title><?= e($title) ?> — <?= e($schoolName) ?></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>

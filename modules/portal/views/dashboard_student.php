@@ -83,7 +83,11 @@ if ($enrollment) {
 
 // ── Unread messages ──────────────────────────────────────────────────────────
 $unreadMsgCount = (int) db_fetch_value(
-    "SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = 0",
+    "SELECT COUNT(DISTINCT ms.message_id)
+     FROM msg_message_status ms
+     JOIN msg_messages m ON m.id = ms.message_id
+     JOIN msg_conversation_participants cp ON cp.conversation_id = m.conversation_id AND cp.user_id = ms.user_id AND cp.is_deleted = 0
+     WHERE ms.user_id = ? AND ms.status != 'read'",
     [portal_user_id()]
 );
 
@@ -351,7 +355,7 @@ portal_head('Home');
 <!-- Quick access -->
 <div class="mb-5 animate-slide-up" style="animation-delay: 400ms">
   <p class="section-title">Quick Access</p>
-  <div class="grid grid-cols-4 gap-2">
+  <div class="grid grid-cols-3 gap-2">
     <a href="<?= portal_url('timetable') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all text-center">
       <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -367,22 +371,6 @@ portal_head('Home');
         </svg>
       </div>
       <span class="text-[10px] font-semibold text-gray-700">Notices</span>
-    </a>
-    <a href="<?= portal_url('results') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all text-center">
-      <div class="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center">
-        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-      </div>
-      <span class="text-[10px] font-semibold text-gray-700">Results</span>
-    </a>
-    <a href="<?= portal_url('profile') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all text-center">
-      <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center">
-        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-        </svg>
-      </div>
-      <span class="text-[10px] font-semibold text-gray-700">Profile</span>
     </a>
     <a href="<?= portal_url('materials') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all text-center">
       <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">

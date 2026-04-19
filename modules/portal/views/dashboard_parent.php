@@ -95,7 +95,11 @@ if ($activeChild) {
 
 // Unread messages
 $unreadMsgCount = (int) db_fetch_value(
-    "SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = 0",
+    "SELECT COUNT(DISTINCT ms.message_id)
+     FROM msg_message_status ms
+     JOIN msg_messages m ON m.id = ms.message_id
+     JOIN msg_conversation_participants cp ON cp.conversation_id = m.conversation_id AND cp.user_id = ms.user_id AND cp.is_deleted = 0
+     WHERE ms.user_id = ? AND ms.status != 'read'",
     [portal_user_id()]
 );
 
@@ -333,15 +337,7 @@ else $greeting = 'Good evening';
 <!-- Quick links -->
 <div class="mb-5 animate-slide-up" style="animation-delay: 350ms">
   <p class="section-title">Quick Access</p>
-  <div class="grid grid-cols-4 gap-2">
-    <a href="<?= portal_url('attendance') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all">
-      <div class="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center">
-        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <span class="text-[10px] font-semibold text-gray-700">Attendance</span>
-    </a>
+  <div class="grid grid-cols-3 gap-2">
     <a href="<?= portal_url('timetable') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all">
       <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -350,14 +346,6 @@ else $greeting = 'Good evening';
       </div>
       <span class="text-[10px] font-semibold text-gray-700">Timetable</span>
     </a>
-    <a href="<?= portal_url('results') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all">
-      <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center">
-        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-      </div>
-      <span class="text-[10px] font-semibold text-gray-700">Results</span>
-    </a>
     <a href="<?= portal_url('notices') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all">
       <div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center">
         <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,6 +353,14 @@ else $greeting = 'Good evening';
         </svg>
       </div>
       <span class="text-[10px] font-semibold text-gray-700">Notices</span>
+    </a>
+    <a href="<?= portal_url('materials') ?>" class="card flex flex-col items-center gap-1.5 py-3 px-2 hover:shadow-md transition-all">
+      <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+      </div>
+      <span class="text-[10px] font-semibold text-gray-700">Materials</span>
     </a>
   </div>
 </div>

@@ -205,93 +205,265 @@ switch ($action) {
         portal_require();
         $userId = portal_user_id();
 
-        // AJAX: unread count check for real-time polling
+        // ── AJAX endpoints ──
+        // Unread count
         if (isset($_GET['_check_unread'])) {
-            header('Content-Type: text/plain');
-            echo (int) db_fetch_value(
+            header('Content-Type: application/json');
+            echo json_encode(['count' => (int) db_fetch_value(
                 "SELECT COUNT(*) FROM msg_message_status WHERE user_id = ? AND status != 'read'",
                 [$userId]
-            );
+            )]);
             exit;
         }
-        if (is_post()) {
-            // Handle message send via msg_* tables
+
+        // AJAX: fetch messages for a conversation
+        if (isset($_GET['_fetch_thread'])) {
+            header('Content-Type: application/json');
+            $cid = (int) $_GET['_fetch_thread'];
+            $afterId = (int) ($_GET['after'] ?? 0);
+            $participant = db_fetch_one(
+                "SELECT 1 FROM msg_conversation_participants WHERE conversation_id = ? AND user_id = ? AND is_deleted = 0",
+                [$cid, $userId]
+            );
+            if (!$participant) { echo json_encode(['error' => 'denied']); exit; }
+
+            $where = $afterId ? "AND m.id > ?" : "AND 1=1";
+            $params = $afterId ? [$cid, $afterId] : [$cid];
+            $msgs = db_fetch_all("
+                SELECT m.id, m.body, m.sender_id, m.created_at, u.full_name AS sender_name
+                FROM msg_messages m JOIN users u ON u.id = m.sender_id
+                WHERE m.conversation_id = ? $where ORDER BY m.created_at ASC
+            ", $params);
+
+            // Attachments
+            $msgIds = array_column($msgs, 'id');
+            $attachments = [];
+            if ($msgIds) {
+                $ph = implode(',', array_fill(0, count($msgIds), '?'));
+                $atts = db_fetch_all("SELECT * FROM msg_attachments WHERE message_id IN ($ph)", $msgIds);
+                foreach ($atts as $a) {
+                    $a['url'] = upload_url($a['file_path']);
+                    $a['is_image'] = str_starts_with($a['mime_type'], 'image/');
+                    $attachments[$a['message_id']][] = $a;
+                }
+            }
+
+            foreach ($msgs as &$m) {
+                $m['attachments'] = $attachments[$m['id']] ?? [];
+                $m['is_mine'] = (int)$m['sender_id'] === $userId;
+                $m['time'] = date('d M, g:i A', strtotime($m['created_at']));
+            }
+            unset($m);
+
+            // Mark as read
+            if ($msgIds) {
+                $ph = implode(',', array_fill(0, count($msgIds), '?'));
+                db_query("UPDATE msg_message_status SET status='read', read_at=NOW() WHERE user_id=? AND status!='read' AND message_id IN ($ph)", array_merge([$userId], $msgIds));
+                db_query("UPDATE msg_conversation_participants SET last_read_at=NOW() WHERE conversation_id=? AND user_id=?", [$cid, $userId]);
+            }
+
+            echo json_encode(['messages' => $msgs]);
+            exit;
+        }
+
+        // AJAX: fetch conversation list
+        if (isset($_GET['_fetch_conversations'])) {
+            header('Content-Type: application/json');
+            $conversations = db_fetch_all("
+                SELECT c.id, c.type, c.subject,
+                    (SELECT m2.body FROM msg_messages m2 WHERE m2.conversation_id = c.id ORDER BY m2.created_at DESC LIMIT 1) AS last_body,
+                    (SELECT m3.created_at FROM msg_messages m3 WHERE m3.conversation_id = c.id ORDER BY m3.created_at DESC LIMIT 1) AS last_msg_at,
+                    (SELECT m4.sender_id FROM msg_messages m4 WHERE m4.conversation_id = c.id ORDER BY m4.created_at DESC LIMIT 1) AS last_sender_id,
+                    (SELECT COUNT(*) FROM msg_message_status ms JOIN msg_messages mm ON mm.id = ms.message_id
+                        WHERE mm.conversation_id = c.id AND ms.user_id = ? AND ms.status != 'read') AS unread_count,
+                    ou.id AS other_user_id, ou.full_name AS other_name
+                FROM msg_conversations c
+                JOIN msg_conversation_participants cp ON cp.conversation_id = c.id AND cp.user_id = ? AND cp.is_deleted = 0
+                LEFT JOIN msg_conversation_participants ocp ON ocp.conversation_id = c.id AND ocp.user_id != ?
+                LEFT JOIN users ou ON ou.id = ocp.user_id
+                WHERE EXISTS (SELECT 1 FROM msg_messages m WHERE m.conversation_id = c.id)
+                ORDER BY last_msg_at DESC LIMIT 30
+            ", [$userId, $userId, $userId]);
+
+            foreach ($conversations as &$c) {
+                $c['is_mine'] = (int)($c['last_sender_id'] ?? 0) === $userId;
+                $c['time'] = $c['last_msg_at'] ? date('d M', strtotime($c['last_msg_at'])) : '';
+                $c['initials'] = mb_substr($c['other_name'] ?? '?', 0, 1);
+            }
+            unset($c);
+            echo json_encode(['conversations' => $conversations]);
+            exit;
+        }
+
+        // AJAX: fetch staff list for compose
+        if (isset($_GET['_fetch_staff'])) {
+            header('Content-Type: application/json');
+            $staff = db_fetch_all(
+                "SELECT DISTINCT u.id, u.full_name, r.name AS role_name
+                 FROM users u JOIN user_roles ur ON ur.user_id = u.id JOIN roles r ON r.id = ur.role_id
+                 WHERE r.slug IN ('teacher','admin','staff','super-admin') AND u.deleted_at IS NULL AND u.id != ?
+                 ORDER BY u.full_name ASC",
+                [$userId]
+            );
+            echo json_encode(['staff' => $staff]);
+            exit;
+        }
+
+        // AJAX: send message
+        if (is_post() && isset($_GET['_ajax_send'])) {
+            header('Content-Type: application/json');
             $receiverId = (int) ($_POST['receiver_id'] ?? 0);
             $subject    = trim($_POST['subject'] ?? '');
             $body       = trim($_POST['body'] ?? '');
-            $convId     = (int) ($_POST['conversation_id'] ?? 0);
+            $convIdPost = (int) ($_POST['conversation_id'] ?? 0);
 
-            if (!$receiverId || $body === '') {
-                set_flash('error', 'Recipient and message body are required.');
-            } elseif ($receiverId === $userId) {
-                set_flash('error', 'You cannot send a message to yourself.');
-            } elseif (mb_strlen($body) > 5000) {
-                set_flash('error', 'Message is too long (max 5000 characters).');
-            } else {
-                $receiver = db_fetch_one(
-                    "SELECT id FROM users WHERE id = ? AND deleted_at IS NULL",
-                    [$receiverId]
-                );
-                if ($receiver) {
-                    db_begin();
-                    try {
-                        if ($convId) {
-                            // Verify user is participant of this conversation
-                            $isParticipant = db_fetch_one(
-                                "SELECT 1 FROM msg_conversation_participants WHERE conversation_id = ? AND user_id = ?",
-                                [$convId, $userId]
-                            );
-                            if (!$isParticipant) $convId = 0;
-                        }
-
-                        if (!$convId) {
-                            // Find existing solo conversation or create new
-                            $existingConvId = db_fetch_value("
-                                SELECT c.id
-                                  FROM msg_conversations c
-                                  JOIN msg_conversation_participants cp1 ON cp1.conversation_id = c.id AND cp1.user_id = ?
-                                  JOIN msg_conversation_participants cp2 ON cp2.conversation_id = c.id AND cp2.user_id = ?
-                                 WHERE c.type = 'solo'
-                                 LIMIT 1
-                            ", [$userId, $receiverId]);
-
-                            if ($existingConvId) {
-                                $convId = (int) $existingConvId;
-                                db_query("UPDATE msg_conversation_participants SET is_deleted = 0 WHERE conversation_id = ? AND user_id = ?", [$convId, $userId]);
-                                db_query("UPDATE msg_conversation_participants SET is_deleted = 0 WHERE conversation_id = ? AND user_id = ?", [$convId, $receiverId]);
-                            } else {
-                                $convId = db_insert('msg_conversations', [
-                                    'type'       => 'solo',
-                                    'subject'    => $subject ?: null,
-                                    'created_by' => $userId,
-                                ]);
-                                db_insert('msg_conversation_participants', ['conversation_id' => $convId, 'user_id' => $userId]);
-                                db_insert('msg_conversation_participants', ['conversation_id' => $convId, 'user_id' => $receiverId]);
-                            }
-                        }
-
-                        $messageId = db_insert('msg_messages', [
-                            'conversation_id' => $convId,
-                            'sender_id'       => $userId,
-                            'body'            => $body,
-                        ]);
-
-                        db_insert('msg_message_status', [
-                            'message_id' => $messageId,
-                            'user_id'    => $receiverId,
-                            'status'     => 'sent',
-                        ]);
-
-                        db_commit();
-                        set_flash('success', 'Message sent successfully.');
-                    } catch (\Throwable $e) {
-                        db_rollback();
-                        set_flash('error', 'Failed to send message.');
-                    }
-                } else {
-                    set_flash('error', 'Recipient not found.');
-                }
+            if (!$receiverId || ($body === '' && empty($_FILES['attachments']['name'][0]))) {
+                echo json_encode(['error' => 'Recipient and message are required.']);
+                exit;
             }
+            if ($receiverId === $userId) {
+                echo json_encode(['error' => 'Cannot message yourself.']);
+                exit;
+            }
+            if ($body && mb_strlen($body) > 5000) {
+                echo json_encode(['error' => 'Message too long (max 5000).']);
+                exit;
+            }
+
+            $receiver = db_fetch_one("SELECT id FROM users WHERE id = ? AND deleted_at IS NULL", [$receiverId]);
+            if (!$receiver) {
+                echo json_encode(['error' => 'Recipient not found.']);
+                exit;
+            }
+
+            db_begin();
+            try {
+                if ($convIdPost) {
+                    $isP = db_fetch_one("SELECT 1 FROM msg_conversation_participants WHERE conversation_id=? AND user_id=?", [$convIdPost, $userId]);
+                    if (!$isP) $convIdPost = 0;
+                }
+                if (!$convIdPost) {
+                    $existingConvId = db_fetch_value("
+                        SELECT c.id FROM msg_conversations c
+                        JOIN msg_conversation_participants cp1 ON cp1.conversation_id = c.id AND cp1.user_id = ?
+                        JOIN msg_conversation_participants cp2 ON cp2.conversation_id = c.id AND cp2.user_id = ?
+                        WHERE c.type = 'solo' LIMIT 1
+                    ", [$userId, $receiverId]);
+
+                    if ($existingConvId) {
+                        $convIdPost = (int) $existingConvId;
+                        db_query("UPDATE msg_conversation_participants SET is_deleted=0 WHERE conversation_id=? AND user_id=?", [$convIdPost, $userId]);
+                        db_query("UPDATE msg_conversation_participants SET is_deleted=0 WHERE conversation_id=? AND user_id=?", [$convIdPost, $receiverId]);
+                    } else {
+                        $convIdPost = db_insert('msg_conversations', [
+                            'type' => 'solo', 'subject' => $subject ?: null, 'created_by' => $userId,
+                        ]);
+                        db_insert('msg_conversation_participants', ['conversation_id' => $convIdPost, 'user_id' => $userId]);
+                        db_insert('msg_conversation_participants', ['conversation_id' => $convIdPost, 'user_id' => $receiverId]);
+                    }
+                }
+
+                $messageId = db_insert('msg_messages', [
+                    'conversation_id' => $convIdPost,
+                    'sender_id'       => $userId,
+                    'body'            => $body,
+                ]);
+
+                db_insert('msg_message_status', [
+                    'message_id' => $messageId,
+                    'user_id'    => $receiverId,
+                    'status'     => 'sent',
+                ]);
+
+                // Handle attachments
+                $uploadedAtts = [];
+                if (!empty($_FILES['attachments']['name'][0])) {
+                    $maxFiles = 5;
+                    $maxFileSize = 10 * 1024 * 1024;
+                    $allowedTypes = [
+                        'image/jpeg','image/png','image/gif','image/webp',
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'application/vnd.ms-excel',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    ];
+                    $fileCount = min(count($_FILES['attachments']['name']), $maxFiles);
+                    for ($i = 0; $i < $fileCount; $i++) {
+                        $tmpName = $_FILES['attachments']['tmp_name'][$i] ?? null;
+                        $originalName = $_FILES['attachments']['name'][$i] ?? '';
+                        $size = $_FILES['attachments']['size'][$i] ?? 0;
+                        if (!$tmpName || $size <= 0 || $size > $maxFileSize) continue;
+
+                        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                        $mime = finfo_file($finfo, $tmpName);
+                        finfo_close($finfo);
+                        if (!in_array($mime, $allowedTypes)) continue;
+
+                        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                        $safeExts = ['jpg','jpeg','png','gif','webp','pdf','doc','docx','xls','xlsx'];
+                        if (!in_array($ext, $safeExts)) $ext = 'bin';
+
+                        $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+                        $subDir = 'messaging/' . date('Y/m');
+                        $targetDir = UPLOAD_PATH . '/' . $subDir;
+                        if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
+
+                        $targetPath = $targetDir . '/' . $filename;
+                        if (move_uploaded_file($tmpName, $targetPath)) {
+                            $finalSize = $size;
+                            if (in_array($mime, ['image/jpeg','image/png','image/webp']) && function_exists('compress_image')) {
+                                $compressed = compress_image($targetPath, 1200, 1200, 75);
+                                if ($compressed !== false) $finalSize = $compressed;
+                            }
+                            $attId = db_insert('msg_attachments', [
+                                'message_id' => $messageId,
+                                'file_name'  => $originalName,
+                                'file_path'  => $subDir . '/' . $filename,
+                                'file_size'  => $finalSize,
+                                'mime_type'  => $mime,
+                            ]);
+                            $uploadedAtts[] = [
+                                'id' => $attId,
+                                'file_name' => $originalName,
+                                'file_path' => $subDir . '/' . $filename,
+                                'file_size' => $finalSize,
+                                'mime_type' => $mime,
+                                'url' => upload_url($subDir . '/' . $filename),
+                                'is_image' => str_starts_with($mime, 'image/'),
+                            ];
+                        }
+                    }
+                }
+
+                db_update('msg_conversations', ['updated_at' => date('Y-m-d H:i:s')], 'id = ?', [$convIdPost]);
+                db_commit();
+
+                // Return the created message
+                $user = db_fetch_one("SELECT full_name FROM users WHERE id=?", [$userId]);
+                echo json_encode([
+                    'success' => true,
+                    'conversation_id' => $convIdPost,
+                    'message' => [
+                        'id' => $messageId,
+                        'body' => $body,
+                        'sender_id' => $userId,
+                        'sender_name' => $user['full_name'] ?? '',
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'time' => date('d M, g:i A'),
+                        'is_mine' => true,
+                        'attachments' => $uploadedAtts,
+                    ],
+                ]);
+            } catch (\Throwable $e) {
+                db_rollback();
+                echo json_encode(['error' => 'Failed to send message.']);
+            }
+            exit;
+        }
+
+        // Normal page load
+        if (is_post()) {
             redirect(url('portal', 'messages'));
         }
         require __DIR__ . '/views/messages.php';
