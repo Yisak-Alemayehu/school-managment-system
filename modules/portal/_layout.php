@@ -179,10 +179,29 @@ function portal_head(string $title, string $backUrl = ''): void
               d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
       </svg>
     </button>
-    <!-- School logo -->
+    <!-- User avatar -->
+    <?php
+    $portalPhoto = null;
+    $portalInitials = mb_substr($schoolName, 0, 2);
+    if (portal_check()) {
+        if (portal_role() === 'student') {
+            $ps = portal_student();
+            $portalPhoto = $ps['photo'] ?? null;
+            $portalInitials = mb_substr($ps['full_name'] ?? $schoolName, 0, 1);
+        } else {
+            $pg = portal_guardian();
+            $portalPhoto = $pg['photo'] ?? null;
+            $portalInitials = mb_substr($pg['name'] ?? $schoolName, 0, 1);
+        }
+    }
+    ?>
+    <?php if ($portalPhoto): ?>
+    <img src="<?= upload_url($portalPhoto) ?>" alt="" class="w-9 h-9 rounded-xl object-cover flex-shrink-0 border border-white/20">
+    <?php else: ?>
     <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-xs font-bold flex-shrink-0 backdrop-blur-sm">
-      <?= e(mb_substr($schoolName, 0, 2)) ?>
+      <?= e($portalInitials) ?>
     </div>
+    <?php endif; ?>
   </div>
 </header>
 

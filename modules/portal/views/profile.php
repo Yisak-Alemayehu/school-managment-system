@@ -55,9 +55,20 @@ foreach (array_slice($words, 0, 2) as $w) {
 
 <!-- Avatar + name -->
 <div class="card flex items-center gap-4 mb-4">
+  <?php
+  $profilePhoto = null;
+  if ($role === 'student') {
+      $st = portal_student();
+      $profilePhoto = $st['photo'] ?? null;
+  }
+  ?>
+  <?php if ($profilePhoto): ?>
+  <img src="<?= upload_url($profilePhoto) ?>" alt="" class="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-primary-100">
+  <?php else: ?>
   <div class="w-16 h-16 rounded-full bg-primary-600 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
     <?= e($initials) ?>
   </div>
+  <?php endif; ?>
   <div class="flex-1 min-w-0">
     <p class="font-bold text-gray-900 text-lg leading-tight truncate"><?= e($user['full_name']) ?></p>
     <p class="text-sm text-gray-500">@<?= e($user['username']) ?></p>
