@@ -203,26 +203,29 @@ switch ($action) {
     // ── Shared pages ──────────────────────────────────────────────────────────
     case 'messages':
         portal_require();
+        $userId = portal_user_id();
+
         // AJAX: unread count check for real-time polling
         if (isset($_GET['_check_unread'])) {
             header('Content-Type: text/plain');
             echo (int) db_fetch_value(
-                "SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = 0",
-                [portal_user_id()]
+                "SELECT COUNT(*) FROM msg_message_status WHERE user_id = ? AND status != 'read'",
+                [$userId]
             );
             exit;
         }
         if (is_post()) {
-            // Handle message send
+            // Handle message send via msg_* tables
             $receiverId = (int) ($_POST['receiver_id'] ?? 0);
             $subject    = trim($_POST['subject'] ?? '');
             $body       = trim($_POST['body'] ?? '');
+            $convId     = (int) ($_POST['conversation_id'] ?? 0);
 
             if (!$receiverId || $body === '') {
                 set_flash('error', 'Recipient and message body are required.');
-            } elseif ($receiverId === portal_user_id()) {
+            } elseif ($receiverId === $userId) {
                 set_flash('error', 'You cannot send a message to yourself.');
-            } elseif (strlen($body) > 5000) {
+            } elseif (mb_strlen($body) > 5000) {
                 set_flash('error', 'Message is too long (max 5000 characters).');
             } else {
                 $receiver = db_fetch_one(
@@ -230,14 +233,61 @@ switch ($action) {
                     [$receiverId]
                 );
                 if ($receiver) {
-                    db_insert('messages', [
-                        'sender_id'   => portal_user_id(),
-                        'receiver_id' => $receiverId,
-                        'subject'     => $subject ?: '(No Subject)',
-                        'body'        => $body,
-                        'is_read'     => 0,
-                    ]);
-                    set_flash('success', 'Message sent successfully.');
+                    db_begin();
+                    try {
+                        if ($convId) {
+                            // Verify user is participant of this conversation
+                            $isParticipant = db_fetch_one(
+                                "SELECT 1 FROM msg_conversation_participants WHERE conversation_id = ? AND user_id = ?",
+                                [$convId, $userId]
+                            );
+                            if (!$isParticipant) $convId = 0;
+                        }
+
+                        if (!$convId) {
+                            // Find existing solo conversation or create new
+                            $existingConvId = db_fetch_value("
+                                SELECT c.id
+                                  FROM msg_conversations c
+                                  JOIN msg_conversation_participants cp1 ON cp1.conversation_id = c.id AND cp1.user_id = ?
+                                  JOIN msg_conversation_participants cp2 ON cp2.conversation_id = c.id AND cp2.user_id = ?
+                                 WHERE c.type = 'solo'
+                                 LIMIT 1
+                            ", [$userId, $receiverId]);
+
+                            if ($existingConvId) {
+                                $convId = (int) $existingConvId;
+                                db_query("UPDATE msg_conversation_participants SET is_deleted = 0 WHERE conversation_id = ? AND user_id = ?", [$convId, $userId]);
+                                db_query("UPDATE msg_conversation_participants SET is_deleted = 0 WHERE conversation_id = ? AND user_id = ?", [$convId, $receiverId]);
+                            } else {
+                                $convId = db_insert('msg_conversations', [
+                                    'type'       => 'solo',
+                                    'subject'    => $subject ?: null,
+                                    'created_by' => $userId,
+                                ]);
+                                db_insert('msg_conversation_participants', ['conversation_id' => $convId, 'user_id' => $userId]);
+                                db_insert('msg_conversation_participants', ['conversation_id' => $convId, 'user_id' => $receiverId]);
+                            }
+                        }
+
+                        $messageId = db_insert('msg_messages', [
+                            'conversation_id' => $convId,
+                            'sender_id'       => $userId,
+                            'body'            => $body,
+                        ]);
+
+                        db_insert('msg_message_status', [
+                            'message_id' => $messageId,
+                            'user_id'    => $receiverId,
+                            'status'     => 'sent',
+                        ]);
+
+                        db_commit();
+                        set_flash('success', 'Message sent successfully.');
+                    } catch (\Throwable $e) {
+                        db_rollback();
+                        set_flash('error', 'Failed to send message.');
+                    }
                 } else {
                     set_flash('error', 'Recipient not found.');
                 }
