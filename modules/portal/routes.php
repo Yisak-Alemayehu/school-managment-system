@@ -312,20 +312,27 @@ switch ($action) {
         // AJAX: send message
         if (is_post() && isset($_GET['_ajax_send'])) {
             header('Content-Type: application/json');
+
             $receiverId = (int) ($_POST['receiver_id'] ?? 0);
             $subject    = trim($_POST['subject'] ?? '');
             $body       = trim($_POST['body'] ?? '');
             $convIdPost = (int) ($_POST['conversation_id'] ?? 0);
 
-            if (!$receiverId || ($body === '' && empty($_FILES['attachments']['name'][0]))) {
-                echo json_encode(['error' => 'Recipient and message are required.']);
+            $hasFiles = !empty($_FILES['attachments']['name'][0]);
+            $hasText = $body !== '';
+            if (!$receiverId) {
+                echo json_encode(['error' => 'Recipient is required.']);
+                exit;
+            }
+            if (!$hasText && !$hasFiles) {
+                echo json_encode(['error' => 'Please type a message or attach a file.']);
                 exit;
             }
             if ($receiverId === $userId) {
                 echo json_encode(['error' => 'Cannot message yourself.']);
                 exit;
             }
-            if ($body && mb_strlen($body) > 5000) {
+            if ($hasText && mb_strlen($body) > 5000) {
                 echo json_encode(['error' => 'Message too long (max 5000).']);
                 exit;
             }
