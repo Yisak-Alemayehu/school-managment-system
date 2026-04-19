@@ -21,7 +21,7 @@ if ($userMode === 'employee') {
         redirect(url('users', 'create'));
     }
 
-    $employee = db_fetch("SELECT * FROM hr_employees WHERE id = ? AND deleted_at IS NULL", [$employeeId]);
+    $employee = db_fetch_one("SELECT * FROM hr_employees WHERE id = ? AND deleted_at IS NULL", [$employeeId]);
     if (!$employee) {
         set_validation_errors(['employee_id' => 'Employee not found.']);
         set_old_input($_POST);
@@ -62,7 +62,7 @@ if ($userMode !== 'employee') {
     if (empty($employee['email'])) {
         $rules['email'] = 'required|email|max:100|unique:users,email';
     } else {
-        $emailExists = db_fetch("SELECT id FROM users WHERE email = ? AND deleted_at IS NULL", [$email]);
+        $emailExists = db_fetch_one("SELECT id FROM users WHERE email = ? AND deleted_at IS NULL", [$email]);
         if ($emailExists) {
             set_validation_errors(['email' => 'This email is already in use by another user account.']);
             set_old_input($_POST);
