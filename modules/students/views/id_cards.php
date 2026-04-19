@@ -150,7 +150,7 @@ ob_start();
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
                                 <?php if ($st['photo']): ?>
-                                    <img src="/uploads/students/<?= e($st['photo']) ?>" class="w-8 h-8 rounded-full object-cover border">
+                                    <img src="<?= upload_url($st['photo']) ?>" class="w-8 h-8 rounded-full object-cover border">
                                 <?php else: ?>
                                     <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-800 text-sm font-bold">
                                         <?= strtoupper(mb_substr($st['full_name'], 0, 1)) ?>

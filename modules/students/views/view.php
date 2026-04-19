@@ -68,9 +68,13 @@ ob_start();
         <!-- Profile Card -->
         <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-6 mb-6">
             <div class="flex flex-col sm:flex-row items-start gap-4">
+                <?php if ($student['photo']): ?>
+                <img src="<?= upload_url($student['photo']) ?>" class="w-20 h-20 rounded-full object-cover flex-shrink-0">
+                <?php else: ?>
                 <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-800 text-3xl font-bold flex-shrink-0">
                     <?= e(strtoupper(substr($student['full_name'], 0, 1))) ?>
                 </div>
+                <?php endif; ?>
                 <div class="flex-1">
                     <div class="flex items-center gap-3 flex-wrap">
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-dark-text"><?= e($student['full_name']) ?></h2>

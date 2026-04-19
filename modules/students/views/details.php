@@ -127,7 +127,7 @@ ob_start();
                     <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                         <td class="px-4 py-3">
                             <?php if ($st['photo']): ?>
-                                <img src="/uploads/students/<?= e($st['photo']) ?>" class="w-8 h-8 rounded-full object-cover">
+                                <img src="<?= upload_url($st['photo']) ?>" class="w-8 h-8 rounded-full object-cover">
                             <?php else: ?>
                                 <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-xs font-bold text-primary-700">
                                     <?= strtoupper(mb_substr($st['full_name'], 0, 1)) ?>

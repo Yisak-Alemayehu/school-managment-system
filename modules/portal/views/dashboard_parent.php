@@ -158,7 +158,7 @@ else $greeting = 'Good evening';
 <div class="card bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white mb-5 animate-slide-up" style="animation-delay: 100ms">
   <div class="flex items-center gap-4">
     <?php if ($activeChild['photo'] ?? null): ?>
-    <img src="<?= e($activeChild['photo']) ?>" alt=""
+    <img src="<?= upload_url($activeChild['photo']) ?>" alt=""
          class="w-16 h-16 rounded-2xl object-cover border-2 border-white/20">
     <?php else: ?>
     <div class="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center text-2xl backdrop-blur-sm">

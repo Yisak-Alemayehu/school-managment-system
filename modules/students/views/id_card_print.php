@@ -483,7 +483,7 @@ $pages = array_chunk($students, 5);
                     <div class="front-body">
                         <div class="front-photo-col">
                             <?php if ($st['photo']): ?>
-                                <img src="/uploads/students/<?= e($st['photo']) ?>" alt="Photo" class="front-photo">
+                                <img src="<?= upload_url($st['photo']) ?>" alt="Photo" class="front-photo">
                             <?php else: ?>
                                 <div class="front-photo-placeholder"><?= strtoupper(mb_substr($st['full_name'], 0, 1)) ?></div>
                             <?php endif; ?>

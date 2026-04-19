@@ -170,9 +170,13 @@ ob_start();
                     <tr class="hover:bg-gray-50 dark:bg-dark-bg">
                         <td data-label="Student" class="px-4 py-3">
                             <div class="flex items-center gap-3">
+                                <?php if (!empty($s['photo'])): ?>
+                                <img src="<?= upload_url($s['photo']) ?>" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                                <?php else: ?>
                                 <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-800 text-sm font-bold flex-shrink-0">
                                     <?= e(strtoupper(substr($s['full_name'], 0, 1))) ?>
                                 </div>
+                                <?php endif; ?>
                                 <div>
                                     <p class="text-sm font-medium text-gray-900 dark:text-dark-text"><?= e($s['full_name']) ?></p>
                                     <?php if ($s['phone']): ?>

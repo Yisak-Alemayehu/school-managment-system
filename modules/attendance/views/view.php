@@ -251,7 +251,7 @@ ob_start();
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-3">
                             <?php if (!empty($r['photo'])): ?>
-                                <img src="/uploads/students/<?= e($r['photo']) ?>" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                                <img src="<?= upload_url($r['photo']) ?>" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
                             <?php else: ?>
                                 <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
                                     <span class="text-xs font-bold text-primary-700"><?= strtoupper(substr($r['first_name'], 0, 1)) ?></span>
