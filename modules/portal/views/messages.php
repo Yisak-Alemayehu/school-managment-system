@@ -1,7 +1,7 @@
 <?php
 /**
- * Portal — Enhanced Messages View (student & parent)
- * Features: Threaded conversations, real-time polling, reply inline, notifications
+ * Portal — Messages View (student & parent)
+ * Uses msg_* tables (msg_conversations, msg_conversation_participants, msg_messages, msg_message_status)
  */
 
 $userId  = portal_user_id();
@@ -10,43 +10,21 @@ $page    = max(1, (int) ($_GET['page'] ?? 1));
 $limit   = 20;
 $offset  = ($page - 1) * $limit;
 $compose = isset($_GET['compose']);
-$viewId  = isset($_GET['view']) ? (int) $_GET['view'] : null;
-$replyTo = isset($_GET['reply']) ? (int) $_GET['reply'] : null;
+$convId  = isset($_GET['view']) ? (int) $_GET['view'] : null;
 
-// Group messages into threads by (sender,receiver pair + subject)
-$messages = db_fetch_all(
-    "SELECT m.id, m.subject, m.body, m.is_read, m.created_at,
-            m.sender_id, m.receiver_id,
-            s.full_name AS sender_name, s.avatar AS sender_avatar,
-            r.full_name AS receiver_name, r.avatar AS receiver_avatar
-     FROM messages m
-     LEFT JOIN users s ON s.id = m.sender_id
-     LEFT JOIN users r ON r.id = m.receiver_id
-     WHERE m.receiver_id = ? OR m.sender_id = ?
-     ORDER BY m.created_at DESC
-     LIMIT ? OFFSET ?",
-    [$userId, $userId, $limit, $offset]
-);
-
-// Mark received unread messages as read when viewing
-if ($viewId) {
-    db_query("UPDATE messages SET is_read = 1 WHERE id = ? AND receiver_id = ?", [$viewId, $userId]);
-}
-
+// Unread count
 $unreadCount = (int) db_fetch_value(
-    "SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = 0",
+    "SELECT COUNT(DISTINCT ms.message_id)
+       FROM msg_message_status ms
+       JOIN msg_messages m ON m.id = ms.message_id
+       JOIN msg_conversation_participants cp ON cp.conversation_id = m.conversation_id AND cp.user_id = ms.user_id AND cp.is_deleted = 0
+      WHERE ms.user_id = ? AND ms.status != 'read'",
     [$userId]
 );
 
-$totalMessages = (int) db_fetch_value(
-    "SELECT COUNT(*) FROM messages WHERE receiver_id = ? OR sender_id = ?",
-    [$userId, $userId]
-);
-$totalPages = (int) ceil($totalMessages / $limit);
-
 // Staff list for compose
 $staffList = [];
-if ($compose || $replyTo) {
+if ($compose) {
     $staffList = db_fetch_all(
         "SELECT DISTINCT u.id, u.full_name, r.name AS role_name
          FROM users u
@@ -59,60 +37,104 @@ if ($compose || $replyTo) {
     );
 }
 
-// Get conversation thread for viewed message
+// ── Conversation thread view ──
+$conversation = null;
 $thread = [];
-$viewedMsg = null;
-if ($viewId) {
-    $viewedMsg = db_fetch_one(
-        "SELECT m.*, s.full_name AS sender_name, s.avatar AS sender_avatar,
-                r.full_name AS receiver_name, r.avatar AS receiver_avatar
-         FROM messages m
-         LEFT JOIN users s ON s.id = m.sender_id
-         LEFT JOIN users r ON r.id = m.receiver_id
-         WHERE m.id = ? AND (m.sender_id = ? OR m.receiver_id = ?)",
-        [$viewId, $userId, $userId]
+$otherUser = null;
+
+if ($convId) {
+    // Verify user is a participant
+    $participant = db_fetch_one(
+        "SELECT 1 FROM msg_conversation_participants WHERE conversation_id = ? AND user_id = ? AND is_deleted = 0",
+        [$convId, $userId]
     );
 
-    if ($viewedMsg) {
-        $otherId = (int)$viewedMsg['sender_id'] === $userId
-            ? (int)$viewedMsg['receiver_id']
-            : (int)$viewedMsg['sender_id'];
+    if ($participant) {
+        $conversation = db_fetch_one("SELECT * FROM msg_conversations WHERE id = ?", [$convId]);
+    }
 
-        $thread = db_fetch_all(
-            "SELECT m.*, s.full_name AS sender_name, s.avatar AS sender_avatar
-             FROM messages m
-             LEFT JOIN users s ON s.id = m.sender_id
-             WHERE ((m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?))
-             ORDER BY m.created_at ASC",
-            [$userId, $otherId, $otherId, $userId]
-        );
+    if ($conversation) {
+        // Get the other participant for display
+        $otherUser = db_fetch_one("
+            SELECT u.id, u.full_name, u.avatar
+              FROM msg_conversation_participants cp
+              JOIN users u ON u.id = cp.user_id
+             WHERE cp.conversation_id = ? AND cp.user_id != ?
+             LIMIT 1
+        ", [$convId, $userId]);
 
-        // Mark all in thread as read
-        db_query(
-            "UPDATE messages SET is_read = 1 WHERE receiver_id = ?
-             AND sender_id = ? AND is_read = 0",
-            [$userId, $otherId]
-        );
+        // Get messages
+        $thread = db_fetch_all("
+            SELECT m.id, m.body, m.sender_id, m.created_at,
+                   u.full_name AS sender_name
+              FROM msg_messages m
+              JOIN users u ON u.id = m.sender_id
+             WHERE m.conversation_id = ?
+             ORDER BY m.created_at ASC
+        ", [$convId]);
+
+        // Mark all messages as read
+        db_query("
+            UPDATE msg_message_status
+               SET status = 'read', read_at = NOW()
+             WHERE user_id = ? AND status != 'read'
+               AND message_id IN (SELECT id FROM msg_messages WHERE conversation_id = ?)
+        ", [$userId, $convId]);
+
+        db_query("
+            UPDATE msg_conversation_participants
+               SET last_read_at = NOW()
+             WHERE conversation_id = ? AND user_id = ?
+        ", [$convId, $userId]);
     }
 }
 
+// ── Conversation list (inbox) ──
+$conversations = [];
+$totalPages = 1;
+if (!$convId && !$compose) {
+    // Get conversations where user is a participant, ordered by latest message
+    $conversations = db_fetch_all("
+        SELECT c.id, c.type, c.subject,
+               (SELECT m2.body FROM msg_messages m2 WHERE m2.conversation_id = c.id ORDER BY m2.created_at DESC LIMIT 1) AS last_body,
+               (SELECT m3.created_at FROM msg_messages m3 WHERE m3.conversation_id = c.id ORDER BY m3.created_at DESC LIMIT 1) AS last_msg_at,
+               (SELECT m4.sender_id FROM msg_messages m4 WHERE m4.conversation_id = c.id ORDER BY m4.created_at DESC LIMIT 1) AS last_sender_id,
+               (SELECT COUNT(*) FROM msg_message_status ms
+                  JOIN msg_messages mm ON mm.id = ms.message_id
+                 WHERE mm.conversation_id = c.id AND ms.user_id = ? AND ms.status != 'read') AS unread_count,
+               ou.id AS other_user_id, ou.full_name AS other_name, ou.avatar AS other_avatar
+          FROM msg_conversations c
+          JOIN msg_conversation_participants cp ON cp.conversation_id = c.id AND cp.user_id = ? AND cp.is_deleted = 0
+          LEFT JOIN msg_conversation_participants ocp ON ocp.conversation_id = c.id AND ocp.user_id != ?
+          LEFT JOIN users ou ON ou.id = ocp.user_id
+         WHERE EXISTS (SELECT 1 FROM msg_messages m WHERE m.conversation_id = c.id)
+         ORDER BY last_msg_at DESC
+         LIMIT ? OFFSET ?
+    ", [$userId, $userId, $userId, $limit, $offset]);
+
+    $totalConvs = (int) db_fetch_value("
+        SELECT COUNT(*)
+          FROM msg_conversations c
+          JOIN msg_conversation_participants cp ON cp.conversation_id = c.id AND cp.user_id = ? AND cp.is_deleted = 0
+         WHERE EXISTS (SELECT 1 FROM msg_messages m WHERE m.conversation_id = c.id)
+    ", [$userId]);
+    $totalPages = max(1, (int) ceil($totalConvs / $limit));
+}
+
 $activeNav = 'messages';
-portal_head('Messages', $viewId ? portal_url('messages') : portal_url('dashboard'));
+portal_head('Messages', $convId ? portal_url('messages') : portal_url('dashboard'));
 ?>
 
-<?php if ($viewedMsg): ?>
+<?php if ($conversation && $otherUser): ?>
 <!-- ═══ Thread View ═══ -->
 <div class="mb-4">
   <div class="flex items-center justify-between">
     <div>
       <h2 class="font-bold text-gray-900 text-lg">
-        <?= e($viewedMsg['subject'] ?: '(No Subject)') ?>
+        <?= e($conversation['subject'] ?: $otherUser['full_name']) ?>
       </h2>
       <p class="text-xs text-gray-500">
-        Conversation with
-        <span class="font-semibold">
-          <?= e((int)$viewedMsg['sender_id'] === $userId ? $viewedMsg['receiver_name'] : $viewedMsg['sender_name']) ?>
-        </span>
+        Conversation with <span class="font-semibold"><?= e($otherUser['full_name']) ?></span>
       </p>
     </div>
   </div>
@@ -127,18 +149,13 @@ portal_head('Messages', $viewId ? portal_url('messages') : portal_url('dashboard
         ? 'bg-primary-600 text-white rounded-2xl rounded-br-md'
         : 'bg-white border border-gray-200 text-gray-900 rounded-2xl rounded-bl-md' ?> px-4 py-3 shadow-sm">
       <?php if (!$isMine): ?>
-      <p class="text-xs font-semibold <?= $isMine ? 'text-primary-200' : 'text-primary-600' ?> mb-1">
+      <p class="text-xs font-semibold text-primary-600 mb-1">
         <?= e($msg['sender_name']) ?>
       </p>
       <?php endif; ?>
       <p class="text-sm whitespace-pre-wrap"><?= e($msg['body']) ?></p>
       <p class="text-[10px] mt-1 <?= $isMine ? 'text-primary-200' : 'text-gray-400' ?> text-right">
         <?= e(date('d M, g:i A', strtotime($msg['created_at']))) ?>
-        <?php if ($isMine && $msg['is_read']): ?>
-          ✓✓
-        <?php elseif ($isMine): ?>
-          ✓
-        <?php endif; ?>
       </p>
     </div>
   </div>
@@ -149,8 +166,9 @@ portal_head('Messages', $viewId ? portal_url('messages') : portal_url('dashboard
 <div class="sticky bottom-16 bg-gray-50 pt-2 pb-2">
   <form method="POST" action="<?= portal_url('messages') ?>" class="flex gap-2">
     <?= csrf_field() ?>
-    <input type="hidden" name="receiver_id" value="<?= (int)$viewedMsg['sender_id'] === $userId ? (int)$viewedMsg['receiver_id'] : (int)$viewedMsg['sender_id'] ?>">
-    <input type="hidden" name="subject" value="<?= e($viewedMsg['subject'] ?: '(No Subject)') ?>">
+    <input type="hidden" name="conversation_id" value="<?= (int)$convId ?>">
+    <input type="hidden" name="receiver_id" value="<?= (int)$otherUser['id'] ?>">
+    <input type="hidden" name="subject" value="<?= e($conversation['subject'] ?? '') ?>">
     <input type="text" name="body" class="form-input flex-1 !py-3 !rounded-full !pl-5"
            placeholder="Type a reply..." required maxlength="5000" autocomplete="off">
     <button type="submit" class="btn-primary !rounded-full !px-4 !py-3 flex-shrink-0">
@@ -224,8 +242,8 @@ portal_head('Messages', $viewId ? portal_url('messages') : portal_url('dashboard
 </div>
 <?php endif; ?>
 
-<!-- Messages list -->
-<?php if (empty($messages) && !$compose): ?>
+<!-- Conversations list -->
+<?php if (empty($conversations) && !$compose): ?>
 <div class="card text-center py-12 text-gray-400">
   <div class="text-5xl mb-3">💬</div>
   <p class="text-sm font-medium">No messages yet</p>
@@ -236,37 +254,14 @@ portal_head('Messages', $viewId ? portal_url('messages') : portal_url('dashboard
 </div>
 <?php elseif (!$compose): ?>
 
-<?php
-  // Group messages into conversations (by other party)
-  $conversations = [];
-  foreach ($messages as $msg) {
-      $isSent = (int)$msg['sender_id'] === $userId;
-      $otherId = $isSent ? (int)$msg['receiver_id'] : (int)$msg['sender_id'];
-      if (!isset($conversations[$otherId])) {
-          $conversations[$otherId] = [
-              'other_id' => $otherId,
-              'other_name' => $isSent ? $msg['receiver_name'] : $msg['sender_name'],
-              'other_avatar' => $isSent ? $msg['receiver_avatar'] : $msg['sender_avatar'],
-              'latest_msg' => $msg,
-              'is_sent' => $isSent,
-              'unread' => 0,
-              'message_id' => (int)$msg['id'],
-          ];
-      }
-      if (!$isSent && !$msg['is_read']) {
-          $conversations[$otherId]['unread']++;
-      }
-  }
-?>
-
 <div class="space-y-2 mb-5">
   <?php foreach ($conversations as $conv):
-    $msg = $conv['latest_msg'];
     $initials = mb_substr($conv['other_name'] ?? '?', 0, 1);
+    $isSentByMe = (int)($conv['last_sender_id'] ?? 0) === $userId;
   ?>
-  <a href="<?= portal_url('messages', ['view' => $conv['message_id']]) ?>"
+  <a href="<?= portal_url('messages', ['view' => (int)$conv['id']]) ?>"
      class="card flex items-center gap-3 transition-all hover:shadow-md hover:border-primary-200
-            <?= $conv['unread'] > 0 ? 'border-primary-300 bg-primary-50/50' : 'bg-white' ?>">
+            <?= $conv['unread_count'] > 0 ? 'border-primary-300 bg-primary-50/50' : 'bg-white' ?>">
     <!-- Avatar -->
     <div class="flex-shrink-0 w-11 h-11 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg">
       <?= e($initials) ?>
@@ -276,20 +271,20 @@ portal_head('Messages', $viewId ? portal_url('messages') : portal_url('dashboard
       <div class="flex items-center justify-between gap-2">
         <span class="text-sm font-bold text-gray-900 truncate"><?= e($conv['other_name'] ?? 'Unknown') ?></span>
         <span class="text-[10px] text-gray-400 flex-shrink-0">
-          <?= e(date('d M', strtotime($msg['created_at']))) ?>
+          <?= $conv['last_msg_at'] ? e(date('d M', strtotime($conv['last_msg_at']))) : '' ?>
         </span>
       </div>
-      <?php if ($msg['subject'] && $msg['subject'] !== '(No Subject)'): ?>
-      <p class="text-xs font-semibold text-gray-700 truncate"><?= e($msg['subject']) ?></p>
+      <?php if ($conv['subject']): ?>
+      <p class="text-xs font-semibold text-gray-700 truncate"><?= e($conv['subject']) ?></p>
       <?php endif; ?>
       <p class="text-xs text-gray-500 truncate">
-        <?= $conv['is_sent'] ? 'You: ' : '' ?><?= e(mb_substr($msg['body'], 0, 60)) ?>
+        <?= $isSentByMe ? 'You: ' : '' ?><?= e(mb_substr($conv['last_body'] ?? '', 0, 60)) ?>
       </p>
     </div>
     <!-- Unread badge -->
-    <?php if ($conv['unread'] > 0): ?>
+    <?php if ($conv['unread_count'] > 0): ?>
     <div class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-bold">
-      <?= $conv['unread'] ?>
+      <?= (int)$conv['unread_count'] ?>
     </div>
     <?php else: ?>
     <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,16 +327,12 @@ portal_head('Messages', $viewId ? portal_url('messages') : portal_url('dashboard
 <script>
 (function() {
     let lastCount = <?= $unreadCount ?>;
-    const badge = document.querySelector('[data-unread-badge]');
-
     setInterval(async () => {
         try {
             const resp = await fetch('<?= portal_url('messages', ['_check_unread' => '1']) ?>');
             if (!resp.ok) return;
             const text = await resp.text();
-            // Simple unread check - the page will show updated count on reload
             if (parseInt(text) > lastCount) {
-                // New messages - show notification
                 const msgNav = document.querySelector('a[href*="messages"]');
                 if (msgNav) {
                     const dot = msgNav.querySelector('.msg-dot');
