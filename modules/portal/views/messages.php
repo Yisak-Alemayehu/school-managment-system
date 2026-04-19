@@ -238,7 +238,7 @@ portal_head('Messages', portal_url('dashboard'));
 </style>
 
 <script>
-const PORTAL_MSG_URL = '<?= portal_url("messages") ?>';
+const PORTAL_MSG_URL = '<?= rtrim(portal_url("messages"), "?") ?>';
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
 const CURRENT_USER_ID = <?= $userId ?>;
 let currentConvId = null;
@@ -290,11 +290,36 @@ async function openConversation(convId, name, otherUserId) {
   showThread();
 
   try {
-    const resp = await fetch(PORTAL_MSG_URL + '?_fetch_thread=' + convId);
-    const data = await resp.json();
+    const resp = await fetch(PORTAL_MSG_URL + '?_fetch_thread=' + convId, { credentials: 'same-origin' });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      console.error('fetch_thread error', resp.status, txt);
+      const snippet = escHtml((txt || '').substring(0, 300));
+      document.getElementById('thread-messages').innerHTML =
+        `<p class="text-center text-red-500 text-sm py-8">Failed to load messages (${resp.status}) ${snippet ? '- ' + snippet : ''}</p>`;
+      return;
+    }
+    // Read text once and try parse JSON from it to avoid double-read errors
+    const txt = await resp.text();
+    let data;
+    try {
+      data = txt ? JSON.parse(txt) : {};
+    } catch (err) {
+      console.error('fetch_thread invalid json', txt);
+      document.getElementById('thread-messages').innerHTML =
+        '<p class="text-center text-red-500 text-sm py-8">Failed to load messages: invalid server response</p>';
+      return;
+    }
+    if (data.error) {
+      showToast(data.error, 'error');
+      document.getElementById('thread-messages').innerHTML =
+        `<p class="text-center text-red-500 text-sm py-8">${escHtml(data.error)}</p>`;
+      return;
+    }
     renderThread(data.messages || []);
     startPolling();
   } catch (e) {
+    console.error('fetch_thread exception', e);
     document.getElementById('thread-messages').innerHTML =
       '<p class="text-center text-red-500 text-sm py-8">Failed to load messages</p>';
   }
@@ -377,9 +402,24 @@ async function sendReply() {
     }
   }
 
+  console.debug('sendReply: sending', { to: currentOtherUserId, conv: currentConvId, bodyLen: body.length, files: hasFiles ? fileInput.files.length : 0 });
   try {
-    const resp = await fetch(PORTAL_MSG_URL + '?_ajax_send', { method: 'POST', body: fd });
-    const data = await resp.json();
+    const resp = await fetch(PORTAL_MSG_URL + '?_ajax_send', { method: 'POST', body: fd, credentials: 'same-origin' });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      console.error('sendReply failed', resp.status, txt);
+      showToast('Failed to send: ' + (txt || resp.status), 'error');
+      btn.classList.remove('sending');
+      return;
+    }
+    const txt = await resp.text();
+    let data;
+    try { data = txt ? JSON.parse(txt) : {}; } catch (err) {
+      console.error('sendReply invalid json', txt);
+      showToast('Failed to send: invalid server response', 'error');
+      btn.classList.remove('sending');
+      return;
+    }
     if (data.error) {
       showToast(data.error, 'error');
     } else if (data.message) {
@@ -390,6 +430,7 @@ async function sendReply() {
       if (fileInput) fileInput.value = '';
     }
   } catch (e) {
+    console.error('sendReply exception', e);
     showToast('Failed to send', 'error');
   }
   btn.classList.remove('sending');
@@ -420,9 +461,25 @@ async function sendCompose() {
     }
   }
 
+  console.debug('sendCompose: sending', { to, subject, bodyLen: body.length, files: hasFiles ? fileInput.files.length : 0 });
   try {
-    const resp = await fetch(PORTAL_MSG_URL + '?_ajax_send', { method: 'POST', body: fd });
-    const data = await resp.json();
+    const resp = await fetch(PORTAL_MSG_URL + '?_ajax_send', { method: 'POST', body: fd, credentials: 'same-origin' });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      console.error('sendCompose failed', resp.status, txt);
+      showToast('Failed to send: ' + (txt || resp.status), 'error');
+      btn.classList.remove('sending');
+      return;
+    }
+    const txt = await resp.text();
+    let data;
+    try { data = txt ? JSON.parse(txt) : {}; } catch (err) {
+      const raw = txt.substring(0,300);
+      console.error('sendCompose invalid json', raw);
+      showToast('Failed to send: invalid server response', 'error');
+      btn.classList.remove('sending');
+      return;
+    }
     if (data.error) {
       showToast(data.error, 'error');
     } else if (data.conversation_id) {
@@ -433,6 +490,7 @@ async function sendCompose() {
       openConversation(data.conversation_id, name, parseInt(to));
     }
   } catch (e) {
+    console.error('sendCompose exception', e);
     showToast('Failed to send', 'error');
   }
   btn.classList.remove('sending');
@@ -443,8 +501,14 @@ async function loadStaffList() {
   const sel = document.getElementById('compose-to');
   sel.innerHTML = '<option value="">— Loading... —</option>';
   try {
-    const resp = await fetch(PORTAL_MSG_URL + '?_fetch_staff');
-    const data = await resp.json();
+    const resp = await fetch(PORTAL_MSG_URL + '?_fetch_staff', { credentials: 'same-origin' });
+    if (!resp.ok) {
+      console.error('fetch_staff failed', resp.status);
+      sel.innerHTML = '<option value="">— Failed to load —</option>';
+      return;
+    }
+    let data;
+    try { data = await resp.json(); } catch (err) { console.error('fetch_staff invalid json'); sel.innerHTML = '<option value="">— Failed to load —</option>'; return; }
     sel.innerHTML = '<option value="">— Select recipient —</option>';
     (data.staff || []).forEach(s => {
       const opt = document.createElement('option');
@@ -453,6 +517,7 @@ async function loadStaffList() {
       sel.appendChild(opt);
     });
   } catch (e) {
+    console.error('fetch_staff exception', e);
     sel.innerHTML = '<option value="">— Failed to load —</option>';
   }
 }
@@ -463,12 +528,18 @@ function startPolling() {
   pollTimer = setInterval(async () => {
     if (!currentConvId) return;
     try {
-      const resp = await fetch(PORTAL_MSG_URL + '?_fetch_thread=' + currentConvId + '&after=' + lastMsgId);
-      const data = await resp.json();
+      const resp = await fetch(PORTAL_MSG_URL + '?_fetch_thread=' + currentConvId + '&after=' + lastMsgId, { credentials: 'same-origin' });
+      if (!resp.ok) {
+        const txt = await resp.text();
+        console.error('poll fetch_thread failed', resp.status, txt);
+        return;
+      }
+      let data;
+      try { data = await resp.json(); } catch (err) { console.error('poll invalid json'); return; }
       if (data.messages && data.messages.length > 0) {
         renderThread(data.messages, true);
       }
-    } catch (e) {}
+    } catch (e) { console.error('poll exception', e); }
   }, 4000);
 }
 
@@ -480,8 +551,14 @@ function startConvPolling() {
 
 async function refreshConversations() {
   try {
-    const resp = await fetch(PORTAL_MSG_URL + '?_fetch_conversations');
-    const data = await resp.json();
+    const resp = await fetch(PORTAL_MSG_URL + '?_fetch_conversations', { credentials: 'same-origin' });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      console.error('fetch_conversations failed', resp.status, txt);
+      return;
+    }
+    let data;
+    try { data = await resp.json(); } catch (err) { console.error('fetch_conversations invalid json'); return; }
     if (!data.conversations) return;
     renderConversationList(data.conversations);
 
@@ -492,7 +569,7 @@ async function refreshConversations() {
       badge.textContent = totalUnread + ' new';
       badge.classList.toggle('hidden', totalUnread === 0);
     }
-  } catch (e) {}
+  } catch (e) { console.error('fetch_conversations exception', e); }
 }
 
 function renderConversationList(convs) {

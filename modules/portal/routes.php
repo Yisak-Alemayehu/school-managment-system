@@ -218,6 +218,8 @@ switch ($action) {
 
         // AJAX: fetch messages for a conversation
         if (isset($_GET['_fetch_thread'])) {
+            // Log incoming fetch_thread request for debugging
+            @file_put_contents(__DIR__ . '/../../logs/messages_debug.log', sprintf("[%s] _fetch_thread request user=%s GET=%s\n", date('c'), $userId, json_encode($_GET)) , FILE_APPEND);
             header('Content-Type: application/json');
             $cid = (int) $_GET['_fetch_thread'];
             $afterId = (int) ($_GET['after'] ?? 0);
@@ -225,7 +227,10 @@ switch ($action) {
                 "SELECT 1 FROM msg_conversation_participants WHERE conversation_id = ? AND user_id = ? AND is_deleted = 0",
                 [$cid, $userId]
             );
-            if (!$participant) { echo json_encode(['error' => 'denied']); exit; }
+            if (!$participant) {
+                // Log denied access for debugging
+                error_log(sprintf("[%s] portal: _fetch_thread denied: user=%s conv=%s\n", date('c'), $userId, $cid), 3, __DIR__ . '/../../logs/messages_debug.log');
+                echo json_encode(['error' => 'denied']); exit; }
 
             $where = $afterId ? "AND m.id > ?" : "AND 1=1";
             $params = $afterId ? [$cid, $afterId] : [$cid];
@@ -464,6 +469,10 @@ switch ($action) {
                 ]);
             } catch (\Throwable $e) {
                 db_rollback();
+                // Log exception with trace for debugging
+                $logFile = __DIR__ . '/../../logs/messages_debug.log';
+                $msg = sprintf("[%s] portal: send exception user=%s receiver=%s conv=%s error=%s\nTrace:%s\n", date('c'), $userId, $receiverId, $convIdPost, $e->getMessage(), $e->getTraceAsString());
+                error_log($msg, 3, $logFile);
                 echo json_encode(['error' => 'Failed to send message.']);
             }
             exit;
