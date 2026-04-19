@@ -10,12 +10,12 @@ $sessions = db_fetch_all("SELECT id, name FROM academic_sessions ORDER BY start_
 
 // Teachers: users with teacher role via user_roles pivot
 $teachers = db_fetch_all(
-    "SELECT u.id, CONCAT(u.first_name, ' ', u.last_name) AS full_name
+    "SELECT u.id, u.full_name
      FROM users u
      JOIN user_roles ur ON ur.user_id = u.id
      JOIN roles r ON r.id = ur.role_id
      WHERE r.slug = 'teacher' AND u.is_active = 1
-     ORDER BY u.first_name, u.last_name"
+     ORDER BY u.full_name"
 );
 
 $activeSession = get_active_session();
@@ -27,7 +27,7 @@ if ($filterSession) {
     $assignments = db_fetch_all(
         "SELECT ct.id, ct.class_id, ct.section_id, ct.teacher_id,
                 c.name AS class_name, s.name AS section_name,
-                CONCAT(u.first_name, ' ', u.last_name) AS teacher_name
+                u.full_name AS teacher_name
          FROM class_teachers ct
          JOIN classes c ON ct.class_id = c.id
          JOIN sections s ON ct.section_id = s.id

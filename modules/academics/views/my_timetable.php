@@ -18,7 +18,7 @@ if (auth_has_role('student')) {
     if ($student && !empty($student['section_id'])) {
         $entries = db_fetch_all("
             SELECT t.*, sub.name AS subject_name, sub.code AS subject_code,
-                   CONCAT(u.first_name, ' ', u.last_name) AS teacher_name
+                   u.full_name AS teacher_name
             FROM timetables t
             JOIN subjects sub ON sub.id = t.subject_id
             LEFT JOIN users u ON u.id = t.teacher_id
@@ -32,7 +32,7 @@ if (auth_has_role('student')) {
     $entries = db_fetch_all("
         SELECT t.*, sub.name AS subject_name, sub.code AS subject_code,
                c.name AS class_name, sec.name AS section_name,
-               CONCAT(u.first_name, ' ', u.last_name) AS teacher_name
+               u.full_name AS teacher_name
         FROM timetables t
         JOIN subjects sub ON sub.id = t.subject_id
         JOIN sections sec ON sec.id = t.section_id

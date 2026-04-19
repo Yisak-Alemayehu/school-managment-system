@@ -35,7 +35,7 @@ if ($studentInfo && !empty($studentInfo['class_id'])) {
     $sessionId = $activeSession['id'] ?? 0;
     $subjects = db_fetch_all("
         SELECT s.name, s.code, s.type, 
-               CONCAT(u.first_name, ' ', u.last_name) AS teacher_name
+               u.full_name AS teacher_name
         FROM class_subjects cs
         JOIN subjects s ON cs.subject_id = s.id
         LEFT JOIN class_teachers ct ON ct.class_id = cs.class_id AND ct.subject_id = cs.subject_id AND ct.session_id = cs.session_id

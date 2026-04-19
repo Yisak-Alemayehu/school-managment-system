@@ -88,11 +88,18 @@ if (!empty($errors)) {
 }
 
 // ---- CREATE USER ----
+// Split full name into first/last for queries that use those columns
+$nameParts = explode(' ', $fullName, 2);
+$firstName = $nameParts[0] ?? '';
+$lastName  = $nameParts[1] ?? '';
+
 $userId = db_insert('users', [
     'username'              => input('username'),
     'email'                 => $email,
     'password_hash'         => password_hash(input('password'), PASSWORD_BCRYPT, ['cost' => 12]),
     'full_name'             => $fullName,
+    'first_name'            => $firstName,
+    'last_name'             => $lastName,
     'phone'                 => $phone,
     'is_active'             => isset($_POST['is_active']) ? 1 : 0,
     'force_password_change' => isset($_POST['force_password_change']) ? 1 : 0,

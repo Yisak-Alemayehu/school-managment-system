@@ -11,12 +11,12 @@ $classes  = db_fetch_all("SELECT id, name FROM classes ORDER BY sort_order ASC")
 $sections = db_fetch_all("SELECT s.id, s.name, s.class_id FROM sections s ORDER BY s.name ASC");
 $subjects = db_fetch_all("SELECT id, name, code FROM subjects WHERE is_active = 1 ORDER BY name ASC");
 $teachers = db_fetch_all("
-    SELECT DISTINCT u.id, CONCAT(u.first_name, ' ', u.last_name) AS full_name
+    SELECT DISTINCT u.id, u.full_name
     FROM users u
     JOIN user_roles ur ON ur.user_id = u.id
     JOIN roles r ON r.id = ur.role_id
     WHERE r.slug = 'teacher' AND u.is_active = 1
-    ORDER BY full_name
+    ORDER BY u.full_name
 ");
 
 $activeSession = get_active_session();
@@ -42,7 +42,7 @@ if ($sessionId) {
 
 $entries = db_fetch_all("
     SELECT t.*, sub.name AS subject_name, sub.code AS subject_code,
-           CONCAT(u.first_name, ' ', u.last_name) AS teacher_name
+           u.full_name AS teacher_name
     FROM timetables t
     JOIN subjects sub ON sub.id = t.subject_id
     LEFT JOIN users u ON u.id = t.teacher_id

@@ -13,12 +13,12 @@ $sections = db_fetch_all("
 ");
 $subjects = db_fetch_all("SELECT id, name, code FROM subjects WHERE is_active = 1 ORDER BY name ASC");
 $teachers = db_fetch_all("
-    SELECT u.id, CONCAT(u.first_name, ' ', u.last_name) AS full_name
+    SELECT u.id, u.full_name
     FROM users u
     JOIN user_roles ur ON ur.user_id = u.id
     JOIN roles r ON r.id = ur.role_id
     WHERE r.slug = 'teacher' AND u.is_active = 1
-    ORDER BY u.first_name, u.last_name
+    ORDER BY u.full_name
 ");
 
 $activeSession = get_active_session();
@@ -27,7 +27,7 @@ $sessionId = $activeSession['id'] ?? 0;
 // Fetch existing subject teacher assignments (not class teachers)
 $assignments = db_fetch_all("
     SELECT ct.*,
-           CONCAT(u.first_name, ' ', u.last_name) AS teacher_name,
+           u.full_name AS teacher_name,
            c.name AS class_name,
            sec.name AS section_name,
            sub.name AS subject_name,
@@ -38,7 +38,7 @@ $assignments = db_fetch_all("
     LEFT JOIN sections sec ON sec.id = ct.section_id
     LEFT JOIN subjects sub ON sub.id = ct.subject_id
     WHERE ct.session_id = ? AND ct.is_class_teacher = 0 AND ct.subject_id IS NOT NULL
-    ORDER BY c.sort_order ASC, sub.name ASC, u.first_name ASC
+    ORDER BY c.sort_order ASC, sub.name ASC, u.full_name ASC
 ", [$sessionId]);
 
 $editId  = input_int('edit');

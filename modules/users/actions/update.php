@@ -41,8 +41,12 @@ if (!empty($errors)) {
     redirect(url('users', 'edit', $id));
 }
 
+$nameParts = explode(' ', input('full_name'), 2);
+
 $updateData = [
     'full_name'             => input('full_name'),
+    'first_name'            => $nameParts[0] ?? '',
+    'last_name'             => $nameParts[1] ?? '',
     'email'                 => input('email'),
     'phone'                 => input('phone'),
     'is_active'             => isset($_POST['is_active']) ? 1 : 0,
