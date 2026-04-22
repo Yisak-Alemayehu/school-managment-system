@@ -334,6 +334,4 @@ This software is proprietary to Urjiberi School. All rights reserved.
 
 ## Support
 
-For technical support, contact the system administrator or email admin@urjiberi.edu.et.
-#   s c h o o l - m a n a g m e n t - s y s t e m  
- 
+For technical support, contact the system administrator or email admin@urjiberischool.com
