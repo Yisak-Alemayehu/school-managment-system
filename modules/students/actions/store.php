@@ -168,8 +168,9 @@ try {
 
         if ($existingGuardianId > 0) {
             // Link existing guardian — skip if already linked
-            $alreadyLinked = db_fetch_one(
-                "SELECT id FROM student_guardians WHERE student_id = ? AND guardian_id = ?",
+            $alreadyLinked = db_exists(
+                'student_guardians',
+                'student_id = ? AND guardian_id = ?',
                 [$studentId, $existingGuardianId]
             );
             if (!$alreadyLinked) {
