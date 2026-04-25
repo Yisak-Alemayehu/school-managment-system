@@ -310,21 +310,7 @@ ob_start();
 </div>
 
 <!-- Row: Exams -->
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-    <!-- Total Exams -->
-    <div class="bg-white dark:bg-dark-card rounded-xl border border-gray-200 dark:border-dark-border p-4 sm:p-5 flex items-center gap-4">
-        <div class="w-11 h-11 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-        </div>
-        <div>
-            <p class="text-xs text-gray-500 dark:text-dark-muted">Exams (Session)</p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-dark-text"><?= number_format($superAdminStats['total_exams'] ?? 0) ?></p>
-            <a href="<?= url('exams') ?>" class="text-xs text-primary-600 hover:underline">View &rarr;</a>
-        </div>
-    </div>
-</div>
+
 
 <!-- ── Class Distribution (Donut Chart + Breakdown) ── -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
